@@ -7,7 +7,11 @@
         "dev": "cross-env APP_ENV=development vite",
         "build": "cross-env APP_ENV=production vite build",
         "preview": "vite preview",
-        "bundle": "mv .env dist"
+        "bundle": "mv .env dist",
+        "lint": "eslint --ext .js,.vue src",
+        "lint:fix": "eslint --fix --ext .js,.vue src",
+        "format:check": "prettier . --check",
+        "format:write": "prettier . --write"
     },
     "dependencies": {
         "cross-env": "^7.0.3",
