@@ -7,22 +7,22 @@ import dns from "dns";
 dns.setDefaultResultOrder("verbatim");
 
 export default () => {
-    const baseURL =
-        process.env.APP_ENV === "development" ? "/" : "/2025/flight-plan/t1/";
+  const baseURL =
+    process.env.APP_ENV === "development" ? "/" : "/2025/flight-plan/t1/";
 
-    return defineConfig({
-        plugins: [
-            vue(),
-            vuetify({
-                autoImport: true
-            }),
-            vueDevTools()
-        ],
+  return defineConfig({
+    plugins: [
+      vue(),
+      vuetify({
+        autoImport: true,
+      }),
+      vueDevTools(),
+    ],
 
-        server: {
-            host: "localhost",
-            port: 8081
-        },
-        base: baseURL
-    });
+    server: {
+      host: "localhost",
+      port: 8081,
+    },
+    base: baseURL,
+  });
 };
