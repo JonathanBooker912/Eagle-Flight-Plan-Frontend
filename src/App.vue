@@ -3,9 +3,12 @@ import NavigationBar from './components/NavigationBar.vue';
 </script>
 
 <template>
-<NavigationBar></NavigationBar>
+  <v-app style="background-color: #242424;">
+    <NavigationBar />
+    <v-main>
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
-
 </style>

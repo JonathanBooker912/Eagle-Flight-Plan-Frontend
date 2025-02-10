@@ -63,38 +63,68 @@ export default {
 </script>
 
 <template>
-  <v-card class="infoSidebar">
+  <div class="userNav">
 
-    <div id="dash" class="userSection dash" @click="showDashboard()"> 
+    <div id="dash" class="navOption dash" @click="showDashboard()"> 
         <i class="pi pi-th-large"></i>
-        Dashboard
+        <p>Dashboard</p>
     </div>
     <div id="flightPlan" class="navOption flightPlan" @click="showFlightPlan()">
         <i class="pi pi-telegram"></i>
-        Flight Plan
+        <p>Flight Plan</p>
     </div>
     <div id="calendar" class="navOption calendar" @click="showCalendar()">
         <i class="pi pi-calendar"></i>
-        Calendar
+        <p>Calendar</p>
     </div>
-    <div id="notifications" class="navOption notifs"  @click="showNotifications()">
+    <div id="notifs" class="navOption notifs" @click="showNotifs()">
         <i class="pi pi-bell"></i>
-        Notifications
+        <p>Notifications</p>
     </div>
     <div id="search" class="navOption search" @click="showSearch()">
         <i class="pi pi-search"></i>
-        Search
+        <p>Search</p>
     </div>
-</v-card>
+  </div>
 </template>
 
 <style>
 
-.pi {
+.userNav {
+    width: 60px; /* Default collapsed width */
+    height: 100%;
+    margin: 1% 0% 1% 1%;
+    border-radius: 25px;
+    background-color: #ddd;
+    transition: width .5s;
+}
 
+.userNav:hover {
+    width: 250px; /* Expanded width */
+}
+
+.navOption {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    white-space: nowrap; /* Prevents text wrapping */
+}
+
+.navOption p {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.infoSidebar:hover .navOption p {
+    opacity: 1;
+}
+
+
+.pi {
     padding-left: 5px;
-    padding-right: 5px;
     font-weight: 700;
+    font-size: 30px;
+    margin: 5px 15px 10px 0px;
 
 }
 
@@ -102,19 +132,6 @@ export default {
     background-color: #eee !important;
     color: #262626 !important;
 }
-.infoSidebar {
-    width: 20%;
-    height: 100%;
-}
 
-.navOption {
-    height: 60px;
-    width: 100%;
 
-    padding-left: 15px;
-    align-content: center;
-
-    font-size: 18px;
-    font-weight: 700;
-}
 </style>
