@@ -13,17 +13,31 @@ export default {
       //  const router = useRouter();
       //  const curUser = ref(null);
 
+        const showProfile = () => {
+            //router.push({name: 'profile'});
+            let x = document.getElementsByClassName('active');              // Find nav bar active item
+            for (let item of x) {
+                item.classList.remove('active');
+            }
+            document.getElementById('profile').classList.add('active');
+            document.getElementById('profile').style = 'border-top-right-radius: 25px; border-top-left-radius: 25px;'  // Needed to have the nav bar show the right borders on the top under this active class
+        }
+
         const showDashboard = () => {
             //router.push({name: 'dashboard'});
             let x = document.getElementsByClassName('active');              // Find nav bar active item
-            x.classList.remove('active');                                   // Remove the actve CSS class
+            for (let item of x) {
+                item.classList.remove('active');
+            }     
             document.getElementById('dash').classList.add('active');
         }
 
         const showFlightPlan = () => {
             //router.push({name: 'flightPlan'});
             let x = document.getElementsByClassName('active');              // Find nav bar active item
-            x.classList.remove('active');                                   // Remove the actve CSS class
+            for (let item of x) {
+                item.classList.remove('active');
+            } 
             document.getElementById('flightPlan').classList.add('active');
         }
 
@@ -32,25 +46,30 @@ export default {
             let x = document.getElementsByClassName('navOption');
             for (let item of x) {
                 item.classList.remove('active');
-            }
+            }                 
             document.getElementById('calendar').classList.add('active');
         }
 
         const showNotifs = () => {
             //router.push({name: 'notifs'});
             let x = document.getElementsByClassName('active');              // Find nav bar active item
-            x.classList.remove('active');                                   // Remove the actve CSS class
+            for (let item of x) {
+                item.classList.remove('active');
+            }
             document.getElementById('notifs').classList.add('active');
         }
 
         const showSearch = () => {
             //router.push({name: 'search'});
             let x = document.getElementsByClassName('active');              // Find nav bar active item
-            x.classList.remove('active');                                   // Remove the actve CSS class
+            for (let item of x) {
+                item.classList.remove('active');
+            }
             document.getElementById('search').classList.add('active');
         }
 
     return {
+      showProfile,
       showDashboard,
       showFlightPlan,
       showCalendar,
@@ -65,6 +84,10 @@ export default {
 <template>
   <div class="userNav">
 
+    <div id="profile" class="navOption profile" @click="showProfile()"> 
+        <i class="pi pi-user"></i>
+        <p>Profile</p>
+    </div>
     <div id="dash" class="navOption dash" @click="showDashboard()"> 
         <i class="pi pi-th-large"></i>
         <p>Dashboard</p>
@@ -111,11 +134,14 @@ export default {
 }
 
 .navOption p {
+    color: #242424;
+    font-size: 20px;
+    font-weight: 600;
     opacity: 0;
     transition: opacity 0.5s;
 }
 
-.infoSidebar:hover .navOption p {
+.userNav:hover .navOption p {
     opacity: 1;
 }
 
@@ -129,8 +155,8 @@ export default {
 }
 
 .active {
-    background-color: #eee !important;
-    color: #262626 !important;
+    background-color: #ccc !important;
+    color: #294965 !important;
 }
 
 
