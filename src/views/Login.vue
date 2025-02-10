@@ -19,9 +19,9 @@ const isMobile = computed(() => smAndDown.value);
 
 <template>
   <v-container fluid class="fill-height mx-auto">
-    <v-row class="fill-height justify-center">
+    <v-row class="fill-height login-container justify-center">
       <!-- First Column -->
-      <v-col v-if="!isMobile" class="d-flex flex-column" cols="5">
+      <v-col v-if="!isMobile" class="d-flex flex-column" cols="5" xl="4">
         <v-card
           class="elevation-0 flex-grow-1 rounded-xl"
           color="backgroundDarken"
@@ -34,7 +34,7 @@ const isMobile = computed(() => smAndDown.value);
       </v-col>
 
       <!-- Second Column -->
-      <v-col class="d-flex flex-column" cols="12" md="4">
+      <v-col class="d-flex flex-column" cols="12" md="4" xl="3">
         <v-card
           class="elevation-0 flex-grow-1 rounded-xl h-25 pa-3"
           color="backgroundDarken"
@@ -73,3 +73,9 @@ const isMobile = computed(() => smAndDown.value);
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.login-container {
+  max-height: 800px;
+}
+</style>
