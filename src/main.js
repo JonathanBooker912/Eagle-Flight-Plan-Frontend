@@ -1,12 +1,14 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router/router.js";
+import vuetify from "./plugins/vuetify.js";
+import { createPinia } from "pinia";
+import { userStore } from "./stores/userStore.js";
 
-// Import Vuetify
-import { createVuetify } from 'vuetify'
-import 'vuetify/styles'
+const app = createApp(App);
+const pinia = createPinia();
 
-// Create Vuetify instance
-const vuetify = createVuetify()
-
-// Create and mount the app
-createApp(App).use(vuetify).mount('#app')
+app.use(router);
+app.use(vuetify);
+app.use(pinia);
+app.mount("#app");

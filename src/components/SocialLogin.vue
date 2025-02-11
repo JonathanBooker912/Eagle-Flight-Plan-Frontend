@@ -1,0 +1,70 @@
+<script setup>
+    import { ref, onMounted } from "vue";
+    import AuthServices from "../services/authServices";
+    import roleServices from "../services/roleServices.js";
+    import Utils from "../config/utils.js";
+    import { useRouter } from "vue-router";
+    import { loginRedirect } from "../router/router.js";
+    import { userStore } from "../stores/userStore.js";
+
+    const store = userStore();
+    const router = useRouter();
+    const fName = ref("");
+    const lName = ref("");
+    const user = ref({});
+
+    const loginWithGoogle = () => {
+        window.handleCredentialResponse = handleCredentialResponse;
+        const client = import.meta.env.VITE_APP_CLIENT_ID;
+        window.google.accounts.id.initialize({
+            client_id: client,
+            cancel_on_tap_outside: false,
+            auto_select: true,
+            callback: window.handleCredentialResponse
+        });
+        window.google.accounts.id.renderButton(
+            document.getElementById("parent_id"),
+            {
+                type: "standard",
+                theme: "outline",
+                size: "large",
+                text: "signup_with",
+                width: 400
+            }
+        );
+    };
+
+    const handleCredentialResponse = async (response) => {
+        let token = {
+            credential: response.credential
+        };
+        let email = "";
+        await AuthServices.loginUser(token)
+            .then((response) => {
+                user.value = response.data;
+                Utils.setStore("user", user.value);
+                fName.value = user.value.fName;
+                lName.value = user.value.lName;
+                email = user.value.email;
+            })
+            .catch((error) => {
+                console.log("error", error);
+            });
+        const roles = await roleServices.getRolesByEmail(email);
+        store.$patch({ user: user.value, roles: roles.data });
+        const redirect = await loginRedirect();
+        router.push(redirect);
+    };
+
+    onMounted(() => {
+        loginWithGoogle();
+    });
+</script>
+
+<template>
+    <div class="signup-buttons">
+        <v-row justify="center">
+            <div id="parent_id" display="flex" />
+        </v-row>
+    </div>
+</template>
