@@ -13,7 +13,7 @@ import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
 import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 
-import AdminLanding from "../views/admin/AdminLanding.vue";
+import AdminLanding from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
@@ -42,12 +42,14 @@ const router = createRouter({
       alias: "/login",
       name: "login",
       component: Login,
+      beforeEnter: loginRedirect,
     },
     {
       path: "/admin",
       name: "admin",
-      component: AdminLanding,
+      component: Admin,
       beforeEnter: isAdmin,
+      redirect: "/admin/dashboard",
       children: [
         {
           path: "calendar",
@@ -55,7 +57,12 @@ const router = createRouter({
           component: AdminCalendar,
         },
         {
-          path: "flightPlan",
+          path: "dashboard",
+          name: "admin-dashboard",
+          component: AdminDashboard,
+        },
+        {
+          path: "/flightPlan",
           name: "admin-flightPlan",
           component: AdminFlightPlan,
         },
@@ -74,85 +81,24 @@ const router = createRouter({
           name: "admin-search",
           component: AdminSearch,
         },
-        {
-          path: "maintenance",
-          name: "maintenance",
-          component: MaintenanceLandingPage,
-        },
-        {
-          path: "maintenance/task",
-          name: "task",
-          component: TasksPage,
-        },
-        {
-          path: "maintenance/task/edit/:id",
-          name: "editTask",
-          component: TaskAddEditPage,
-          props: { isAdd: false },
-        },
-        {
-          path: "maintenance/task/add",
-          name: "addTask",
-          component: TaskAddEditPage,
-          props: { isAdd: true },
-        },
-        {
-          path: "/maintenance/reward",
-          name: "reward",
-          component: RewardPage,
-        },
-        {
-          path: "/maintenance/reward/edit/:id",
-          name: "editReward",
-          component: RewardAddEditPage,
-          props: { isAdd: false },
-        },
-        {
-          path: "/maintenance/reward/add",
-          name: "addReward",
-          component: RewardAddEditPage,
-          props: { isAdd: true },
-        },
-        {
-          path: "/maintenance/reward/redeem/:id",
-          name: "redeemReward",
-          component: RewardRedemptionPage,
-        },
-        {
-          path: "maintenance/experience",
-          name: "experience",
-          component: ExperiencesPage,
-        },
-        {
-          path: "maintenance/experience/edit/:id",
-          name: "edit",
-          component: ExperienceAddEditPage,
-          props: { isAdd: false },
-        },
-        {
-          path: "maintenance/experience/add",
-          name: "add",
-          component: ExperienceAddEditPage,
-          props: { isAdd: true },
-        },
-        {
-          path: "maintenance/badge",
-          name: "badge",
-          component: BadgeCardPage,
-        },
-        /** Put all further admin routes in here */
       ],
     },
     {
       path: "/faculty",
       name: "faculty",
-      component: FacultyLanding,
+      component: Faculty,
       beforeEnter: isFaculty,
+      redirect: "/faculty/dashboard",
       children: [
         {
           path: "calendar",
           name: "faculty-calendar",
           component: FacultyCalendar,
+        },
+        {
+          path: "dashboard",
+          name: "faculty-dashboard",
+          component: FacultyDashboard,
         },
         {
           path: "flightPlan",
@@ -178,13 +124,20 @@ const router = createRouter({
     },
     {
       path: "/student",
+      alias: "/student",
       name: "student",
-      component: StudentLanding,
+      component: Student,
+      redirect: "/student/dashboard",
       children: [
         {
           path: "calendar",
           name: "student-calendar",
           component: StudentCalendar,
+        },
+        {
+          path: "dashboard",
+          name: "student-dashboard",
+          component: StudentDashboard,
         },
         {
           path: "flightPlan",
@@ -207,12 +160,6 @@ const router = createRouter({
           component: StudentSearch,
         },
       ],
-    },
-    { path: "/:pathMatch(.*)*", component: NotFound },
-    {
-      path: "/Unauthorized",
-      name: "unauthorized",
-      component: Unauthorized,
     },
   ],
 });
