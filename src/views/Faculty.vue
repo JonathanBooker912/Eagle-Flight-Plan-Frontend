@@ -1,14 +1,12 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
   <v-card class="main-page">
     <v-card class="content-area">
-        <router-view :key="$route.fullPath" />
+      <router-view :key="$route.fullPath" />
     </v-card>
   </v-card>
 </template>
-
 
 <style scoped>
 .main-page {
