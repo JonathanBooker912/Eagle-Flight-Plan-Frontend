@@ -8,10 +8,12 @@ store.setupRouteWatcher();
 
 <template>
   <v-app>
-    <!-- <MenuBar :key="$route.fullPath" /> -->
-    <v-main color="background">
-      <NavigationBar></NavigationBar>
-      <router-view />
-    </v-main>
+  <v-app style="background-color: #242424;">
+    <v-row no-gutters no-wrap>
+      <NavigationBar />
+      <v-main>
+        <router-view />
+      </v-main>
+    </v-row>
   </v-app>
 </template>
