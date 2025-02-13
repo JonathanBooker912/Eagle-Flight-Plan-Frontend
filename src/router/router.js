@@ -1,9 +1,37 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
-import AdminLanding from "../views/admin/AdminLanding.vue";
-import StudentLanding from "../views/student/StudentLanding.vue";
-import FacultyLanding from "../views/faculty/FacultyLanding.vue";
+
+
+import Admin from "../views/Admin.vue"
+import AdminCalendar from "../views/admin/AdminCalendar.vue";
+import AdminDashboard from "../views/admin/AdminDashboard.vue";
+import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
+import AdminNotification from "../views/admin/AdminNotification.vue";
+import AdminProfile from "../views/admin/AdminProfile.vue";
+import AdminSearch from "../views/admin/AdminSearch.vue";
+
+import Student from "../views/Student.vue"
+import StudentCalendar from "../views/student/StudentCalendar.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
+import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
+import StudentNotification from "../views/student/StudentNotification.vue";
+import StudentProfile from "../views/student/StudentProfile.vue";
+import StudentSearch from "../views/student/StudentSearch.vue";
+
+import Faculty from "../views/Faculty.vue"
+import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
+import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
+import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
+import FacultyNotification from "../views/faculty/FacultyNotification.vue";
+import FacultyProfile from "../views/faculty/FacultyProfile.vue";
+import FacultySearch from "../views/faculty/FacultySearch.vue";
+
+
+
 import { userStore } from "../stores/userStore";
+
+
+
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,33 +45,121 @@ const router = createRouter({
         },
         {
             path: "/admin",
-            alias: "/admin",
             name: "admin",
-            component: AdminLanding,
+            component: Admin,
             beforeEnter: isAdmin,
+            redirect: "/admin/dashboard",
             children: [
-                /** Put all further admin routes in here */
-            ]
+                {
+                    path: "calendar",
+                    name: "admin-calendar",
+                    component: AdminCalendar,
+                },
+                {
+                    path: "dashboard",
+                    name: "admin-dashboard",
+                    component: AdminDashboard
+                },
+                {
+                    path: "/flightPlan",
+                    name: "admin-flightPlan",
+                    component: AdminFlightPlan,
+                },
+                {
+                    path: "notifications",
+                    name: "admin-notifications",
+                    component: AdminNotification,
+                },
+                {
+                    path: "profile",
+                    name: "admin-profile",
+                    component: AdminProfile,
+                },
+                {
+                    path: "search",
+                    name: "admin-search",
+                    component: AdminSearch
+                },
+            ],
         },
         {
             path: "/faculty",
-            alias: "/faculty",
             name: "faculty",
-            component: FacultyLanding,
+            component: Faculty,
             beforeEnter: isFaculty,
+            redirect: '/faculty/dashboard',
             children: [
-                /** Put all further faculty routes in here */
-            ]
+                {
+                    path: "calendar",
+                    name: "faculty-calendar",
+                    component: FacultyCalendar,
+                },
+                {
+                    path: "dashboard",
+                    name: "faculty-dashboard",
+                    component: FacultyDashboard,
+                },
+                {
+                    path: "flightPlan",
+                    name: "faculty-flightPlan",
+                    component: FacultyFlightPlan,
+                },
+                {
+                    path: "notifications",
+                    name: "faculty-notifications",
+                    component: FacultyNotification,
+                },
+                {
+                    path: "profile",
+                    name: "faculty-profile",
+                    component: FacultyProfile,
+                },
+                {
+                    path: "search",
+                    name: "faculty-search",
+                    component: FacultySearch,
+                },
+            ],
         },
         {
             path: "/student",
             alias: "/student",
             name: "student",
-            component: StudentLanding,
+            component: Student,
+            redirect: '/student/dashboard',
             children: [
-                /** Put all further student routes in here */
+                {
+                    path: "calendar",
+                    name: "student-calendar",
+                    component: StudentCalendar,
+                },
+                {
+                    path: "dashboard",
+                    name: "student-dashboard",
+                    component: StudentDashboard
+                },
+                {
+                    path: "flightPlan",
+                    name: "student-flightPlan",
+                    component: StudentFlightPlan,
+                },
+                {
+                    path: "notifications",
+                    name: "student-notifications",
+                    component: StudentNotification,
+                },
+                {
+                    path: "profile",
+                    name: "student-profile",
+                    component: StudentProfile,
+                },
+                {
+                    path: "search",
+                    name: "student-search",
+                    component: StudentSearch,
+                },
             ]
-        }
+        },
     ]
 });
 

@@ -8,9 +8,11 @@
 
 <template>
   <v-app style="background-color: #242424;">
-    <NavigationBar />
-    <v-main>
-      <router-view />
-    </v-main>
+    <v-row no-gutters no-wrap>
+      <NavigationBar />
+      <v-main>
+        <router-view />
+      </v-main>
+    </v-row>
   </v-app>
 </template>

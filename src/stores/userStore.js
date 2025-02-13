@@ -83,9 +83,15 @@ export const userStore = defineStore("user", {
         },
         async setupStore() {
             const user = Utils.getStore("user");
-            const roles = await roleServices.getRolesByEmail(this.user.email);
-            this.$patch({ user, roles: roles.data });
+        
+            try {
+                const roles = await roleServices.getRolesByEmail(this.user.email);        
+                this.$patch({ user, roles: roles.data });
+            } catch (error) {
+                console.error("Error fetching roles:", error);
+            }
         }
+        
     },
     persist: true // Persist across page reloads to keep the number of network requests down
 });
