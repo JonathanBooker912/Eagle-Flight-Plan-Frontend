@@ -9,7 +9,7 @@
 <template>
   <v-app style="background-color: #242424;">
     <v-row no-gutters no-wrap>
-      <NavigationBar />
+      <NavigationBar v-if="$route.path !== '/login'"/>
       <v-main>
         <router-view />
       </v-main>
