@@ -1,9 +1,6 @@
 <script setup>
-import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { userStore } from "../stores/userStore";
-import { storeToRefs } from "pinia";
-import Utils from "../config/utils";
 
 import "primeicons/primeicons.css";
 

@@ -34,7 +34,136 @@ import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
 
+import { userStore } from "../stores/userStore";
+
 const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: "/",
+      alias: "/login",
+      name: "login",
+      component: Login,
+      beforeEnter: loginRedirect,
+    },
+    {
+      path: "/admin",
+      name: "admin",
+      component: Admin,
+      beforeEnter: isAdmin,
+      redirect: "/admin/dashboard",
+      children: [
+        {
+          path: "calendar",
+          name: "admin-calendar",
+          component: AdminCalendar,
+        },
+        {
+          path: "dashboard",
+          name: "admin-dashboard",
+          component: AdminDashboard,
+        },
+        {
+          path: "/flightPlan",
+          name: "admin-flightPlan",
+          component: AdminFlightPlan,
+        },
+        {
+          path: "notifications",
+          name: "admin-notifications",
+          component: AdminNotification,
+        },
+        {
+          path: "profile",
+          name: "admin-profile",
+          component: AdminProfile,
+        },
+        {
+          path: "search",
+          name: "admin-search",
+          component: AdminSearch,
+        },
+      ],
+    },
+    {
+      path: "/faculty",
+      name: "faculty",
+      component: Faculty,
+      beforeEnter: isFaculty,
+      redirect: "/faculty/dashboard",
+      children: [
+        {
+          path: "calendar",
+          name: "faculty-calendar",
+          component: FacultyCalendar,
+        },
+        {
+          path: "dashboard",
+          name: "faculty-dashboard",
+          component: FacultyDashboard,
+        },
+        {
+          path: "flightPlan",
+          name: "faculty-flightPlan",
+          component: FacultyFlightPlan,
+        },
+        {
+          path: "notifications",
+          name: "faculty-notifications",
+          component: FacultyNotification,
+        },
+        {
+          path: "profile",
+          name: "faculty-profile",
+          component: FacultyProfile,
+        },
+        {
+          path: "search",
+          name: "faculty-search",
+          component: FacultySearch,
+        },
+      ],
+    },
+    {
+      path: "/student",
+      alias: "/student",
+      name: "student",
+      component: Student,
+      redirect: "/student/dashboard",
+      children: [
+        {
+          path: "calendar",
+          name: "student-calendar",
+          component: StudentCalendar,
+        },
+        {
+          path: "dashboard",
+          name: "student-dashboard",
+          component: StudentDashboard,
+        },
+        {
+          path: "flightPlan",
+          name: "student-flightPlan",
+          component: StudentFlightPlan,
+        },
+        {
+          path: "notifications",
+          name: "student-notifications",
+          component: StudentNotification,
+        },
+        {
+          path: "profile",
+          name: "student-profile",
+          component: StudentProfile,
+        },
+        {
+          path: "search",
+          name: "student-search",
+          component: StudentSearch,
+        },
+      ],
+    },
+  ],
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
