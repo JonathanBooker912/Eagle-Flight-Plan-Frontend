@@ -2,8 +2,8 @@
 </script>
 
 <template>
-  <v-card color="background" class="main-page">
-    <v-card class="content-area" color="background">
+  <v-card class="main-page">
+    <v-card class="content-area">
         <router-view :key="$route.fullPath" />
     </v-card>
   </v-card>
