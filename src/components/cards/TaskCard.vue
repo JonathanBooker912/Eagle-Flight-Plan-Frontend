@@ -1,0 +1,42 @@
+<script setup>
+    const props = defineProps({
+        task: Object
+    });
+</script>
+<template>
+    <v-card color="backgroundDarken" class="cardContainer">
+        <v-card-text>
+            <p class="text-h5 mb-2">
+                {{ props.task.name }}
+            </p>
+            <p class="text-subtitle-1 font-weight-regular">
+                Category: {{ props.task.category }}
+            </p>
+            <p class="text-subtitle-1 font-weight-regular">
+                Type: {{ props.task.taskType }}
+            </p>
+            <p class="text-subtitle-1 font-weight-regular">
+                Completion Type: {{ props.task.completionType }}
+            </p></v-card-text
+        >
+        <v-row class="ma-2 float-right">
+            <v-btn color="warning" class="mr-2 cardButton">
+                <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
+            </v-btn>
+            <v-btn color="danger" class="cardButton"
+                ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
+            ></v-btn>
+        </v-row>
+    </v-card>
+</template>
+
+<style scoped>
+    .cardContainer {
+        max-width: 20vw;
+        min-width: 280px;
+        border-radius: 25px;
+    }
+    .cardButton {
+        border-radius: 13px;
+    }
+</style>

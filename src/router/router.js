@@ -3,7 +3,10 @@ import Login from "../views/Login.vue";
 import AdminLanding from "../views/admin/AdminLanding.vue";
 import StudentLanding from "../views/student/StudentLanding.vue";
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
+import TaskCardPage from "../views/admin/TaskCardPage.vue";
 import { userStore } from "../stores/userStore";
+import NotFound from "../views/NotFound.vue";
+import Unauthorized from "../views/Unauthorized.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,22 +15,24 @@ const router = createRouter({
             path: "/",
             alias: "/login",
             name: "login",
-            component: Login,
-            beforeEnter: loginRedirect
+            component: Login
         },
         {
             path: "/admin",
-            alias: "/admin",
             name: "admin",
             component: AdminLanding,
             beforeEnter: isAdmin,
             children: [
+                {
+                    path: "task",
+                    name: "task",
+                    component: TaskCardPage
+                }
                 /** Put all further admin routes in here */
             ]
         },
         {
             path: "/faculty",
-            alias: "/faculty",
             name: "faculty",
             component: FacultyLanding,
             beforeEnter: isFaculty,
@@ -37,12 +42,17 @@ const router = createRouter({
         },
         {
             path: "/student",
-            alias: "/student",
             name: "student",
             component: StudentLanding,
             children: [
                 /** Put all further student routes in here */
             ]
+        },
+        { path: "/:pathMatch(.*)*", component: NotFound },
+        {
+            path: "/Unauthorized",
+            name: "unauthorized",
+            component: Unauthorized
         }
     ]
 });
@@ -51,52 +61,42 @@ router.beforeEach(async (to, from, next) => {
     const store = userStore();
     const isAuthenticated = await store.isAuthenticated();
     if (!isAuthenticated) {
-        if (to.path !== "/login") {
-            next({ path: "/login" });
+        if (to.path !== "/login" && to.path !== "/") {
+            next({ name: "login" });
         } else {
             next();
         }
     } else {
         if (to.path == "/login") {
-            next({ path: "/" });
+            next(loginRedirect());
         } else {
             next();
         }
     }
 });
 
-export async function loginRedirect(to) {
+export async function loginRedirect() {
     const store = userStore();
-    const isAuthenticated = await store.isAuthenticated();
-    if (isAuthenticated) {
-        const hasAdminPrivileges = await store.isAdmin();
-        if (hasAdminPrivileges) {
-            return { name: "admin" };
-        }
-
-        const hasFacultyPrivileges = await store.isFaculty();
-        if (hasFacultyPrivileges) {
-            return { name: "faculty" };
-        }
-
+    if (store.isAdmin()) {
+        return { name: "admin" };
+    } else if (store.isFaculty()) {
+        return { name: "faculty" };
+    } else {
         return { name: "student" };
     }
-    return;
 }
 
 async function isAdmin() {
     const store = userStore();
-    const admin = store.roles
-        ? store.roles.some((role) => role.name.toLowerCase() == "admin")
-        : false;
-    return admin;
+    const response = (await store.isAdmin()) ? true : { name: "unauthorized" };
+    return response;
 }
 async function isFaculty() {
     const store = userStore();
-    const faculty = store.roles
-        ? store.roles.some((role) => role.name.toLowerCase() == "faculty")
-        : false;
-    return faculty;
+    const response = (await store.isFaculty())
+        ? true
+        : { name: "unauthorized" };
+    return response;
 }
 
 export default router;

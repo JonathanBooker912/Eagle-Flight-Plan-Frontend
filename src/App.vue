@@ -1,8 +1,4 @@
-<script setup>
-    import { userStore } from "./stores/userStore";
-    const store = userStore();
-    store.setupRouteWatcher();
-</script>
+<script setup></script>
 
 <template>
     <v-app>

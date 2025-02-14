@@ -11,4 +11,8 @@ const pinia = createPinia();
 app.use(router);
 app.use(vuetify);
 app.use(pinia);
+
+const store = userStore();
+await store.setupStore();
+
 app.mount("#app");

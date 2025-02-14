@@ -1,6 +1,4 @@
 import { defineStore } from "pinia";
-import { watchEffect } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import Utils from "../config/utils";
 
 import roleServices from "../services/roleServices";
@@ -27,13 +25,15 @@ export const userStore = defineStore("user", {
                 : false;
         },
         async isAdmin() {
+            console.log("Inside isAdmin");
             return await this.checkRole("admin");
         },
         async isFaculty() {
+            console.log("Inside isFaculty");
             return await this.checkRole("faculty");
         },
         async isAuthenticated() {
-            if (!this.user) return false;
+            if (!this.user) this.$patch({ user: Utils.getStore("user") });
             try {
                 const { data } = await authServices.validateToken(this.user);
                 return data.isValid;
@@ -42,48 +42,13 @@ export const userStore = defineStore("user", {
                 return false;
             }
         },
-        setupRouteWatcher() {
-            const route = useRoute();
-            const router = useRouter();
-
-            const validateAndRedirect = async () => {
-                try {
-                    const isValidToken = await authServices.validateToken(
-                        this.user
-                    );
-                    if (isValidToken) {
-                        console.log("Valid Token");
-                        router.push({ path: route.fullPath });
-                    } else {
-                        console.log("Invalid Token");
-                        router.push({ name: "/" });
-                    }
-                } catch {
-                    console.error("Token validation error");
-                    router.push({ name: "/" });
-                }
-            };
-
-            watchEffect(async () => {
-                this.user = Utils.getStore("user");
-                this.roles = (
-                    await roleServices.getRolesByEmail(this.user.email)
-                ).data;
-
-                const previousRoute = this.currentRoute;
-                this.currentRoute = route.fullPath;
-
-                if (
-                    ["/login", "/"].includes(this.currentRoute) ||
-                    ["/login", "/"].includes(previousRoute)
-                ) {
-                    await validateAndRedirect();
-                }
-            });
-        },
         async setupStore() {
             const user = Utils.getStore("user");
-            const roles = await roleServices.getRolesByEmail(this.user.email);
+            let roles = [];
+            if (user) {
+                roles = await roleServices.getRolesByEmail(user.email);
+            }
+
             this.$patch({ user, roles: roles.data });
         }
     },
