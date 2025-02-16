@@ -5,18 +5,17 @@ import roleServices from "../services/roleServices";
 import authServices from "../services/authServices";
 
 export const userStore = defineStore("user", {
-    state: () => ({
-        user: null,
-        roles: null,
-        currentRoute: null
-    }),
-    actions: {
-        async checkRole(roleName) {
-            // If the roles are null because of a reload, then the roles need to be requeried from the database
-            if (!this.roles) {
-                await this.setupStore();
-            }
-
+  state: () => ({
+    user: null,
+    roles: null,
+    currentRoute: null,
+  }),
+  actions: {
+    async checkRole(roleName) {
+      // If the roles are null because of a reload, then the roles need to be requeried from the database
+      if (!this.roles) {
+        await this.setupStore();
+      }
             return this.roles
                 ? this.roles.some(
                       (role) =>
@@ -51,6 +50,13 @@ export const userStore = defineStore("user", {
 
             this.$patch({ user, roles: roles.data });
         }
+      });
     },
-    persist: true // Persist across page reloads to keep the number of network requests down
+    async setupStore() {
+      const user = Utils.getStore("user");
+      const roles = await roleServices.getRolesByEmail(this.user.email);
+      this.$patch({ user, roles: roles.data });
+    },
+  },
+  persist: true, // Persist across page reloads to keep the number of network requests down
 });

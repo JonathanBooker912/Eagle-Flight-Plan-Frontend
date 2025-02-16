@@ -1,7 +1,7 @@
 <script setup>
-    import { userStore } from "./stores/userStore";
-    const store = userStore();
-    store.setupRouteWatcher();
+import { userStore } from "./stores/userStore";
+const store = userStore();
+store.setupRouteWatcher();
 </script>
 
 <template>
