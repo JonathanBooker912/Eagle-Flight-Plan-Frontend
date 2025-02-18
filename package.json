@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "bundle": "mv .env dist",
     "lint": "eslint src",
-    "lint:fix": "eslint --fix --ext .js,.vue src",
+    "lint:fix": "eslint src --fix ",
     "format:check": "prettier . --check",
     "format": "prettier . --write"
   },

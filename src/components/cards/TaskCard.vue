@@ -2,6 +2,7 @@
 const props = defineProps({
   task: Object,
 });
+const emit = defineEmits(["edit", "delete"]);
 </script>
 <template>
   <v-card color="backgroundDarken" class="cardContainer">
@@ -20,10 +21,17 @@ const props = defineProps({
       </p></v-card-text
     >
     <v-row class="ma-2 float-right">
-      <v-btn color="warning" class="mr-2 cardButton">
+      <v-btn
+        color="warning"
+        class="mr-2 cardButton"
+        @click="emit('edit', props.task.id)"
+      >
         <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
       </v-btn>
-      <v-btn color="danger" class="cardButton"
+      <v-btn
+        color="danger"
+        class="cardButton"
+        @click="emit('delete', props.task.id)"
         ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
       ></v-btn>
     </v-row>
@@ -32,7 +40,6 @@ const props = defineProps({
 
 <style scoped>
 .cardContainer {
-  max-width: 20vw;
   min-width: 280px;
   border-radius: 25px;
 }

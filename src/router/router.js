@@ -3,10 +3,11 @@ import Login from "../views/Login.vue";
 import AdminLanding from "../views/admin/AdminLanding.vue";
 import StudentLanding from "../views/student/StudentLanding.vue";
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
-import TaskCardPage from "../views/admin/TaskCardPage.vue";
+import TasksPage from "../views/admin/TasksPage.vue";
 import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
+import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,7 +27,19 @@ const router = createRouter({
         {
           path: "task",
           name: "task",
-          component: TaskCardPage,
+          component: TasksPage,
+        },
+        {
+          path: "task/edit/:id",
+          name: "edit",
+          component: TaskAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "task/add",
+          name: "add",
+          component: TaskAddEditPage,
+          props: { isAdd: true },
         },
         /** Put all further admin routes in here */
       ],
