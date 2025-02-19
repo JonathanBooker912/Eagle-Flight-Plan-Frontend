@@ -3,30 +3,30 @@ import { ref, onMounted } from "vue";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 
 const admin = [
-  { "route-name": "admin-profile", "link-text": "profile" },
-  { "route-name": "admin-dashboard", "link-text": "dashboard" },
-  { "route-name": "admin-flightPlan", "link-text": "flightPlan" },
-  { "route-name": "admin-calendar", "link-text": "calendar" },
-  { "route-name": "admin-notifications", "link-text": "notifications" },
-  { "route-name": "admin-search", "link-text": "search" },
+  { "route-name": "admin-profile", "link-text": "Profile" },
+  { "route-name": "admin-dashboard", "link-text": "Dashboard" },
+  { "route-name": "admin-flightPlan", "link-text": "Flight Plan" },
+  { "route-name": "admin-calendar", "link-text": "Calendar" },
+  { "route-name": "admin-notifications", "link-text": "Notifications" },
+  { "route-name": "admin-search", "link-text": "Search" },
 ];
 
 const faculty = [
-  { "route-name": "faculty-profile", "link-text": "profile" },
-  { "route-name": "faculty-dashboard", "link-text": "dashboard" },
-  { "route-name": "faculty-flightPlan", "link-text": "flightPlan" },
-  { "route-name": "faculty-calendar", "link-text": "calendar" },
-  { "route-name": "faculty-notifications", "link-text": "notifications" },
-  { "route-name": "faculty-search", "link-text": "search" },
+  { "route-name": "faculty-profile", "link-text": "Profile" },
+  { "route-name": "faculty-dashboard", "link-text": "Dashboard" },
+  { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
+  { "route-name": "faculty-calendar", "link-text": "Calendar" },
+  { "route-name": "faculty-notifications", "link-text": "Notifications" },
+  { "route-name": "faculty-search", "link-text": "Search" },
 ];
 
 const student = [
-  { "route-name": "student-profile", "link-text": "profile" },
-  { "route-name": "student-dashboard", "link-text": "dashboard" },
-  { "route-name": "student-flightPlan", "link-text": "flightPlan" },
-  { "route-name": "student-calendar", "link-text": "calendar" },
-  { "route-name": "student-notifications", "link-text": "notifications" },
-  { "route-name": "student-search", "link-text": "search" },
+  { "route-name": "student-profile", "link-text": "Profile" },
+  { "route-name": "student-dashboard", "link-text": "Dashboard" },
+  { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
+  { "route-name": "student-calendar", "link-text": "Calendar" },
+  { "route-name": "student-notifications", "link-text": "Notifications" },
+  { "route-name": "student-search", "link-text": "Search" },
 ];
 
 const role = ref("");
@@ -45,31 +45,37 @@ onMounted(async () => {
 
 const getIcon = (linkText) => {
   const icons = {
-    profile: "pi pi-user",
-    dashboard: "pi pi-home",
-    flightPlan: "pi pi-plane",
-    calendar: "pi pi-calendar",
-    notifications: "pi pi-bell",
-    search: "pi pi-search",
+    Profile: "mdi-account",
+    Dashboard: "mdi-view-dashboard",
+    "Flight Plan": "mdi-airplane",
+    Calendar: "mdi-calendar",
+    Notifications: "mdi-bell",
+    Search: "mdi-magnify",
   };
-  return icons[linkText] || "pi pi-circle"; // Default icon if none matched
+
+  console.log(linkText);
+  return icons[linkText] || "mdi-circle"; // Default if not found
 };
 </script>
 
 <template>
-  <v-container class="d-flex flex-column pa-2 userNav" color="secondary">
+  <v-container class="d-flex flex-column pa-2 userNav bg-secondary">
     <v-list v-if="role === 'admin'" class="pa-0">
       <v-list-item-group v-for="(item, index) in admin" :key="index">
-        <v-list-item :to="{ name: item['route-name'] }" color="secondary">
-          <v-list-item-avatar>
-            <v-icon color="text">{{ getIcon(item["link-text"]) }}</v-icon>
-          </v-list-item-avatar>
+        <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
           <v-list-item-content>
             <v-list-item-title
               class="text-body-1 font-weight-bold"
               color="text"
             >
-              <p>{{ item["link-text"] }}</p>
+              <div class="nav-item-content">
+                <v-icon :size="32" :color="text" class="mr-2">
+                  {{ getIcon(item["link-text"]) }}
+                </v-icon>
+                <span class="nav-text" :color="text">{{
+                  item["link-text"]
+                }}</span>
+              </div>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -78,34 +84,42 @@ const getIcon = (linkText) => {
 
     <v-list v-if="role === 'faculty'" class="pa-0">
       <v-list-item-group v-for="(item, index) in faculty" :key="index">
-        <v-list-item :to="{ name: item['route-name'] }" color="secondary">
-          <v-list-item-avatar>
-            <v-icon color="text">{{ getIcon(item["link-text"]) }}</v-icon>
-          </v-list-item-avatar>
+        <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
           <v-list-item-content>
             <v-list-item-title
               class="text-body-1 font-weight-bold"
               color="text"
             >
-              <p>{{ item["link-text"] }}</p>
+              <div class="nav-item-content">
+                <v-icon :size="32" :color="text" class="mr-2">
+                  {{ getIcon(item["link-text"]) }}
+                </v-icon>
+                <span class="nav-text" :color="text">{{
+                  item["link-text"]
+                }}</span>
+              </div>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list-item-group>
     </v-list>
 
-    <v-list v-if="role === 'student'" class="pa-0" color="primary">
+    <v-list v-if="role === 'student'" class="pa-0" color="secondary">
       <v-list-item-group v-for="(item, index) in student" :key="index">
-        <v-list-item :to="{ name: item['route-name'] }" color="secondary">
-          <v-list-item-avatar>
-            <v-icon color="text">{{ getIcon(item["link-text"]) }}</v-icon>
-          </v-list-item-avatar>
+        <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
           <v-list-item-content>
             <v-list-item-title
               class="text-body-1 font-weight-bold"
               color="text"
             >
-              <p>{{ item["link-text"] }}</p>
+              <div class="nav-item-content">
+                <v-icon :size="32" :color="text" class="mr-2">
+                  {{ getIcon(item["link-text"]) }}
+                </v-icon>
+                <span class="nav-text" :color="text">{{
+                  item["link-text"]
+                }}</span>
+              </div>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -114,13 +128,29 @@ const getIcon = (linkText) => {
   </v-container>
 </template>
 
-<style scoped>
+<style>
+/* Hide text when not hovering over the navbar */
+.userNav .nav-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.userNav .nav-text {
+  display: none;
+}
+
+/* Show text when navbar is hovered */
+.userNav:hover .nav-text {
+  display: inline;
+}
+
 .userNav {
-  width: 60px;
+  width: 7.5vw;
   height: 98vh;
   transition: width 0.5s;
   border-top-right-radius: 25px;
   border-top-left-radius: 25px;
+  margin: 2vh 2vh 0vh 2vh;
 }
 
 .userNav:hover {
@@ -130,7 +160,7 @@ const getIcon = (linkText) => {
 .navOption {
   display: flex;
   align-items: center;
-  padding: 10px;
+  margin: 3vh;
   white-space: nowrap;
 }
 
