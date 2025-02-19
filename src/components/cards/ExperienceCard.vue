@@ -13,8 +13,8 @@ const emit = defineEmits(["edit", "delete"]);
       <p class="text-subtitle-1 font-weight-regular">
         Type: {{ props.experience.experienceType }}
       </p>
-      <p class="text-subtitle-1 font-we        Scheduling Type: {{ props.experience.schedulingType }}
-chedulingType}}
+      <p class="text-subtitle-1 font-weight-regular">
+        Scheduling Type: {{ props.experience.schedulingType }}
       </p>
       <p class="text-subtitle-1 font-weight-regular">
         Cateogry: {{ props.experience.category }}
