@@ -8,6 +8,8 @@ import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
 import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
+import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
+import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +43,24 @@ const router = createRouter({
           component: TaskAddEditPage,
           props: { isAdd: true },
         },
+        {
+          path: "experience",
+          name: "experience",
+          component: ExperiencesPage,
+        },
+        {
+          path: "experience/edit/:id",
+          name: "edit",
+          component: ExperienceAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "experience/add",
+          name: "add",
+          component: ExperienceAddEditPage,
+          props: { isAdd: true },
+        },
+
         /** Put all further admin routes in here */
       ],
     },
