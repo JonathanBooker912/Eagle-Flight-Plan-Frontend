@@ -7,7 +7,7 @@ store.setupRouteWatcher();
 </script>
 
 <template>
-  <v-app style="background-color: #242424">
+  <v-app>
     <v-row no-gutters no-wrap>
       <NavigationBar v-if="$route.path !== '/login'" />
       <v-main>
