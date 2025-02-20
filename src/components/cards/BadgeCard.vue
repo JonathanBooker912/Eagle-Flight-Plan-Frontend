@@ -9,7 +9,7 @@ const emit = defineEmits(["edit", "delete"]);
     <v-card-text>
       <img src="../../assets/goldBadgeMock.png" width="100" height="100">
       <p class="text-h5 mb-2">
-          Badge Name  
+          {{ props.badge.name }}  
       </p>
     </v-card-text>
     <v-row class="ma-2 float-right">
