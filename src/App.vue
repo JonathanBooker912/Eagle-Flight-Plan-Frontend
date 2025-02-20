@@ -9,7 +9,7 @@ import UserCard from "./components/UserCard.vue";
   <v-app>
     <!-- <MenuBar :key="$route.fullPath" /> -->
     <v-main color="background">
-<user-card></user-card>
+      <user-card></user-card>
     </v-main>
   </v-app>
 </template>
