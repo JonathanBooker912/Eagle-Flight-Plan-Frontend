@@ -8,6 +8,7 @@ import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
 import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
+import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,6 +41,11 @@ const router = createRouter({
           name: "add",
           component: TaskAddEditPage,
           props: { isAdd: true },
+        },
+        {
+          path: "badge",
+          name: "badge",
+          component: BadgeCardPage,
         },
         /** Put all further admin routes in here */
       ],
