@@ -114,7 +114,7 @@ const getIcon = (linkText) => {
       </v-list-item-group>
     </v-list>
 
-    <v-list v-if="role === 'student'" class="pa-0" color="secondary">
+    <v-list v-if="role === 'student'" class="pa-0">
       <v-list-item-group v-for="(item, index) in student" :key="index">
         <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
           <v-list-item-content>
