@@ -4,14 +4,21 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["edit", "delete"]);
-
 </script>
 <template>
   <v-card color="backgroundDarken" class="cardContainer">
-    <v-card-text class="text-center" style="padding-bottom: 0px;">
-      <img src="../../assets/goldBadgeMock.png" width="100" class="badgeImage">
+    <v-card-text class="text-center" style="padding-bottom: 0px">
+      <img
+        src="../../assets/goldBadgeMock.png"
+        width="100"
+        class="badgeImage"
+      />
       <p class="text-h5 mb-2">
-        {{ (props.badge.name.trim().length > 20) ? props.badge.name.trim().substring(0, 20) + '...' : props.badge.name.trim() }}  
+        {{
+          props.badge.name.trim().length > 20
+            ? props.badge.name.trim().substring(0, 20) + "..."
+            : props.badge.name.trim()
+        }}
       </p>
     </v-card-text>
     <v-row class="ma-2 actionButtons">
@@ -26,7 +33,7 @@ const emit = defineEmits(["edit", "delete"]);
         color="danger"
         class="cardButton"
         @click="emit('delete', props.badge.id)"
-        >
+      >
         <v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
       ></v-btn>
     </v-row>
@@ -34,7 +41,6 @@ const emit = defineEmits(["edit", "delete"]);
 </template>
 
 <style scoped>
-
 .cardContainer {
   justify-items: center;
   margin: 10px;
@@ -49,8 +55,8 @@ const emit = defineEmits(["edit", "delete"]);
 }
 
 .badgeImage {
-  display: block; 
-  margin: 0 auto; 
+  display: block;
+  margin: 0 auto;
 }
 
 .actionButtons {

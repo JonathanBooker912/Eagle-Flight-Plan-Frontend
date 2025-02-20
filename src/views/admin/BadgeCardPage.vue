@@ -7,7 +7,6 @@ const badge = ref({
 const badge2 = ref({
   name: "Badge Name test and this is soooo long",
 });
-
 </script>
 <template>
   <BadgeCard :badge="badge"></BadgeCard>
