@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 
+// Admin, Faculty, and Student Imports
 import Admin from "../views/Admin.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminDashboard from "../views/admin/AdminDashboard.vue";
@@ -44,18 +45,14 @@ const router = createRouter({
       beforeEnter: isAdmin,
       redirect: "/admin/dashboard",
       children: [
-        {
-          path: "calendar",
-          name: "admin-calendar",
-          component: AdminCalendar,
-        },
+        { path: "calendar", name: "admin-calendar", component: AdminCalendar },
         {
           path: "dashboard",
           name: "admin-dashboard",
           component: AdminDashboard,
         },
         {
-          path: "/flightPlan",
+          path: "flightPlan",
           name: "admin-flightPlan",
           component: AdminFlightPlan,
         },
@@ -64,16 +61,8 @@ const router = createRouter({
           name: "admin-notifications",
           component: AdminNotification,
         },
-        {
-          path: "profile",
-          name: "admin-profile",
-          component: AdminProfile,
-        },
-        {
-          path: "search",
-          name: "admin-search",
-          component: AdminSearch,
-        },
+        { path: "profile", name: "admin-profile", component: AdminProfile },
+        { path: "search", name: "admin-search", component: AdminSearch },
       ],
     },
     {
@@ -103,16 +92,8 @@ const router = createRouter({
           name: "faculty-notifications",
           component: FacultyNotification,
         },
-        {
-          path: "profile",
-          name: "faculty-profile",
-          component: FacultyProfile,
-        },
-        {
-          path: "search",
-          name: "faculty-search",
-          component: FacultySearch,
-        },
+        { path: "profile", name: "faculty-profile", component: FacultyProfile },
+        { path: "search", name: "faculty-search", component: FacultySearch },
       ],
     },
     {
@@ -142,16 +123,8 @@ const router = createRouter({
           name: "student-notifications",
           component: StudentNotification,
         },
-        {
-          path: "profile",
-          name: "student-profile",
-          component: StudentProfile,
-        },
-        {
-          path: "search",
-          name: "student-search",
-          component: StudentSearch,
-        },
+        { path: "profile", name: "student-profile", component: StudentProfile },
+        { path: "search", name: "student-search", component: StudentSearch },
       ],
     },
   ],
@@ -160,6 +133,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const store = userStore();
   const isAuthenticated = await store.isAuthenticated();
+
   if (!isAuthenticated) {
     if (to.path !== "/login") {
       next({ path: "/login" });
@@ -167,14 +141,22 @@ router.beforeEach(async (to, from, next) => {
       next();
     }
   } else {
-    if (to.path == "/login") {
-      next({ path: "/" });
-    } else {
+    const hasAdminPrivileges = await store.isAdmin();
+    const hasFacultyPrivileges = await store.isFaculty();
+
+    if (to.path.startsWith("/admin") && hasAdminPrivileges) {
       next();
+    } else if (to.path.startsWith("/faculty") && hasFacultyPrivileges) {
+      next();
+    } else if (to.path.startsWith("/student")) {
+      next();
+    } else {
+      next({ path: "/" });
     }
   }
 });
 
+// Login Redirect
 export async function loginRedirect() {
   const store = userStore();
   const isAuthenticated = await store.isAuthenticated();
@@ -194,17 +176,20 @@ export async function loginRedirect() {
   return;
 }
 
+// Admin Check
 async function isAdmin() {
   const store = userStore();
   const admin = store.roles
-    ? store.roles.some((role) => role.name.toLowerCase() == "admin")
+    ? store.roles.some((role) => role.name.toLowerCase() === "admin")
     : false;
   return admin;
 }
+
+// Faculty Check
 async function isFaculty() {
   const store = userStore();
   const faculty = store.roles
-    ? store.roles.some((role) => role.name.toLowerCase() == "faculty")
+    ? store.roles.some((role) => role.name.toLowerCase() === "faculty")
     : false;
   return faculty;
 }

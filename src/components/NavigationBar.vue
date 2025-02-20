@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 
 const admin = [
@@ -30,17 +31,27 @@ const student = [
 ];
 
 const role = ref("");
+const route = useRoute();
 
 onMounted(async () => {
   const store = userStore();
 
-  // Await role checks
   const isAdmin = await store.isAdmin();
   const isFaculty = await store.isFaculty();
 
+  // Set the initial role based on authentication and role checks
   role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
 
-  console.log(role.value);
+  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
+
+  console.log(route);
+  if (route.path.startsWith("/admin")) {
+    role.value = "admin";
+  } else if (route.path.startsWith("/faculty")) {
+    role.value = "faculty";
+  } else if (route.path.startsWith("/student")) {
+    role.value = "student";
+  }
 });
 
 const getIcon = (linkText) => {
@@ -53,7 +64,6 @@ const getIcon = (linkText) => {
     Search: "mdi-magnify",
   };
 
-  console.log(linkText);
   return icons[linkText] || "mdi-circle"; // Default if not found
 };
 </script>
@@ -145,7 +155,7 @@ const getIcon = (linkText) => {
 }
 
 .userNav {
-  width: 7.5vw;
+  width: 4vw;
   height: 98vh;
   transition: width 0.5s;
   border-top-right-radius: 25px;
@@ -154,7 +164,8 @@ const getIcon = (linkText) => {
 }
 
 .userNav:hover {
-  width: 250px;
+  width: 12vw;
+  align-items: left;
 }
 
 .navOption {
@@ -181,22 +192,6 @@ const getIcon = (linkText) => {
   font-size: 30px;
   margin: 5px 15px 10px 0px;
 }
-
-/*
-.active {
-  background-color: #ccc !important;
-}
-
-.active p {
-  color: #294965 !important;
-}
-.active i {
-  color: #294965 !important;
-}
-
-.pi.active {
-  color: #294965 !important;
-} */
 
 @media screen and (max-width: 500px) {
   .userNav {
