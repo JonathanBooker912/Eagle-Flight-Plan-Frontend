@@ -1,12 +1,19 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { userStore } from "../../stores/userStore";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
+const store = userStore();
+const isAdmin = ref(false);
+
 const props = defineProps({
-  event: Object,
+  event: {
+    type: Object,
+    required: true,
+  },
 });
 
 const eventDate = computed(() => {
@@ -20,11 +27,16 @@ const eventTime = computed(() => {
 
   return `${startTime} - ${endTime}`;
 });
+
+const viewCard = () => {};
+
+onMounted(async () => {
+  isAdmin.value = await store.isAdmin();
+});
 </script>
 <template>
-  <v-card color="backgroundDarken" class="cardContainer">
+  <v-card v-if="isAdmin" color="backgroundDarken" class="cardContainer">
     <v-row no-gutters>
-      <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>
         <v-card-text>
           <p class="text-h5">
@@ -48,6 +60,32 @@ const eventTime = computed(() => {
             ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
           ></v-btn>
         </v-row>
+      </v-col>
+    </v-row>
+  </v-card>
+  <v-card
+    v-else
+    color="backgroundDarken"
+    class="cardContainer"
+    @click="viewCard"
+  >
+    <v-row no-gutters>
+      <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
+      <v-col>
+        <v-card-text>
+          <p class="text-h5">
+            {{ props.event.name }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ props.event.location }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ eventDate }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ eventTime }}
+          </p>
+        </v-card-text>
       </v-col>
     </v-row>
   </v-card>
