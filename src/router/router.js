@@ -4,6 +4,7 @@ import AdminLanding from "../views/admin/AdminLanding.vue";
 import StudentLanding from "../views/student/StudentLanding.vue";
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
+import EventCardPage from "../views/admin/EventCardPage.vue";
 import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
@@ -50,6 +51,11 @@ const router = createRouter({
       component: FacultyLanding,
       beforeEnter: isFaculty,
       children: [
+        {
+          path: "event",
+          name: "event",
+          component: EventCardPage,
+        },
         /** Put all further faculty routes in here */
       ],
     },
