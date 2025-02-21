@@ -1,29 +1,21 @@
 <template>
-  <v-card class="user-card">
-    <img src="/Birb.png" class="user-img" alt="User Image" />
-    <div class="user-info">
-      <p class="name">{{ props.name }}</p>
-      <p class="grade">{{ props.grade }}</p>
-      <p class="major">{{ props.major }}</p>
-    </div>
+  <v-card color="backgroundDarken" class="cardContainer user-card">
+    <v-card-text>
+      <img src="/Birb.png" class="user-img" alt="User Image" />
+      <div class="user-info">
+        <p class="name">{{ props.user.name }}</p>
+        <p class="grade">{{ props.user.grade }}</p>
+        <p class="major">{{ props.user.major }}</p>
+      </div>
+    </v-card-text>
   </v-card>
 </template>
 
 <script setup>
 const props = defineProps({
-  name: {
-    type: String,
-    default: "Jonah Veit",
-  },
-  grade: {
-    type: String,
-    default: "Sophomore",
-  },
-  major: {
-    type: String,
-    default: "Computer Science",
-  },
+  user: Object,
 });
+const emit = defineEmits(["edit", "delete"]);
 </script>
 
 <style scoped>
