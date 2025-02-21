@@ -1,11 +1,11 @@
 <template>
-  <v-card color="backgroundDarken" class="cardContainer user-card">
-    <v-card-text>
+  <v-card class="cardContainer">
+    <v-card-text color="backgroundDarken" class="user-card">
       <img src="/Birb.png" class="user-img" alt="User Image" />
-      <div class="user-info">
-        <p class="name">{{ props.user.name }}</p>
-        <p class="grade">{{ props.user.grade }}</p>
-        <p class="major">{{ props.user.major }}</p>
+      <v class="user-info" color="">
+        <p class="name">{{ props.name }}</p>
+        <p class="grade">{{ props.grade }}</p>
+        <p class="major">{{ props.major }}</p>
       </div>
     </v-card-text>
   </v-card>
@@ -13,7 +13,9 @@
 
 <script setup>
 const props = defineProps({
-  user: Object,
+  name: "Jonah",
+  grade: "Sophomore",
+  major: "Computer",
 });
 const emit = defineEmits(["edit", "delete"]);
 </script>
