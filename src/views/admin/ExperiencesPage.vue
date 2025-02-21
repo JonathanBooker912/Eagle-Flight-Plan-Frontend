@@ -1,59 +1,60 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import taskServices from "../../services/taskServices";
-import TaskCard from "../../components/cards/TaskCard.vue";
+import experienceServices from "../../services/experienceServices";
+import ExperienceCard from "../../components/cards/ExperienceCard.vue";
 import CardTable from "../../components/CardTable.vue";
 import CardHeader from "../../components/CardHeader.vue";
 
 // Constants
 const PAGE_SIZE = 8;
-const label = "Tasks";
+const label = "Experiences";
 
 // Reactive states
 const router = useRouter();
-const tasks = ref([]);
+const experiences = ref([]);
 const page = ref(1);
 const searchQuery = ref("");
 const count = ref(0);
 
-// Fetch tasks
-const getTasks = async (pageNumber = page.value) => {
+// Fetch experiences
+const getExperiences = async (pageNumber = page.value) => {
   try {
-    const result = await taskServices.getAllTasks(
+    const result = await experienceServices.getAllExperiences(
       pageNumber,
       PAGE_SIZE,
       searchQuery.value,
     );
-    tasks.value = result.data.tasks;
+    console.log(result);
+    experiences.value = result.data.experiences;
     count.value = result.data.count;
   } catch (error) {
-    console.error("Error fetching tasks:", error);
+    console.error("Error fetching experiences:", error);
   }
 };
 
 // Handlers
-const handleAdd = () => router.push({ name: "addTask" });
-const handleEdit = (taskId) =>
-  router.push({ name: "editTask", params: { id: taskId } });
+const handleAdd = () => router.push({ name: "add" });
+const handleEdit = (experienceId) =>
+  router.push({ name: "edit", params: { id: experienceId } });
 
-const handleDelete = async (taskId) => {
+const handleDelete = async (experienceId) => {
   try {
-    await taskServices.deleteTask(taskId);
-    await getTasks(); // Re-fetch tasks after delete
+    await experienceServices.deleteExperience(experienceId);
+    await getExperiences(); // Re-fetch experiences after delete
   } catch (error) {
-    console.error("Error deleting task:", error);
+    console.error("Error deleting experience:", error);
   }
 };
 
 const handleSearchChange = (input) => {
   searchQuery.value = input;
   page.value = 1; // Reset to first page on search change
-  getTasks(page.value);
+  getExperiences(page.value);
 };
 
 // Initial fetch
-onMounted(() => getTasks());
+onMounted(() => getExperiences());
 </script>
 <template>
   <v-container fluid>
@@ -62,24 +63,24 @@ onMounted(() => getTasks());
       @changed="handleSearchChange"
       @add="handleAdd"
     ></CardHeader>
-    <v-row v-if="tasks.length === 0" class="justify-center">
+    <v-row v-if="experiences.length === 0" class="justify-center">
       <v-col>
         <v-alert color="danger" class="text-center"> No results found </v-alert>
       </v-col>
     </v-row>
     <CardTable
       v-else
-      :items="tasks"
+      :items="experiences"
       :per-row-lg="4"
       :per-row-md="3"
       :per-row-sm="2"
     >
       <template #item="{ item }">
-        <TaskCard
-          :task="item"
+        <ExperienceCard
+          :experience="item"
           @edit="handleEdit"
           @delete="handleDelete"
-        ></TaskCard>
+        ></ExperienceCard>
       </template>
     </CardTable>
     <v-pagination
@@ -87,9 +88,9 @@ onMounted(() => getTasks());
       :length="count"
       :total-visible="$vuetify.display.smAndDown ? 3 : 5"
       class="m-2"
-      @next="getTasks"
-      @prev="getTasks"
-      @update:model-value="getTasks"
+      @next="getExperiences"
+      @prev="getExperiences"
+      @update:model-value="getExperiences"
     >
     </v-pagination>
   </v-container>
