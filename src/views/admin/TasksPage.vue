@@ -33,9 +33,9 @@ const getTasks = async (pageNumber = page.value) => {
 };
 
 // Handlers
-const handleAdd = () => router.push({ name: "add" });
+const handleAdd = () => router.push({ name: "addTask" });
 const handleEdit = (taskId) =>
-  router.push({ name: "edit", params: { id: taskId } });
+  router.push({ name: "editTask", params: { id: taskId } });
 
 const handleDelete = async (taskId) => {
   try {
