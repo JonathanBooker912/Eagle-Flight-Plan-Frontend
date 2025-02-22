@@ -4,11 +4,14 @@ import AdminLanding from "../views/admin/AdminLanding.vue";
 import StudentLanding from "../views/student/StudentLanding.vue";
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
+import EventCardPage from "../views/admin/EventCardPage.vue";
 import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
 import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
 import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
+import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
+import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,14 +35,31 @@ const router = createRouter({
         },
         {
           path: "task/edit/:id",
-          name: "edit",
+          name: "editTask",
           component: TaskAddEditPage,
           props: { isAdd: false },
         },
         {
           path: "task/add",
-          name: "add",
+          name: "addTask",
           component: TaskAddEditPage,
+          props: { isAdd: true },
+        },
+        {
+          path: "experience",
+          name: "experience",
+          component: ExperiencesPage,
+        },
+        {
+          path: "experience/edit/:id",
+          name: "edit",
+          component: ExperienceAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "experience/add",
+          name: "add",
+          component: ExperienceAddEditPage,
           props: { isAdd: true },
         },
         {
@@ -56,6 +76,11 @@ const router = createRouter({
       component: FacultyLanding,
       beforeEnter: isFaculty,
       children: [
+        {
+          path: "event",
+          name: "event",
+          component: EventCardPage,
+        },
         /** Put all further faculty routes in here */
       ],
     },

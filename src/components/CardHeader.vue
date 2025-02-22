@@ -41,8 +41,9 @@ const handleAdd = () => emit("add");
         rounded="xl"
         class="mr-2"
         color="backgroundDarken"
+        @click="handleAdd"
       >
-        <v-icon icon="mdi-plus" @click="handleAdd"></v-icon>
+        <v-icon icon="mdi-plus"></v-icon>
       </v-btn>
       <v-btn
         v-else

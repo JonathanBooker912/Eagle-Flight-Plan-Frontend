@@ -13,6 +13,6 @@ app.use(vuetify);
 app.use(pinia);
 
 const store = userStore();
-await store.setupStore();
+store.initalSetup();
 
 app.mount("#app");
