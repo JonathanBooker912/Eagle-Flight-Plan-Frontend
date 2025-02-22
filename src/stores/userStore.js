@@ -47,5 +47,9 @@ export const userStore = defineStore("user", {
 
       this.$patch({ user, roles: roles.data });
     },
+    initalSetup() {
+      const user = Utils.getStore("user");
+      this.$patch({ user });
+    },
   },
 });
