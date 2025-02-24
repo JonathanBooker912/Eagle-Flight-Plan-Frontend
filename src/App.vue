@@ -1,6 +1,5 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import NavigationBar from './components/NavigationBar.vue';
+import NavigationBar from "./components/NavigationBar.vue";
 import { userStore } from "./stores/userStore";
 const store = userStore();
 store.setupRouteWatcher();
