@@ -1,0 +1,56 @@
+<script setup>
+import { ref, computed, watch } from "vue";
+import dayjs from "dayjs"; // Importing day.js
+
+const props = defineProps({
+  label: {
+    type: String,
+    default: "Select Date",
+  },
+  modelValue: { type: [String, Date], default: null },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const menu = ref(false);
+const selectedDate = ref(
+  props.modelValue ? dayjs(props.modelValue).toDate() : null
+);
+
+watch(selectedDate, (newValue) => {
+  emit("update:modelValue", newValue); // Emit the updated value to the parent
+});
+
+const fieldLabel = ref(props.label);
+
+// Format the date for display using day.js
+const formattedDate = computed(() =>
+  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : ""
+);
+
+// Clear the date selection
+const clearDate = () => {
+  selectedDate.value = null;
+  emit("update:modelValue", null);
+};
+</script>
+
+<template>
+  <v-menu v-model="menu" transition="scale-transition" offset-y>
+    <template v-slot:activator="{ props }">
+      <v-text-field
+        v-bind="props"
+        v-model="formattedDate"
+        :label="fieldLabel"
+        prepend-inner-icon="mdi-calendar"
+        readonly
+        clearable
+        @click:clear="clearDate"
+      />
+    </template>
+    <v-date-picker
+      v-model="selectedDate"
+      @update:modelValue="menu = false"
+    ></v-date-picker>
+  </v-menu>
+</template>

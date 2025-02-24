@@ -6,10 +6,11 @@ const props = defineProps({
 });
 
 // Emit event functions
-const emit = defineEmits(["changed", "add"]);
+const emit = defineEmits(["changed", "add", "toggle-filters"]);
 
 const handleChange = (newValue) => emit("changed", newValue);
 const handleAdd = () => emit("add");
+const handleToggleFilters = () => emit("toggle-filters");
 </script>
 
 <template>
@@ -61,6 +62,7 @@ const handleAdd = () => emit("add");
         v-if="$vuetify.display.smAndUp"
         color="backgroundDarken"
         rounded="xl"
+        @click="handleToggleFilters"
       >
         Filter & Sort
       </v-btn>

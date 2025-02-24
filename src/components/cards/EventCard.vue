@@ -39,7 +39,7 @@ onMounted(async () => {
     <v-row no-gutters>
       <v-col>
         <v-card-text>
-          <p class="text-h5">
+          <p class="text-h5 text-no-wrap text-truncate">
             {{ props.event.name }}
           </p>
           <p class="text-subtitle-1 font-weight-regular">
@@ -73,7 +73,7 @@ onMounted(async () => {
       <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>
         <v-card-text>
-          <p class="text-h5">
+          <p class="text-h5 text-truncate w-100">
             {{ props.event.name }}
           </p>
           <p class="text-subtitle-1 font-weight-regular">
@@ -97,8 +97,7 @@ onMounted(async () => {
   border-radius: 20px 0px 0px 20px;
 }
 .cardContainer {
-  max-width: 20vw;
-  min-width: 280px;
+  min-width: 250px;
   border-radius: 25px;
 }
 .cardButton {
