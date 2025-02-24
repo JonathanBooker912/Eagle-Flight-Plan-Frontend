@@ -1,11 +1,11 @@
 <template>
-  <v-card class="cardContainer">
-    <v-card-text color="backgroundDarken" class="user-card">
+  <v-card class="cardContainer" color="backgroundDarken">
+    <v-card-text class="user-card">
       <img src="/Birb.png" class="user-img" alt="User Image" />
-      <v class="user-info" color="">
-        <p class="name">{{ props.name }}</p>
-        <p class="grade">{{ props.grade }}</p>
-        <p class="major">{{ props.major }}</p>
+      <div class="user-info">
+        <span color="text" class="name">{{ props.name }}</span>
+        <span color="text" class="grade">{{ props.grade }}</span>
+        <span color="text" class="major">{{ props.major }}</span>
       </div>
     </v-card-text>
   </v-card>
@@ -13,11 +13,11 @@
 
 <script setup>
 const props = defineProps({
-  name: "Jonah",
-  grade: "Sophomore",
-  major: "Computer",
+  name: { type: String, default: "Jonah" },
+  grade: { type: String, default: "Sophomore" },
+  major: { type: String, default: "Computer Science" },
+  role: { type: String, default: "Student" },
 });
-const emit = defineEmits(["edit", "delete"]);
 </script>
 
 <style scoped>
@@ -29,8 +29,7 @@ const emit = defineEmits(["edit", "delete"]);
   width: 40vh;
   margin: 20px;
   border-radius: 25px;
-  border-left: 10px solid #f00;
-  background-color: white;
+  border-left: 10px solid;
 }
 
 .user-img {
@@ -49,12 +48,10 @@ const emit = defineEmits(["edit", "delete"]);
 .name {
   font-weight: bold;
   font-size: 1.2em;
-  color: gray;
 }
 
 .grade,
 .major {
   font-size: 1em;
-  color: gray;
 }
 </style>
