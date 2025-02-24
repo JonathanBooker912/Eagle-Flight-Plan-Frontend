@@ -155,7 +155,7 @@ const getIcon = (linkText) => {
 }
 
 .userNav {
-  width: 4vw;
+  width: 80px;
   height: 98vh;
   transition: width 0.5s;
   border-top-right-radius: 25px;
