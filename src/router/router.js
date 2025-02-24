@@ -12,6 +12,9 @@ import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
 import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
 import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
 import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
+import RewardPage from "../views/admin/reward/RewardPage.vue";
+import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
+import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +47,28 @@ const router = createRouter({
           name: "addTask",
           component: TaskAddEditPage,
           props: { isAdd: true },
+        },
+        {
+          path: "reward",
+          name: "reward",
+          component: RewardPage,
+        },
+        {
+          path: "reward/edit/:id",
+          name: "editReward",
+          component: RewardAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "reward/add",
+          name: "addReward",
+          component: RewardAddEditPage,
+          props: { isAdd: true },
+        },
+        {
+          path: "reward/redeem/:id",
+          name: "redeemReward",
+          component: RewardRedemptionPage,
         },
         {
           path: "experience",
