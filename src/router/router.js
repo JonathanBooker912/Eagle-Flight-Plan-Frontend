@@ -12,7 +12,6 @@ import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
 
 import AdminLanding from "../views/admin/AdminLanding.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
@@ -20,7 +19,6 @@ import AdminSearch from "../views/admin/AdminSearch.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
-import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentNotification from "../views/student/StudentNotification.vue";
 import StudentProfile from "../views/student/StudentProfile.vue";
@@ -28,7 +26,6 @@ import StudentSearch from "../views/student/StudentSearch.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
-import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
@@ -49,6 +46,19 @@ const router = createRouter({
       component: AdminLanding,
       beforeEnter: isAdmin,
       children: [
+        { path: "calendar", name: "admin-calendar", component: AdminCalendar },
+        {
+          path: "flightPlan",
+          name: "admin-flightPlan",
+          component: AdminFlightPlan,
+        },
+        {
+          path: "notifications",
+          name: "admin-notifications",
+          component: AdminNotification,
+        },
+        { path: "profile", name: "admin-profile", component: AdminProfile },
+        { path: "search", name: "admin-search", component: AdminSearch },
         {
           path: "task",
           name: "task",
@@ -98,11 +108,22 @@ const router = createRouter({
       beforeEnter: isFaculty,
       children: [
         {
-          path: "event",
-          name: "event",
-          component: EventCardPage,
+          path: "calendar",
+          name: "faculty-calendar",
+          component: FacultyCalendar,
         },
-        /** Put all further faculty routes in here */
+        {
+          path: "flightPlan",
+          name: "faculty-flightPlan",
+          component: FacultyFlightPlan,
+        },
+        {
+          path: "notifications",
+          name: "faculty-notifications",
+          component: FacultyNotification,
+        },
+        { path: "profile", name: "faculty-profile", component: FacultyProfile },
+        { path: "search", name: "faculty-search", component: FacultySearch },
       ],
     },
     {
@@ -110,7 +131,23 @@ const router = createRouter({
       name: "student",
       component: StudentLanding,
       children: [
-        /** Put all further student routes in here */
+        {
+          path: "calendar",
+          name: "student-calendar",
+          component: StudentCalendar,
+        },
+        {
+          path: "flightPlan",
+          name: "student-flightPlan",
+          component: StudentFlightPlan,
+        },
+        {
+          path: "notifications",
+          name: "student-notifications",
+          component: StudentNotification,
+        },
+        { path: "profile", name: "student-profile", component: StudentProfile },
+        { path: "search", name: "student-search", component: StudentSearch },
       ],
     },
     { path: "/:pathMatch(.*)*", component: NotFound },
