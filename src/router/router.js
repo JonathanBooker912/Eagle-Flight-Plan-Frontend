@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
-import EventCardPage from "../views/admin/EventCardPage.vue";
 import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
