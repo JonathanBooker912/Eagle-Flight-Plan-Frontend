@@ -1,8 +1,10 @@
-<script setup></script>
+<script setup>
+import NavBar from "./components/NavBar.vue";
+</script>
 
 <template>
   <v-app>
-    <!-- <MenuBar :key="$route.fullPath" /> -->
+    <NavBar />
     <v-main color="background">
       <router-view />
     </v-main>

@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
-import AdminLanding from "../views/admin/AdminLanding.vue";
-import StudentLanding from "../views/student/StudentLanding.vue";
-import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
 import EventCardPage from "../views/admin/EventCardPage.vue";
 import { userStore } from "../stores/userStore";
@@ -12,6 +9,30 @@ import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
 import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
 import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
 import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
+
+import AdminLanding from "../views/admin/AdminLanding.vue";
+import AdminCalendar from "../views/admin/AdminCalendar.vue";
+import AdminDashboard from "../views/admin/AdminDashboard.vue";
+import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
+import AdminNotification from "../views/admin/AdminNotification.vue";
+import AdminProfile from "../views/admin/AdminProfile.vue";
+import AdminSearch from "../views/admin/AdminSearch.vue";
+
+import StudentLanding from "../views/student/StudentLanding.vue";
+import StudentCalendar from "../views/student/StudentCalendar.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
+import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
+import StudentNotification from "../views/student/StudentNotification.vue";
+import StudentProfile from "../views/student/StudentProfile.vue";
+import StudentSearch from "../views/student/StudentSearch.vue";
+
+import FacultyLanding from "../views/faculty/FacultyLanding.vue";
+import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
+import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
+import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
+import FacultyNotification from "../views/faculty/FacultyNotification.vue";
+import FacultyProfile from "../views/faculty/FacultyProfile.vue";
+import FacultySearch from "../views/faculty/FacultySearch.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
