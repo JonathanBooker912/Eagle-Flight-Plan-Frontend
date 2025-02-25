@@ -5,7 +5,7 @@ import { userStore } from "../stores/userStore"; // Adjust this import based on 
 
 const admin = [
   { "route-name": "admin-profile", "link-text": "Profile" },
-  { "route-name": "admin-dashboard", "link-text": "Dashboard" },
+  { "route-name": "admin", "link-text": "Dashboard" },
   { "route-name": "admin-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
@@ -14,7 +14,7 @@ const admin = [
 
 const faculty = [
   { "route-name": "faculty-profile", "link-text": "Profile" },
-  { "route-name": "faculty-dashboard", "link-text": "Dashboard" },
+  { "route-name": "faculty", "link-text": "Dashboard" },
   { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "faculty-calendar", "link-text": "Calendar" },
   { "route-name": "faculty-notifications", "link-text": "Notifications" },
@@ -23,7 +23,7 @@ const faculty = [
 
 const student = [
   { "route-name": "student-profile", "link-text": "Profile" },
-  { "route-name": "student-dashboard", "link-text": "Dashboard" },
+  { "route-name": "student", "link-text": "Dashboard" },
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
   { "route-name": "student-notifications", "link-text": "Notifications" },
@@ -72,17 +72,21 @@ const getIcon = (linkText) => {
   <v-container class="d-flex flex-column pa-2 userNav bg-secondary">
     <v-list v-if="role === 'admin'" class="pa-0">
       <v-list-item-group v-for="(item, index) in admin" :key="index">
-        <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
+        <v-list-item
+          :to="{ name: item['route-name'] }"
+          class="bg-secondary"
+          exact
+        >
           <v-list-item-content>
             <v-list-item-title
               class="text-body-1 font-weight-bold"
               color="text"
             >
               <div class="nav-item-content">
-                <v-icon :size="32" :color="text" class="mr-2">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" :color="text">{{
+                <span class="nav-text" color="backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
@@ -94,7 +98,11 @@ const getIcon = (linkText) => {
 
     <v-list v-if="role === 'faculty'" class="pa-0">
       <v-list-item-group v-for="(item, index) in faculty" :key="index">
-        <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
+        <v-list-item
+          :to="{ name: item['route-name'] }"
+          class="bg-secondary"
+          exact
+        >
           <v-list-item-content>
             <v-list-item-title
               class="text-body-1 font-weight-bold"
@@ -116,7 +124,11 @@ const getIcon = (linkText) => {
 
     <v-list v-if="role === 'student'" class="pa-0">
       <v-list-item-group v-for="(item, index) in student" :key="index">
-        <v-list-item :to="{ name: item['route-name'] }" class="bg-secondary">
+        <v-list-item
+          :to="{ name: item['route-name'] }"
+          class="bg-secondary"
+          exact
+        >
           <v-list-item-content>
             <v-list-item-title
               class="text-body-1 font-weight-bold"
@@ -164,7 +176,7 @@ const getIcon = (linkText) => {
 }
 
 .userNav:hover {
-  width: 12vw;
+  width: 200px;
   align-items: left;
 }
 
