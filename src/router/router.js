@@ -9,6 +9,7 @@ import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
 import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
+import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
 import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
 import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
 
@@ -61,7 +62,11 @@ const router = createRouter({
           component: ExperienceAddEditPage,
           props: { isAdd: true },
         },
-
+        {
+          path: "badge",
+          name: "badge",
+          component: BadgeCardPage,
+        },
         /** Put all further admin routes in here */
       ],
     },
