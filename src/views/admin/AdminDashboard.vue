@@ -1,7 +1,6 @@
 <script setup>
-
 //import eventServices from '../../services/eventServices';
-import notificationServices from '../../services/notificationServices';
+import notificationServices from "../../services/notificationServices";
 
 import { onMounted, ref } from "vue";
 // import { useModalStore } from "../../store/modal.store";
@@ -13,7 +12,7 @@ import { onMounted, ref } from "vue";
 // const events = ref({});
 const notifications = ref({});
 const isLoaded = ref(false);
-
+/*
 const getEvents = async () => {
   await eventServices
     .getAllEventsForUser()
@@ -22,7 +21,7 @@ const getEvents = async () => {
       isLoaded.value = true;
     })
     .catch((err) => console.log(err));
-};
+};*/
 
 const getNotifications = async () => {
   await notificationServices
@@ -36,11 +35,10 @@ const getNotifications = async () => {
 };
 
 onMounted(() => {
- // getEvents();
+  // getEvents();
   getNotifications();
 });
 //ok so now that we have the services, get the data.
-
 </script>
 
 <template>
@@ -54,6 +52,9 @@ onMounted(() => {
       </v-card>
       <v-card color="background" class="adminItem adminItemSmall">
         <p>Notifications</p>
+        <li v-for="item in notifications">
+          {{ item.header }}
+        </li>
       </v-card>
       <v-card color="background" class="adminItem adminItemBig">
         <p>Test</p>
