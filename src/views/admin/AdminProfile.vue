@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>This is the admin profile page!</h1>
+  <h1>Admin Profile Page</h1>
 </template>

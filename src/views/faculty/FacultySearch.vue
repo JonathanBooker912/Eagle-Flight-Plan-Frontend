@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>This is the faculty search page!</h1>
+  <h1>Faculty Search Page</h1>
 </template>

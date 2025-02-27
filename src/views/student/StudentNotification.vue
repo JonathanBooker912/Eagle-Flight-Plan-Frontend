@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>This is the student notification page!</h1>
+  <h1>Student Notifications Page</h1>
 </template>

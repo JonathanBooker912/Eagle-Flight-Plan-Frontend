@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>This is the faculty calendar page!</h1>
+  <h1>Faculty Calendar Page</h1>
 </template>

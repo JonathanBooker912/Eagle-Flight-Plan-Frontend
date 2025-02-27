@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>This is the student flight plan page!</h1>
+  <h1>Student Flight Plan Page</h1>
 </template>

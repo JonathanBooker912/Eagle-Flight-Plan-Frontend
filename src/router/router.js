@@ -1,32 +1,38 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
+import TasksPage from "../views/admin/TasksPage.vue";
+import { userStore } from "../stores/userStore";
+import NotFound from "../views/NotFound.vue";
+import Unauthorized from "../views/Unauthorized.vue";
+import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
+import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
+import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
+import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
+import RewardPage from "../views/admin/reward/RewardPage.vue";
+import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
+import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
+import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 
-// Admin, Faculty, and Student Imports
-import Admin from "../views/Admin.vue";
+import AdminLanding from "../views/admin/AdminLanding.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 
-import Student from "../views/Student.vue";
+import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
-import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentNotification from "../views/student/StudentNotification.vue";
 import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
-import Faculty from "../views/Faculty.vue";
+import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
-import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
-
-import { userStore } from "../stores/userStore";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,7 +42,6 @@ const router = createRouter({
       alias: "/login",
       name: "login",
       component: Login,
-      beforeEnter: loginRedirect,
     },
     {
       path: "/admin",
@@ -46,11 +51,6 @@ const router = createRouter({
       redirect: "/admin/dashboard",
       children: [
         { path: "calendar", name: "admin-calendar", component: AdminCalendar },
-        {
-          path: "dashboard",
-          name: "admin-dashboard",
-          component: AdminDashboard,
-        },
         {
           path: "flightPlan",
           name: "admin-flightPlan",
@@ -63,6 +63,73 @@ const router = createRouter({
         },
         { path: "profile", name: "admin-profile", component: AdminProfile },
         { path: "search", name: "admin-search", component: AdminSearch },
+        {
+          path: "maintenance",
+          name: "maintenance",
+          component: MaintenanceLandingPage,
+        },
+        {
+          path: "maintenance/task",
+          name: "task",
+          component: TasksPage,
+        },
+        {
+          path: "maintenance/task/edit/:id",
+          name: "editTask",
+          component: TaskAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "maintenance/task/add",
+          name: "addTask",
+          component: TaskAddEditPage,
+          props: { isAdd: true },
+        },
+        {
+          path: "reward",
+          name: "reward",
+          component: RewardPage,
+        },
+        {
+          path: "reward/edit/:id",
+          name: "editReward",
+          component: RewardAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "reward/add",
+          name: "addReward",
+          component: RewardAddEditPage,
+          props: { isAdd: true },
+        },
+        {
+          path: "reward/redeem/:id",
+          name: "redeemReward",
+          component: RewardRedemptionPage,
+        },
+        {
+          path: "maintenance/experience",
+          name: "experience",
+          component: ExperiencesPage,
+        },
+        {
+          path: "maintenance/experience/edit/:id",
+          name: "edit",
+          component: ExperienceAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "maintenance/experience/add",
+          name: "add",
+          component: ExperienceAddEditPage,
+          props: { isAdd: true },
+        },
+        {
+          path: "maintenance/badge",
+          name: "badge",
+          component: BadgeCardPage,
+        },
+        /** Put all further admin routes in here */
       ],
     },
     {
@@ -76,11 +143,6 @@ const router = createRouter({
           path: "calendar",
           name: "faculty-calendar",
           component: FacultyCalendar,
-        },
-        {
-          path: "dashboard",
-          name: "faculty-dashboard",
-          component: FacultyDashboard,
         },
         {
           path: "flightPlan",
@@ -98,7 +160,6 @@ const router = createRouter({
     },
     {
       path: "/student",
-      alias: "/student",
       name: "student",
       component: Student,
       redirect: "/student/dashboard",
@@ -107,11 +168,6 @@ const router = createRouter({
           path: "calendar",
           name: "student-calendar",
           component: StudentCalendar,
-        },
-        {
-          path: "dashboard",
-          name: "student-dashboard",
-          component: StudentDashboard,
         },
         {
           path: "flightPlan",
@@ -127,6 +183,12 @@ const router = createRouter({
         { path: "search", name: "student-search", component: StudentSearch },
       ],
     },
+    { path: "/:pathMatch(.*)*", component: NotFound },
+    {
+      path: "/Unauthorized",
+      name: "unauthorized",
+      component: Unauthorized,
+    },
   ],
 });
 
@@ -135,23 +197,16 @@ router.beforeEach(async (to, from, next) => {
   const isAuthenticated = await store.isAuthenticated();
 
   if (!isAuthenticated) {
-    if (to.path !== "/login") {
-      next({ path: "/login" });
+    if (to.path !== "/login" && to.path !== "/") {
+      next({ name: "login" });
     } else {
       next();
     }
   } else {
-    const hasAdminPrivileges = await store.isAdmin();
-    const hasFacultyPrivileges = await store.isFaculty();
-
-    if (to.path.startsWith("/admin") && hasAdminPrivileges) {
-      next();
-    } else if (to.path.startsWith("/faculty") && hasFacultyPrivileges) {
-      next();
-    } else if (to.path.startsWith("/student")) {
-      next();
+    if (to.path == "/login" || to.path == "/") {
+      next(await loginRedirect());
     } else {
-      next({ path: "/" });
+      next();
     }
   }
 });
@@ -159,39 +214,27 @@ router.beforeEach(async (to, from, next) => {
 // Login Redirect
 export async function loginRedirect() {
   const store = userStore();
-  const isAuthenticated = await store.isAuthenticated();
-  if (isAuthenticated) {
-    const hasAdminPrivileges = await store.isAdmin();
-    if (hasAdminPrivileges) {
-      return { name: "admin" };
-    }
-
-    const hasFacultyPrivileges = await store.isFaculty();
-    if (hasFacultyPrivileges) {
-      return { name: "faculty" };
-    }
-
+  if (await store.isAdmin()) {
+    return { name: "admin" };
+  } else if (await store.isFaculty()) {
+    return { name: "faculty" };
+  } else {
     return { name: "student" };
   }
-  return;
 }
 
 // Admin Check
 async function isAdmin() {
   const store = userStore();
-  const admin = store.roles
-    ? store.roles.some((role) => role.name.toLowerCase() === "admin")
-    : false;
-  return admin;
+  const response = (await store.isAdmin()) ? true : { name: "unauthorized" };
+  return response;
 }
 
 // Faculty Check
 async function isFaculty() {
   const store = userStore();
-  const faculty = store.roles
-    ? store.roles.some((role) => role.name.toLowerCase() === "faculty")
-    : false;
-  return faculty;
+  const response = (await store.isFaculty()) ? true : { name: "unauthorized" };
+  return response;
 }
 
 export default router;

@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>Admin Calendar Page</h1>
+  <h1>Redemption!!</h1>
 </template>

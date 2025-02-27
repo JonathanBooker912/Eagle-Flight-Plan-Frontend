@@ -20,10 +20,10 @@ const redirect = async () => {
   <v-container
     class="d-flex flex-column align-center justify-center fill-height"
   >
-    <v-icon size="128" color="danger">mdi-alert-circle-outline</v-icon>
-    <h1 class="text-h4 font-weight-bold my-4">Page Not Found</h1>
+    <v-icon size="128" color="danger">mdi-lock</v-icon>
+    <h1 class="text-h4 font-weight-bold my-4">Unauthorized Access</h1>
     <p class="text-body-1 mb-6 text-center">
-      The page you are looking for does not exist.
+      You do not have the necessary permissions to view this page.
     </p>
     <v-btn color="primary" to="/" large @click="redirect()">
       Go Back Home

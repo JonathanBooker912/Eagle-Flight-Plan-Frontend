@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>This is the admin notification page!</h1>
+  <h1>Admin Notifications Page</h1>
 </template>
