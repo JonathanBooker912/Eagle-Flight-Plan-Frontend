@@ -5,7 +5,7 @@ import NavBar from "./components/NavBar.vue";
 <template>
   <v-app>
     <v-row no-gutters nowrap>
-      <NavBar />
+      <NavBar v-if="$route.path !== '/'" />
       <v-main color="background">
         <router-view />
       </v-main>
