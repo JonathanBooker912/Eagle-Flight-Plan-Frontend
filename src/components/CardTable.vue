@@ -3,7 +3,7 @@ import { VRow, VCol, VCard } from "vuetify/components";
 
 // Props for number of items per row and items array
 const props = defineProps({
-  items: Array,
+  items: { type: Array, required: true },
   perRow: { type: Number, default: 4 },
   perRowLg: { type: Number, default: 3 },
   perRowMd: { type: Number, default: 2 },
