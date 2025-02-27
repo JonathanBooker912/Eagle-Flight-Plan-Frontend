@@ -12,6 +12,7 @@ import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
 import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
 import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
 import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
+import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,41 +30,46 @@ const router = createRouter({
       beforeEnter: isAdmin,
       children: [
         {
-          path: "task",
+          path: "maintenance",
+          name: "maintenance",
+          component: MaintenanceLandingPage,
+        },
+        {
+          path: "maintenance/task",
           name: "task",
           component: TasksPage,
         },
         {
-          path: "task/edit/:id",
+          path: "maintenance/task/edit/:id",
           name: "editTask",
           component: TaskAddEditPage,
           props: { isAdd: false },
         },
         {
-          path: "task/add",
+          path: "maintenance/task/add",
           name: "addTask",
           component: TaskAddEditPage,
           props: { isAdd: true },
         },
         {
-          path: "experience",
+          path: "maintenance/experience",
           name: "experience",
           component: ExperiencesPage,
         },
         {
-          path: "experience/edit/:id",
+          path: "maintenance/experience/edit/:id",
           name: "edit",
           component: ExperienceAddEditPage,
           props: { isAdd: false },
         },
         {
-          path: "experience/add",
+          path: "maintenance/experience/add",
           name: "add",
           component: ExperienceAddEditPage,
           props: { isAdd: true },
         },
         {
-          path: "badge",
+          path: "maintenance/badge",
           name: "badge",
           component: BadgeCardPage,
         },
