@@ -13,19 +13,18 @@ export default {
   getExperience(experienceId) {
     return apiClient.get(`/experience/${experienceId}`);
   },
-  getSchedulingTypes(){
+  getSchedulingTypes() {
     return apiClient.get("/experience/types/schedulingTypes");
   },
-  getExperienceTypes(){
+  getExperienceTypes() {
     return apiClient.get("/experience/types/experienceTypes");
   },
   // getFulfillingEvents(){
   //   return apiClient.get("/experience/types/fulfillingEvents");
   // },
   getCategories() {
-    return apiClient.get("/experience/types/categories")
+    return apiClient.get("/experience/types/categories");
   },
-
 
   createExperience(experienceData) {
     return apiClient.post("/experience", experienceData);

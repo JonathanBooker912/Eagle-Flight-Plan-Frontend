@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { required, positiveNumber } from "../../../utils/formValidators";
+import { required } from "../../../utils/formValidators";
 import experienceServices from "../../../services/experienceServices";
 
 const props = defineProps({ isAdd: Boolean });
@@ -11,7 +11,6 @@ const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
 const experienceTypes = ref([]);
-const completionTypes = ref([]);
 
 const route = useRoute();
 const router = useRouter();
@@ -28,7 +27,10 @@ const handleSubmit = async () => {
     if (props.isAdd) {
       await experienceServices.createExperience(formData.value);
     } else {
-      await experienceServices.updateExperience(route.params.id, formData.value);
+      await experienceServices.updateExperience(
+        route.params.id,
+        formData.value,
+      );
     }
     router.push({ name: "experience" });
   } catch (error) {
@@ -38,12 +40,11 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, experienceTypesRes,  fulfillingEventsRes] =
+    const [categoriesRes, schedulingRes, experienceTypesRes] =
       await Promise.all([
         experienceServices.getCategories(),
         experienceServices.getSchedulingTypes(),
         experienceServices.getExperienceTypes(),
-        // experienceServices.getFulfillingEvents(),
       ]);
 
     categories.value = categoriesRes.data;
@@ -52,7 +53,9 @@ onMounted(async () => {
     // getFulfillingEvents.value = getFulfillingEventsRes.data;
 
     if (!props.isAdd) {
-      formData.value = (await experienceServices.getExperience(route.params.id)).data;
+      formData.value = (
+        await experienceServices.getExperience(route.params.id)
+      ).data;
     }
   } catch (error) {
     console.error("Error fetching data:", error);
