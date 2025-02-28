@@ -13,8 +13,6 @@ export default {
   getExperience(experienceId) {
     return apiClient.get(`/experience/${experienceId}`);
   },
-
-
   getSchedulingTypes(){
     return apiClient.get("/experience/types/schedulingTypes");
   },
