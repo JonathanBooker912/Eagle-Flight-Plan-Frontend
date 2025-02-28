@@ -82,7 +82,6 @@
 
 <style scoped>
     .cardContainer {
-        min-width: 280px;
         border-radius: 25px;
     }
     .cardButton {
