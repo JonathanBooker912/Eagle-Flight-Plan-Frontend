@@ -1,10 +1,13 @@
 <script setup>
-    import { ref } from "vue";
+    import { onMounted, ref } from "vue";
     import { useRouter, useRoute } from "vue-router";
     import { required, positiveNumber } from "../../../utils/formValidators";
     import rewardServices from "../../../services/rewardServices";
 
-    const props = defineProps({ isAdd: Boolean });
+    const props = defineProps({
+        isAdd: Boolean
+    });
+    const errorMessage = ref("");
 
     const form = ref(null);
     const formData = ref({});
@@ -29,13 +32,31 @@
                     formData.value
                 );
             }
-            // router.push({ name: "reward" });
+            router.push({ name: "reward" });
         } catch (error) {
+            errorMessage.value =
+                error.response.data.message ?? "An error occurred";
             console.error("Error saving task:", error);
         }
     };
+
+    onMounted(async () => {
+        if (!props.isAdd) {
+            try {
+                const response = await rewardServices.getReward(
+                    route.params.id
+                );
+                formData.value = response.data;
+            } catch (err) {
+                errorMessage.value = err.response.data.message;
+            }
+        }
+    });
 </script>
 <template>
+    <v-alert closable v-if="errorMessage" type="error">
+        {{ errorMessage }}
+    </v-alert>
     <h1 class="text-center ma-5">
         {{ props.isAdd ? "Add Reward" : "Edit Reward" }}
     </h1>
@@ -87,7 +108,6 @@
                 variant="solo"
                 rounded="lg"
                 label="Image File"
-                :rules="[required]"
             ></v-file-input>
             <v-row class="justify-center my-1">
                 <v-btn
