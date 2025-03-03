@@ -44,7 +44,9 @@ const handleShop = (rewardId) => {
 
 const handleDelete = async (rewardId, rewardFileName) => {
   try {
-    await rewardServices.deleteRewardImage(rewardFileName);
+    if (rewardFileName) {
+      await rewardServices.deleteRewardImage(rewardFileName);
+    }
     await rewardServices.deleteReward(rewardId);
     await getRewards(); // Re-fetch rewards after delete
   } catch (error) {
