@@ -144,6 +144,7 @@ onMounted(async () => {
         variant="solo"
         rounded="lg"
         label="Image File"
+        chips
         :rules="[fileTypeRule]"
       ></v-file-input>
       <v-row class="justify-center my-1">
