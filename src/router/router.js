@@ -153,6 +153,11 @@ const router = createRouter({
           name: "adminStudentFlightPlan",
           component: AdminUserFlightPlan,
         },
+        {
+          path: "maintenance/event",
+          name: "event",
+          component: EventCardPage,
+        },
         /** Put all further admin routes in here */
       ],
     },
