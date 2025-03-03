@@ -4,7 +4,7 @@ import notificationServices from "../../services/notificationServices";
 import EventCard from "../../components/cards/EventCard.vue";
 
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+//import { useRoute } from "vue-router";
 // import { useModalStore } from "../../store/modal.store";
 // import { storeToRefs } from "pinia";
 
@@ -14,7 +14,7 @@ import { useRoute } from "vue-router";
 const events = ref([]);
 const notifications = ref([]);
 const isLoaded = ref(false);
-const route = useRoute();
+//const route = useRoute();
 
 const getEvents = async () => {
   await eventServices
