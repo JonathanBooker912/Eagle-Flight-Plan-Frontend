@@ -41,7 +41,7 @@ onMounted(() => {
       :items="sortOptions"
       label="Sort by"
       hide-details
-      @update:modelValue="emitSort"
+      @update:model-value="emitSort"
     ></v-select>
     <v-icon class="ml-4" @click="toggleSortDirection">{{
       sortDirection === "asc" ? "mdi-arrow-up" : "mdi-arrow-down"
