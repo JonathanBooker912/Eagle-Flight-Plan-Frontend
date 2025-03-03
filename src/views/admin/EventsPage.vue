@@ -70,7 +70,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value }
+      { ...filters.value, ...sortOptions.value },
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -108,7 +108,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id
+      (strength) => strength.id,
     );
   }
   getEvents();
@@ -154,8 +154,8 @@ onMounted(() => {
         ></EventCard>
       </template>
       <template #filters>
-        <DatePickerField label="Start Date" v-model="filters.startDate" />
-        <DatePickerField label="End Date" v-model="filters.endDate" />
+        <DatePickerField v-model="filters.startDate" label="Start Date" />
+        <DatePickerField v-model="filters.endDate" label="End Date" />
         <v-combobox
           v-model="filters.strengths"
           :items="strengths"
@@ -172,7 +172,7 @@ onMounted(() => {
         ></v-text-field>
         <SortSelect
           v-model="sortOptions"
-          :sortOptions="sortProperties"
+          :sort-options="sortProperties"
         ></SortSelect>
       </template>
       <template #pagination>

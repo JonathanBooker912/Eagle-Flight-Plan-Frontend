@@ -23,7 +23,7 @@ const getTasks = async (pageNumber = page.value) => {
     const result = await taskServices.getAllTasks(
       pageNumber,
       PAGE_SIZE,
-      searchQuery.value
+      searchQuery.value,
     );
     tasks.value = result.data.tasks;
     count.value = result.data.count;
