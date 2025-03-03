@@ -1,4 +1,15 @@
 <script setup></script>
 <template>
-  <h1>Admin Notifications Page</h1>
+ <v-card color="background" class="background">
+  <p>Test</p>
+ </v-card>
 </template>
+
+
+<style>
+
+.background {
+  height: 90vh;
+}
+
+</style>
