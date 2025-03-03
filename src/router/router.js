@@ -14,21 +14,22 @@ import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
 import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 
-import AdminLanding from "../views/admin/AdminDashboard.vue";
+import Admin from "../views/admin/Admin.vue";
+import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 
-import StudentLanding from "../views/student/StudentLanding.vue";
+import Student from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentNotification from "../views/student/StudentNotification.vue";
 import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
-import FacultyLanding from "../views/faculty/FacultyLanding.vue";
+import Faculty from "../views/faculty/FacultyDashboard.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
@@ -64,6 +65,11 @@ const router = createRouter({
           path: "flightPlan",
           name: "admin-flightPlan",
           component: AdminFlightPlan,
+        },
+        {
+          path: "dashboard",
+          name: "admin-dashboard",
+          component: AdminDashboard,
         },
         {
           path: "notifications",

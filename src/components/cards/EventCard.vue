@@ -14,6 +14,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  isEdit: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const eventDate = computed(() => {
@@ -33,9 +37,16 @@ const viewCard = () => {};
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
 });
+
+// GEORGE PLEASE CHECK THE BOOL LOGIC
 </script>
+
 <template>
-  <v-card v-if="isAdmin" color="backgroundDarken" class="cardContainer">
+  <v-card
+    v-if="isAdmin && isEdit"
+    color="backgroundDarken"
+    class="cardContainer"
+  >
     <v-row no-gutters>
       <v-col>
         <v-card-text>
@@ -100,6 +111,7 @@ onMounted(async () => {
   max-width: 20vw;
   min-width: 280px;
   border-radius: 25px;
+  margin: 4px;
 }
 .cardButton {
   border-radius: 13px;
