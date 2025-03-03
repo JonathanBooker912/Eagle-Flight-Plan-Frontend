@@ -42,8 +42,10 @@ onMounted(async () => {
           <p class="text-h5 text-no-wrap text-truncate">
             {{ props.event.name }}
           </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ props.event.location }}
+          <p
+            class="text-subtitle-1 font-weight-regular text-no-wrap text-truncate"
+          >
+            {{ props.event.location || "No Location" }}
           </p>
           <p class="text-subtitle-1 font-weight-regular">
             {{ eventDate }}

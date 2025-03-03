@@ -17,6 +17,12 @@ const selectedDate = ref(
   props.modelValue ? dayjs(props.modelValue).toDate() : null
 );
 
+watch(props, () => {
+  if (props.modelValue == null) {
+    selectedDate.value = null;
+  }
+});
+
 watch(selectedDate, (newValue) => {
   emit("update:modelValue", newValue); // Emit the updated value to the parent
 });
