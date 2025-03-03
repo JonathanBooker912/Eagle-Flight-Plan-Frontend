@@ -1,7 +1,11 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { required, positiveNumber } from "../../../utils/formValidators";
+import {
+  required,
+  positiveNumber,
+  fileTypeRule,
+} from "../../../utils/formValidators";
 import rewardServices from "../../../services/rewardServices";
 
 // Define statements for vue
@@ -140,6 +144,7 @@ onMounted(async () => {
         variant="solo"
         rounded="lg"
         label="Image File"
+        :rules="[fileTypeRule]"
       ></v-file-input>
       <v-row class="justify-center my-1">
         <v-btn

@@ -6,3 +6,12 @@ export const positiveNumber = (input) => {
     ? true
     : "Must be an integer greater than 0";
 };
+
+export const fileTypeRule = (value) => {
+  if (!value || !value.length) return true; // Allow empty input
+  const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+  return (
+    allowedTypes.includes(value[0].type) ||
+    "Only PNG, JPG, WEBP, and JPEG files are allowed."
+  );
+};
