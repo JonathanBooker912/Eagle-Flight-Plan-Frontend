@@ -4,17 +4,22 @@
     import { required, positiveNumber } from "../../../utils/formValidators";
     import rewardServices from "../../../services/rewardServices";
 
+    // Define statements for vue
     const props = defineProps({
         isAdd: Boolean
     });
-    const errorMessage = ref("");
 
-    const form = ref(null);
-    const formData = ref({});
-
+    // Vue specific statements
     const route = useRoute();
     const router = useRouter();
 
+    // Reactive states
+    const errorMessage = ref("");
+    const form = ref(null);
+    const formData = ref({});
+    const image = ref(null);
+
+    // Functions
     const handleCancel = () => {
         router.push({ name: "reward" });
     };
@@ -22,11 +27,12 @@
     const handleSubmit = async () => {
         const isValid = (await form.value?.validate())?.valid;
         if (!isValid) return;
-
         try {
             if (props.isAdd) {
+                await uploadImage();
                 await rewardServices.createReward(formData.value);
             } else {
+                await handleImageUpdate();
                 await rewardServices.updateReward(
                     route.params.id,
                     formData.value
@@ -34,21 +40,44 @@
             }
             router.push({ name: "reward" });
         } catch (error) {
-            errorMessage.value =
-                error.response.data.message ?? "An error occurred";
+            errorMessage.value = "An error occurred while trying to submit.";
             console.error("Error saving task:", error);
         }
     };
 
+    const uploadImage = async () => {
+        if (!image.value) return;
+        const response = await rewardServices.uploadRewardImage({
+            image: image.value
+        });
+        formData.value.imageName = response.data.fileName;
+    };
+
+    const handleImageUpdate = async () => {
+        if (image.value && formData.value.imageName !== image.value.name) {
+            await rewardServices.deleteRewardImage(formData.value.imageName);
+            await uploadImage();
+        }
+        formData.value.image = undefined;
+    };
+
+    // Vue functions
     onMounted(async () => {
         if (!props.isAdd) {
             try {
-                const response = await rewardServices.getReward(
-                    route.params.id
-                );
+                let response = await rewardServices.getReward(route.params.id);
                 formData.value = response.data;
+                if (formData.value.imageName) {
+                    response = await rewardServices.getRewardImage(
+                        formData.value.imageName
+                    );
+                    image.value = new File(
+                        [response.data.image],
+                        formData.value.imageName
+                    );
+                }
             } catch (err) {
-                errorMessage.value = err.response.data.message;
+                console.log("Error", err);
             }
         }
     });
@@ -104,7 +133,7 @@
                 :rules="[required]"
             ></v-textarea>
             <v-file-input
-                v-model="formData.image"
+                v-model="image"
                 variant="solo"
                 rounded="lg"
                 label="Image File"

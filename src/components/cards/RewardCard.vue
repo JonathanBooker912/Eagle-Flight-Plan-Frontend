@@ -1,13 +1,17 @@
 <script setup>
     import { ref, onMounted, onUnmounted } from "vue";
     import defaultImage from "/defaultRewardImage.png";
+
+    // Define statements for vue
     const props = defineProps({
         reward: { type: Object, required: true }
     });
     const emit = defineEmits(["edit", "delete", "shop"]);
 
+    // Reactive states
     const imageSrc = ref("");
 
+    // Functions
     const loadImage = (image) => {
         if (!image || !image.data) return;
 
@@ -18,6 +22,7 @@
         imageSrc.value = URL.createObjectURL(blob);
     };
 
+    // Vue functions
     onMounted(() => {
         loadImage(props.reward.image);
     });
@@ -68,7 +73,9 @@
                 <v-btn
                     color="danger"
                     class="cardButton"
-                    @click="emit('delete', props.reward.id)"
+                    @click="
+                        emit('delete', props.reward.id, props.reward.imageName)
+                    "
                     ><v-icon
                         icon="mdi-delete"
                         color="text"

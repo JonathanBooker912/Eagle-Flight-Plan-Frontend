@@ -1,6 +1,6 @@
 import apiClient from "./services.js";
 import axios from "axios";
-import Utils from "../config/utils.js";
+import { getAuthHeader, jsonToFormData, getBaseURL } from "./serviceUtils.js";
 export default {
     getAllRewards(page, pageSize, searchQuery) {
         return apiClient.get("/reward", {
@@ -18,42 +18,23 @@ export default {
         return apiClient.get(`/reward/${rewardId}`);
     },
     createReward(rewardData) {
-        let baseurl = getBaseURL();
-        let formData = jsonToFormData(rewardData);
-        return axios.post(baseurl + `/reward`, formData, {
-            headers: { Authorization: getAuthHeader() }
+        return apiClient.post("/reward", rewardData);
+    },
+    uploadRewardImage(rewardData) {
+        const authHeader = getAuthHeader();
+        const formData = jsonToFormData(rewardData);
+        const baseURL = getBaseURL();
+        return axios.post(`${baseURL}/reward/upload`, formData, {
+            headers: { Authorization: authHeader }
         });
+    },
+    deleteRewardImage(fileName) {
+        return apiClient.delete(`/reward/image/${fileName}`);
+    },
+    getRewardImage(fileName) {
+        return apiClient.get(`/reward/image/${fileName}`);
     },
     updateReward(rewardId, rewardData) {
         return apiClient.put(`/reward/${rewardId}`, rewardData);
     }
 };
-
-function jsonToFormData(json) {
-    const formData = new FormData();
-    for (const key in json) {
-        if (json.hasOwnProperty(key)) {
-            formData.append(key, json[key]);
-        }
-    }
-    return formData;
-}
-
-function getAuthHeader() {
-    let user = Utils.getStore("user");
-    if (user != null) {
-        let token = user.token;
-        let authHeader = "";
-        if (token != null && token != "") authHeader = "Bearer " + token;
-        return authHeader;
-    }
-    return "";
-}
-
-function getBaseURL() {
-    if (import.meta.env.DEV) {
-        return "http://localhost:3031/flight-plan-t1";
-    } else {
-        return "/flight-plan-t1";
-    }
-}
