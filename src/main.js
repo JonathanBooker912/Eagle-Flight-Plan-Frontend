@@ -3,7 +3,6 @@ import App from "./App.vue";
 import router from "./router/router.js";
 import vuetify from "./plugins/vuetify.js";
 //import mdiVue from "mdi-vue/v3";
-import * as mdijs from "@mdi/js";
 import "@mdi/font/css/materialdesignicons.css";
 import { createPinia } from "pinia";
 import { userStore } from "./stores/userStore.js";
