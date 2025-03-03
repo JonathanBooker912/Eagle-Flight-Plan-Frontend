@@ -49,7 +49,11 @@ const router = createRouter({
       component: AdminLanding,
       beforeEnter: isAdmin,
       children: [
-        { path: "calendar", name: "admin-calendar", component: AdminCalendar },
+        {
+          path: "calendar",
+          name: "admin-calendar",
+          component: AdminCalendar,
+        },
         {
           path: "flightPlan",
           name: "admin-flightPlan",
@@ -60,8 +64,16 @@ const router = createRouter({
           name: "admin-notifications",
           component: AdminNotification,
         },
-        { path: "profile", name: "admin-profile", component: AdminProfile },
-        { path: "search", name: "admin-search", component: AdminSearch },
+        {
+          path: "profile",
+          name: "admin-profile",
+          component: AdminProfile,
+        },
+        {
+          path: "search",
+          name: "admin-search",
+          component: AdminSearch,
+        },
         {
           path: "maintenance",
           name: "maintenance",
@@ -85,24 +97,24 @@ const router = createRouter({
           props: { isAdd: true },
         },
         {
-          path: "reward",
+          path: "/maintenance/reward",
           name: "reward",
           component: RewardPage,
         },
         {
-          path: "reward/edit/:id",
+          path: "/maintenance/reward/edit/:id",
           name: "editReward",
           component: RewardAddEditPage,
           props: { isAdd: false },
         },
         {
-          path: "reward/add",
+          path: "/maintenance/reward/add",
           name: "addReward",
           component: RewardAddEditPage,
           props: { isAdd: true },
         },
         {
-          path: "reward/redeem/:id",
+          path: "/maintenance/reward/redeem/:id",
           name: "redeemReward",
           component: RewardRedemptionPage,
         },
@@ -152,8 +164,16 @@ const router = createRouter({
           name: "faculty-notifications",
           component: FacultyNotification,
         },
-        { path: "profile", name: "faculty-profile", component: FacultyProfile },
-        { path: "search", name: "faculty-search", component: FacultySearch },
+        {
+          path: "profile",
+          name: "faculty-profile",
+          component: FacultyProfile,
+        },
+        {
+          path: "search",
+          name: "faculty-search",
+          component: FacultySearch,
+        },
       ],
     },
     {
@@ -176,8 +196,16 @@ const router = createRouter({
           name: "student-notifications",
           component: StudentNotification,
         },
-        { path: "profile", name: "student-profile", component: StudentProfile },
-        { path: "search", name: "student-search", component: StudentSearch },
+        {
+          path: "profile",
+          name: "student-profile",
+          component: StudentProfile,
+        },
+        {
+          path: "search",
+          name: "student-search",
+          component: StudentSearch,
+        },
       ],
     },
     { path: "/:pathMatch(.*)*", component: NotFound },
