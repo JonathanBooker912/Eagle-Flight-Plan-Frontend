@@ -11,7 +11,7 @@ import { useRoute } from "vue-router";
 //const modalStore = useModalStore();
 
 //const items = ref([]);
-const events = ref({});
+const events = ref([]);
 const notifications = ref([]);
 const isLoaded = ref(false);
 const route = useRoute();
@@ -54,14 +54,11 @@ onMounted(() => {
           >Upcoming Events</strong
         >
         <EventCard
-          v-for=""
+          v-for="(item, index) in events.slice(0, 2)"
+          :key="index"
+          :event="item"
           :isEdit="false"
-          :to="{ name: 'admin-notifications' }"
-        ></EventCard>
-        <EventCard
-          :event="event2"
-          :isEdit="false"
-          :to="{ name: 'admin-notifications' }"
+          :to="{ name: 'admin-calendar' }"
         ></EventCard>
       </v-card>
       <v-card color="background" class="adminItem adminItemBig">
@@ -73,11 +70,11 @@ onMounted(() => {
         >
         <div id="notifList">
           <v-card
+            v-for="(item, index) in notifications.slice(0, 4)"
+            :key="index"
             :to="{ name: 'admin-notifications' }"
             class="notification"
             color="background"
-            v-for="(item, index) in notifications.slice(0, 4)"
-            :key="index"
           >
             <div style="display: flex; align-items: center">
               <img
