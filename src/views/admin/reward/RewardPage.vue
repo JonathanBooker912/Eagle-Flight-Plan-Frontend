@@ -42,8 +42,11 @@ const handleShop = (rewardId) => {
   router.push({ name: "redeemReward", params: { id: rewardId } });
 };
 
-const handleDelete = async (rewardId) => {
+const handleDelete = async (rewardId, rewardFileName) => {
   try {
+    if (rewardFileName) {
+      await rewardServices.deleteRewardImage(rewardFileName);
+    }
     await rewardServices.deleteReward(rewardId);
     await getRewards(); // Re-fetch rewards after delete
   } catch (error) {

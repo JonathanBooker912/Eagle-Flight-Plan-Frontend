@@ -50,8 +50,8 @@ const handleRouteClick = (routeName) => {
       >
         <v-card
           class="pa-10 rounded-xl"
-          @click="handleRouteClick(route.routeName)"
           color="backgroundDarken"
+          @click="handleRouteClick(route.routeName)"
         >
           <v-card-text color="text" class="text-center text-h5">{{
             route.name
