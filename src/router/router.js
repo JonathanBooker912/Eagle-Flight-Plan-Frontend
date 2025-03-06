@@ -19,6 +19,7 @@ import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
+import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
@@ -33,6 +34,7 @@ import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
+import AdminUserFlightPlan from "../views/admin/user/AdminUserFlightPlan.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -139,6 +141,16 @@ const router = createRouter({
           path: "maintenance/badge",
           name: "badge",
           component: BadgeCardPage,
+        },
+        {
+          path: "maintenance/user",
+          name: "user",
+          component: AdminUserPage,
+        },
+        {
+          path: "maintenance/user/studentFlightPlan/:id",
+          name: "adminStudentFlightPlan",
+          component: AdminUserFlightPlan,
         },
         /** Put all further admin routes in here */
       ],

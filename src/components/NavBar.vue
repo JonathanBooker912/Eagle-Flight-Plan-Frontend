@@ -63,6 +63,7 @@ const getIcon = (linkText) => {
     Calendar: "mdi-calendar",
     Notifications: "mdi-bell",
     Search: "mdi-magnify",
+    Maintenance: "mdi-cog",
   };
 
   return icons[linkText] || "mdi-circle"; // Default if not found
