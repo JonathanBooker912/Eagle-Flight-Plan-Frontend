@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 const props = defineProps({
   user: { type: Object, required: true },
 });
+const emit = defineEmits(["cardPressed"]);
 const initials = ref("");
 const isAdmin = ref(false);
 
@@ -15,7 +16,11 @@ onMounted(() => {
 });
 </script>
 <template>
-  <v-card color="backgroundDarken" class="cardContainer pa-0 ma-0">
+  <v-card
+    color="backgroundDarken"
+    class="cardContainer pa-0 ma-0"
+    @click="emit('cardPressed', props.user.id, isAdmin)"
+  >
     <v-container class="pa-2">
       <v-row no-gutters style="align-self: stretch">
         <v-sheet

@@ -1,4 +1,5 @@
 <script setup>
+import { useRouter } from "vue-router";
 import CardHeader from "../../../components/CardHeader.vue";
 import UserCard from "../../../components/cards/UserCard.vue";
 import CardTable from "../../../components/CardTable.vue";
@@ -9,6 +10,8 @@ const users = ref([]);
 const page = ref(1);
 const count = ref(0);
 const searchQuery = ref("");
+
+const router = useRouter();
 
 const fetchUsers = async ({
   pageNumber = page.value,
@@ -22,6 +25,11 @@ const fetchUsers = async ({
 const handleSearchChange = (input) => {
   searchQuery.value = input;
   page.value = 1; // Reset to first page on search change
+};
+
+const handleCardClick = (id, isAdmin) => {
+  if (isAdmin) return;
+  router.push({ name: "adminStudentFlightPlan", params: { id } });
 };
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
@@ -46,7 +54,11 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
       :per-row-sm="2"
     >
       <template #item="{ item }">
-        <UserCard :user="item" :key="item.id"></UserCard>
+        <UserCard
+          :user="item"
+          :key="item.id"
+          @card-pressed="handleCardClick"
+        ></UserCard>
       </template>
     </CardTable>
     <v-pagination
