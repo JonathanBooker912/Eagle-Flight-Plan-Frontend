@@ -1,81 +1,73 @@
 <script setup>
-    // Props definition
-    const props = defineProps({
-        label: { type: String, default: "Label" },
-        addButton: { type: Boolean, default: true }
-    });
+// Props definition
+const props = defineProps({
+  label: { type: String, default: "Label" },
+  addButton: { type: Boolean, default: true },
+});
 
-    // Emit event functions
-    const emit = defineEmits(["changed", "add"]);
+// Emit event functions
+const emit = defineEmits(["changed", "add"]);
 
-    const handleChange = (newValue) => emit("changed", newValue);
-    const handleAdd = () => emit("add");
+const handleChange = (newValue) => emit("changed", newValue);
+const handleAdd = () => emit("add");
 </script>
 
 <template>
-    <v-row align="center" class="mt-12" no-gutters>
-        <!-- Header -->
-        <v-col
-            cols="auto"
-            class="d-flex justify-center"
-            style="min-width: 100px"
+  <v-row align="center" class="mt-12" no-gutters>
+    <!-- Header -->
+    <v-col cols="auto" class="d-flex justify-center" style="min-width: 100px">
+      <h2 class="text-h5">{{ props.label }}</h2>
+    </v-col>
+
+    <!-- Search Field -->
+    <v-col class="flex-grow-1 mx-4">
+      <v-text-field
+        label="Search"
+        append-inner-icon="mdi-magnify"
+        density="compact"
+        hide-details
+        variant="solo"
+        rounded="xl"
+        bg-color="backgroundDarken"
+        color="text"
+        @update:model-value="handleChange"
+      ></v-text-field>
+    </v-col>
+
+    <!-- Buttons -->
+    <v-col cols="auto" class="d-flex justify-end" style="min-width: 50px">
+      <!-- Add button -->
+      <div v-if="props.addButton">
+        <v-btn
+          v-if="$vuetify.display.smAndUp"
+          rounded="xl"
+          class="mr-2"
+          color="backgroundDarken"
+          @click="handleAdd"
         >
-            <h2 class="text-h5">{{ props.label }}</h2>
-        </v-col>
+          <v-icon icon="mdi-plus"></v-icon>
+        </v-btn>
+        <v-btn
+          v-else
+          icon="mdi-plus"
+          color="backgroundDarken"
+          class="mr-1"
+          @click="handleAdd"
+        ></v-btn>
+      </div>
 
-        <!-- Search Field -->
-        <v-col class="flex-grow-1 mx-4">
-            <v-text-field
-                label="Search"
-                append-inner-icon="mdi-magnify"
-                density="compact"
-                hide-details
-                variant="solo"
-                rounded="xl"
-                bg-color="backgroundDarken"
-                color="text"
-                @update:model-value="handleChange"
-            ></v-text-field>
-        </v-col>
-
-        <!-- Buttons -->
-        <v-col cols="auto" class="d-flex justify-end" style="min-width: 50px">
-            <!-- Add button -->
-            <div v-if="props.addButton">
-                <v-btn
-                    v-if="$vuetify.display.smAndUp"
-                    rounded="xl"
-                    class="mr-2"
-                    color="backgroundDarken"
-                    @click="handleAdd"
-                >
-                    <v-icon icon="mdi-plus"></v-icon>
-                </v-btn>
-                <v-btn
-                    v-else
-                    icon="mdi-plus"
-                    color="backgroundDarken"
-                    class="mr-1"
-                    @click="handleAdd"
-                ></v-btn>
-            </div>
-
-            <!-- Filter & Sort button (desktop) -->
-            <v-btn
-                v-if="$vuetify.display.smAndUp"
-                color="backgroundDarken"
-                rounded="xl"
-            >
-                Filter & Sort
-            </v-btn>
-            <!-- Filter icon button (mobile) -->
-            <v-btn
-                v-else
-                icon="mdi-filter-variant"
-                color="backgroundDarken"
-            ></v-btn>
-        </v-col>
-    </v-row>
+      <!-- Filter & Sort button (desktop) -->
+      <v-btn
+        v-if="$vuetify.display.smAndUp"
+        color="backgroundDarken"
+        rounded="xl"
+      >
+        Filter & Sort
+      </v-btn>
+      <!-- Filter icon button (mobile) -->
+      <v-btn v-else icon="mdi-filter-variant" color="backgroundDarken"></v-btn>
+    </v-col>
+  </v-row>
 </template>
 
 <style scoped></style>
