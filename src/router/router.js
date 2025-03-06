@@ -24,6 +24,7 @@ import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import Student from "../views/student/StudentDashboard.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentNotification from "../views/student/StudentNotification.vue";
@@ -31,14 +32,13 @@ import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
 import Faculty from "../views/faculty/FacultyDashboard.vue";
+import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
 import AdminUserFlightPlan from "../views/admin/user/AdminUserFlightPlan.vue";
-
-import { userStore } from "../stores/userStore";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

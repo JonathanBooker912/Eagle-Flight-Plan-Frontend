@@ -13,7 +13,7 @@ const pinia = createPinia();
 app.use(router);
 app.use(vuetify);
 app.use(pinia);
-app.use(mdiVue, { icons: mdijs });
+//app.use(mdiVue, { icons: mdijs });
 
 const store = userStore();
 store.initalSetup();
