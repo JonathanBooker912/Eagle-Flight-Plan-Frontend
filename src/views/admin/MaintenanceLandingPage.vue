@@ -39,7 +39,7 @@ const handleRouteClick = (routeName) => {
 </script>
 
 <template>
-  <v-container class="">
+  <v-container>
     <v-row>
       <v-col
         v-for="(route, index) in routes"

@@ -21,6 +21,7 @@ import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
+import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import Student from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
@@ -35,6 +36,7 @@ import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
+import AdminUserFlightPlan from "../views/admin/user/AdminUserFlightPlan.vue";
 
 import { userStore } from "../stores/userStore";
 
@@ -310,6 +312,16 @@ const router = createRouter({
           path: "profile",
           name: "admin-profile",
           component: AdminProfile,
+        },
+        {
+          path: "maintenance/user",
+          name: "user",
+          component: AdminUserPage,
+        },
+        {
+          path: "maintenance/user/studentFlightPlan/:id",
+          name: "adminStudentFlightPlan",
+          component: AdminUserFlightPlan,
         },
         {
           path: "search",
