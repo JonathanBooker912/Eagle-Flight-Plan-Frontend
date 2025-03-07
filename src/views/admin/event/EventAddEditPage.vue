@@ -1,7 +1,10 @@
 <script setup>
 const props = defineProps({
   isAdd: Boolean,
-  id: Number,
+  id: {
+    type: Number,
+    default: -1,
+  },
 });
 </script>
 <template>

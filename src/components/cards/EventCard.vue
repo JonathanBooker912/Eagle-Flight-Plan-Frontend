@@ -6,7 +6,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
-const emit = defineEmits(["edit"]);
+const emit = defineEmits(["edit", "delete"]);
 
 const store = userStore();
 const isAdmin = ref(false);
