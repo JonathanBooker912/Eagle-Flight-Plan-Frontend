@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
 import EventCardPage from "../views/admin/EventsPage.vue";
+import EventAddEditPage from "../views/admin/event/EventAddEditPage.vue";
 import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
@@ -157,6 +158,18 @@ const router = createRouter({
           path: "maintenance/event",
           name: "event",
           component: EventCardPage,
+        },
+        {
+          path: "maintenance/event/edit/:id",
+          name: "editEvent",
+          component: EventAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "maintenance/event/add",
+          name: "addEvent",
+          component: EventAddEditPage,
+          props: { isAdd: true },
         },
         /** Put all further admin routes in here */
       ],

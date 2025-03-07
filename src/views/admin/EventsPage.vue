@@ -53,6 +53,7 @@ const sortOptions = ref({
 const display = useDisplay();
 
 const numCardColumns = computed(() => {
+  if (display.xxl.value) return 4;
   if (display.xl.value) return showFilters.value ? 3 : 4;
   if (display.lg.value) return showFilters.value ? 3 : 4;
   if (display.md.value) return showFilters.value ? 2 : 3;
@@ -70,7 +71,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value },
+      { ...filters.value, ...sortOptions.value }
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -108,7 +109,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id,
+      (strength) => strength.id
     );
   }
   getEvents();

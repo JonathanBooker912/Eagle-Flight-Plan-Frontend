@@ -6,6 +6,8 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
+const emit = defineEmits(["edit"]);
+
 const store = userStore();
 const isAdmin = ref(false);
 
@@ -29,6 +31,10 @@ const eventTime = computed(() => {
 });
 
 const viewCard = () => {};
+
+const editEvent = () => {
+  emit("edit", props.event.id);
+};
 
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
@@ -55,10 +61,17 @@ onMounted(async () => {
           </p>
         </v-card-text>
         <v-row class="ma-2 float-right">
-          <v-btn color="warning" class="mr-2 cardButton elevation-0">
+          <v-btn
+            color="warning"
+            class="mr-2 cardButton elevation-0"
+            @click="editEvent"
+          >
             <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
           </v-btn>
-          <v-btn color="danger" class="cardButton elevation-0"
+          <v-btn
+            color="danger"
+            class="cardButton elevation-0"
+            @click="emit('delete', props.event.id)"
             ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
           ></v-btn>
         </v-row>
