@@ -10,6 +10,8 @@ const users = ref([]);
 const page = ref(1);
 const count = ref(0);
 const searchQuery = ref("");
+const studentPopup = ref(false);
+const popUpId = ref(null);
 
 const router = useRouter();
 
@@ -28,8 +30,24 @@ const handleSearchChange = (input) => {
 };
 
 const handleCardClick = (id, isAdmin) => {
-  if (isAdmin) return;
-  router.push({ name: "adminStudentFlightPlan", params: { id } });
+  if (isAdmin) {
+    router.push({ name: "adminProfile", params: { id } });
+  } else {
+    studentPopup.value = true;
+    popUpId.value = id;
+  }
+};
+
+const handleDialogClick = (optionNumber) => {
+  optionNumber
+    ? router.push({
+        name: "adminProfile",
+        params: { id: popUpId.value },
+      })
+    : router.push({
+        name: "adminStudentFlightPlan",
+        params: { id: popUpId.value },
+      });
 };
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
@@ -38,8 +56,8 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
   <v-container>
     <CardHeader
       label="Users"
-      @changed="handleSearchChange"
       :add-button="false"
+      @changed="handleSearchChange"
     ></CardHeader>
     <v-row v-if="users.length === 0" class="justify-center">
       <v-col>
@@ -55,8 +73,8 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     >
       <template #item="{ item }">
         <UserCard
-          :user="item"
           :key="item.id"
+          :user="item"
           @card-pressed="handleCardClick"
         ></UserCard>
       </template>
@@ -72,4 +90,15 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     >
     </v-pagination>
   </v-container>
+  <v-dialog v-model="studentPopup" width="50vw"
+    ><v-card color="backgroundDarken rounded-lg">
+      <v-card-text
+        ><v-btn block variant="tonal" class="ma-2" @click="handleDialogClick(1)"
+          >Profile</v-btn
+        ><v-btn block variant="tonal" class="ma-2" @click="handleDialogClick(0)"
+          >Flight Plan</v-btn
+        ></v-card-text
+      >
+    </v-card>
+  </v-dialog>
 </template>

@@ -37,7 +37,7 @@ import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
-import AdminUserFlightPlan from "../views/admin/user/AdminUserFlightPlan.vue";
+import FlightPlan from "../views/FlightPlan.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -165,7 +165,13 @@ const router = createRouter({
         {
           path: "maintenance/user/studentFlightPlan/:id",
           name: "adminStudentFlightPlan",
-          component: AdminUserFlightPlan,
+          component: FlightPlan,
+        },
+        {
+          path: "user/profile/:id",
+          name: "adminProfile",
+          component: AdminProfile,
+          props: { isAdmin: true },
         },
         {
           path: "maintenance/event",
