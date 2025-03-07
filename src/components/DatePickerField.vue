@@ -14,7 +14,7 @@ const emit = defineEmits(["update:modelValue"]);
 
 const menu = ref(false);
 const selectedDate = ref(
-  props.modelValue ? dayjs(props.modelValue).toDate() : null
+  props.modelValue ? dayjs(props.modelValue).toDate() : null,
 );
 
 watch(props, () => {
@@ -31,7 +31,7 @@ const fieldLabel = ref(props.label);
 
 // Format the date for display using day.js
 const formattedDate = computed(() =>
-  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : ""
+  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : "",
 );
 
 // Clear the date selection

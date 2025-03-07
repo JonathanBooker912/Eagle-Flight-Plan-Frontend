@@ -71,7 +71,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value }
+      { ...filters.value, ...sortOptions.value },
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -109,7 +109,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id
+      (strength) => strength.id,
     );
   }
   getEvents();
