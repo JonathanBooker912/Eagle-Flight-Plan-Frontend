@@ -14,7 +14,7 @@ const emit = defineEmits(["update:modelValue"]);
 
 const menu = ref(false);
 const selectedDate = ref(
-  props.modelValue ? dayjs(props.modelValue).toDate() : null,
+  props.modelValue ? dayjs(props.modelValue).toDate() : null
 );
 
 watch(props, () => {
@@ -31,7 +31,7 @@ const fieldLabel = ref(props.label);
 
 // Format the date for display using day.js
 const formattedDate = computed(() =>
-  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : "",
+  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : ""
 );
 
 // Clear the date selection
@@ -42,7 +42,12 @@ const clearDate = () => {
 </script>
 
 <template>
-  <v-menu v-model="menu" transition="scale-transition" offset-y>
+  <v-menu
+    v-model="menu"
+    transition="scale-transition"
+    offset-y
+    :close-on-content-click="false"
+  >
     <!-- eslint-disable-next-line vue/no-template-shadow -->
     <template #activator="{ props }">
       <v-text-field
@@ -55,9 +60,10 @@ const clearDate = () => {
         @click:clear="clearDate"
       />
     </template>
-    <v-date-picker
-      v-model="selectedDate"
-      @update:model-value="menu = false"
-    ></v-date-picker>
+    <v-date-picker v-model="selectedDate" @update:model-value="menu = false">
+      <template #actions>
+        <v-btn text="OK" @click="menu = false"></v-btn>
+      </template>
+    </v-date-picker>
   </v-menu>
 </template>
