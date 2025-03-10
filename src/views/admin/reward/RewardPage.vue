@@ -20,14 +20,14 @@ const count = ref(0);
 // Fetch rewards
 const getRewards = async (
   pageNumber = page.value,
-  query = searchQuery.value,
+  query = searchQuery.value
 ) => {
   try {
     console.log(pageNumber);
     const result = await rewardServices.getAllRewards(
       pageNumber,
       PAGE_SIZE,
-      query,
+      query
     );
     rewards.value = result.data.rewards || [];
     count.value = result.data.count || 0;

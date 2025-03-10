@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+ import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
 import EventCardPage from "../views/admin/EventsPage.vue";
@@ -7,7 +7,7 @@ import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
 import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
-import BadgesPage from "../views/admin/BadgesPage.vue";
+import BadgesPage from "../views/admin/badge/BadgesPage.vue";
 import BadgeAddEditPage from "../views/admin/badge/BadgeAddEditPage.vue";
 import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
 import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
@@ -146,13 +146,13 @@ const router = createRouter({
           component: BadgesPage,
         },
         {
-          path: "badge/edit/:id",
+          path: "maintenance/badge/edit/:id",
           name: "edit",
           component: BadgeAddEditPage,
           props: { isAdd: false },
         },
         {
-          path: "badge/add",
+          path: "maintenance/badge/add",
           name: "add",
           component: BadgeAddEditPage,
           props: { isAdd: true },

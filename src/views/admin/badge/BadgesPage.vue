@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import badgeServices from "../../services/badgeServices";
-import BadgeCard from "../../components/cards/BadgeCard.vue";
-import CardTable from "../../components/CardTable.vue";
-import CardHeader from "../../components/CardHeader.vue";
+import CardTable from "../../../components/CardTable.vue";
+import CardHeader from "../../../components/CardHeader.vue";
+import BadgeCard from "../../../components/cards/BadgeCard.vue";
+import badgeServices from "../../../services/badgeServices";
 
 // Constants
 const PAGE_SIZE = 8;
@@ -17,28 +17,18 @@ const page = ref(1);
 const searchQuery = ref("");
 const count = ref(0);
 
-// Fetch badges
-const getBadges = async (pageNumber = page.value) => {
-  try {
-    const result = await badgeServices.getAllBadges(
-      pageNumber,
-      PAGE_SIZE,
-      searchQuery.value,
-    );
-    badges.value = result.data.badges;
-    count.value = result.data.count;
-  } catch (error) {
-    console.error("Error fetching badges:", error);
-  }
-};
-
 // Handlers
-const handleAdd = () => router.push({ name: "add" });
+const handleAdd = () => {
+  router.push({ name: "add" });
+};
 const handleEdit = (badgeId) =>
   router.push({ name: "edit", params: { id: badgeId } });
 
-const handleDelete = async (badgeId) => {
+const handleDelete = async (badgeId, badgeFileName) => {
   try {
+    if (badgeFileName) {
+      await badgeServices.deleteBadgeImage(badgeFileName);
+    }
     await badgeServices.deleteBadge(badgeId);
     await getBadges(); // Re-fetch badges after delete
   } catch (error) {
@@ -49,8 +39,30 @@ const handleDelete = async (badgeId) => {
 const handleSearchChange = (input) => {
   searchQuery.value = input;
   page.value = 1; // Reset to first page on search change
-  getBadges(page.value);
 };
+
+// Fetch badges
+const getBadges = async (
+  pageNumber = page.value,
+  query = searchQuery.value
+) => {
+  try {
+    const result = await badgeServices.getAllBadges(
+      pageNumber,
+      PAGE_SIZE,
+      query
+    );
+    badges.value = result.data.badges || [];
+    count.value = result.data.count || 0;
+  } catch (error) {
+    console.error("Error fetching badges:", error);
+  }
+};
+
+// Watch for changes in page and search query
+watch([page, searchQuery], () => getBadges(page.value, searchQuery.value), {
+  immediate: true,
+});
 
 // Initial fetch
 onMounted(() => getBadges());
@@ -76,6 +88,7 @@ onMounted(() => getBadges());
     >
       <template #item="{ item }">
         <BadgeCard
+          :key="item.id"
           :badge="item"
           @edit="handleEdit"
           @delete="handleDelete"
