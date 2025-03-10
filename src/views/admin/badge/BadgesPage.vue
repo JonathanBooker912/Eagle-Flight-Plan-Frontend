@@ -44,13 +44,13 @@ const handleSearchChange = (input) => {
 // Fetch badges
 const getBadges = async (
   pageNumber = page.value,
-  query = searchQuery.value
+  query = searchQuery.value,
 ) => {
   try {
     const result = await badgeServices.getAllBadges(
       pageNumber,
       PAGE_SIZE,
-      query
+      query,
     );
     badges.value = result.data.badges || [];
     count.value = result.data.count || 0;
