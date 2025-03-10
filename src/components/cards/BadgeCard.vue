@@ -1,65 +1,80 @@
 <script setup>
-const props = defineProps({
-  badge: Object,
-});
+import { ref, onMounted, onUnmounted } from "vue";
+import defaultImage from "../../assets/DefaultBadgeImage.png";
 
+// Define statements for vue
+const props = defineProps({
+  badge: { type: Object, required: true },
+});
 const emit = defineEmits(["edit", "delete"]);
+
+// Reactive states
+const imageSrc = ref("");
+
+// Functions
+const loadImage = (image) => {
+  if (!image || !image.data) return;
+
+  // Ensure image.data is a Uint8Array
+  const byteArray = new Uint8Array(image.data);
+
+  const blob = new Blob([byteArray], { type: image.type }); // Adjust type accordingly
+  imageSrc.value = URL.createObjectURL(blob);
+};
+
+// Vue functions
+onMounted(() => {
+  console.log(props.badge.image);
+  loadImage(props.badge.image);
+});
+onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 </script>
 <template>
   <v-card color="backgroundDarken" class="cardContainer">
-    <v-card-text class="text-center" style="padding-bottom: 0px">
-      <img
-        src="../../assets/goldBadgeMock.png"
-        width="100"
-        class="badgeImage"
-      />
-      <p class="text-h5 mb-2">
-        {{
-          props.badge.name.trim().length > 20
-            ? props.badge.name.trim().substring(0, 20) + "..."
-            : props.badge.name.trim()
-        }}
+    <v-card-text>
+      <v-img
+        v-if="imageSrc"
+        class="image"
+        :src="imageSrc"
+        alt="Uploaded Image"
+      ></v-img>
+      <v-img
+        v-else
+        class="image"
+        :src="defaultImage"
+        alt="Generic Merchandise Image"
+      >
+      </v-img>
+      <p class="text-h5 text-center my-2">
+        {{ props.badge.name }}
       </p>
+      <v-row class="ma-2 justify-center">
+        <v-btn
+          color="warning"
+          class="mr-2 cardButton"
+          @click="emit('edit', props.badge.id)"
+        >
+          <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
+        </v-btn>
+        <v-btn
+          color="danger"
+          class="cardButton"
+          @click="emit('delete', props.badge.id, props.badge.imageName)"
+          ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
+        ></v-btn>
+      </v-row>
     </v-card-text>
-    <v-row class="ma-2 actionButtons">
-      <v-btn
-        color="warning"
-        class="mr-2 cardButton"
-        @click="emit('edit', props.badge.id)"
-      >
-        <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
-      </v-btn>
-      <v-btn
-        color="danger"
-        class="cardButton"
-        @click="emit('delete', props.badge.id)"
-      >
-        <v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
-      ></v-btn>
-    </v-row>
   </v-card>
 </template>
 
 <style scoped>
 .cardContainer {
-  justify-items: center;
-  display: block;
-  width: 300px;
-  height: auto;
   border-radius: 25px;
 }
-
 .cardButton {
   border-radius: 13px;
 }
-
-.badgeImage {
-  display: block;
-  margin: 0 auto;
-}
-
-.actionButtons {
-  justify-content: center;
-  padding-bottom: 10px;
+.image {
+  max-height: 150px;
 }
 </style>
