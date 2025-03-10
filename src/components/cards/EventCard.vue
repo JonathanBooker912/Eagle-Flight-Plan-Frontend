@@ -6,6 +6,8 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
+const emit = defineEmits(["edit", "delete"]);
+
 const store = userStore();
 const isAdmin = ref(false);
 
@@ -30,6 +32,10 @@ const eventTime = computed(() => {
 
 const viewCard = () => {};
 
+const editEvent = () => {
+  emit("edit", props.event.id);
+};
+
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
 });
@@ -39,11 +45,13 @@ onMounted(async () => {
     <v-row no-gutters>
       <v-col>
         <v-card-text>
-          <p class="text-h5">
+          <p class="text-h5 text-no-wrap text-truncate">
             {{ props.event.name }}
           </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ props.event.location }}
+          <p
+            class="text-subtitle-1 font-weight-regular text-no-wrap text-truncate"
+          >
+            {{ props.event.location || "No Location" }}
           </p>
           <p class="text-subtitle-1 font-weight-regular">
             {{ eventDate }}
@@ -53,10 +61,17 @@ onMounted(async () => {
           </p>
         </v-card-text>
         <v-row class="ma-2 float-right">
-          <v-btn color="warning" class="mr-2 cardButton elevation-0">
+          <v-btn
+            color="warning"
+            class="mr-2 cardButton elevation-0"
+            @click="editEvent"
+          >
             <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
           </v-btn>
-          <v-btn color="danger" class="cardButton elevation-0"
+          <v-btn
+            color="danger"
+            class="cardButton elevation-0"
+            @click="emit('delete', props.event.id)"
             ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
           ></v-btn>
         </v-row>
@@ -73,7 +88,7 @@ onMounted(async () => {
       <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>
         <v-card-text>
-          <p class="text-h5">
+          <p class="text-h5 text-truncate w-100">
             {{ props.event.name }}
           </p>
           <p class="text-subtitle-1 font-weight-regular">
@@ -97,8 +112,7 @@ onMounted(async () => {
   border-radius: 20px 0px 0px 20px;
 }
 .cardContainer {
-  max-width: 20vw;
-  min-width: 280px;
+  min-width: 250px;
   border-radius: 25px;
 }
 .cardButton {
