@@ -14,6 +14,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  isEdit: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const eventDate = computed(() => {
@@ -34,74 +38,63 @@ onMounted(async () => {
   isAdmin.value = await store.isAdmin();
 });
 </script>
+
 <template>
-  <v-card v-if="isAdmin" color="backgroundDarken" class="cardContainer">
+  <v-card
+    v-if="isAdmin && isEdit"
+    color="backgroundDarken"
+    class="d-flex flex-column rounded-xl ma-2 p-4"
+  >
     <v-row no-gutters>
       <v-col>
         <v-card-text>
-          <p class="text-h5">
-            {{ props.event.name }}
-          </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ props.event.location }}
-          </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ eventDate }}
-          </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ eventTime }}
-          </p>
+          <p class="text-h5">{{ props.event.name }}</p>
+          <p class="text-subtitle-1">{{ props.event.location }}</p>
+          <p class="text-subtitle-1">{{ eventDate }}</p>
+          <p class="text-subtitle-1">{{ eventTime }}</p>
         </v-card-text>
-        <v-row class="ma-2 float-right">
-          <v-btn color="warning" class="mr-2 cardButton elevation-0">
+        <v-row class="ma-2 justify-end">
+          <v-btn color="warning" class="elevation-0">
             <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
           </v-btn>
-          <v-btn color="danger" class="cardButton elevation-0"
-            ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
-          ></v-btn>
+          <v-btn color="danger" class="elevation-0">
+            <v-icon icon="mdi-delete" color="text" size="x-large"></v-icon>
+          </v-btn>
         </v-row>
       </v-col>
     </v-row>
   </v-card>
+
   <v-card
     v-else
     color="backgroundDarken"
-    class="cardContainer"
+    class="d-flex flex-column rounded-xl ma-2 p-4"
     @click="viewCard"
   >
     <v-row no-gutters>
       <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>
         <v-card-text>
-          <p class="text-h5">
-            {{ props.event.name }}
-          </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ props.event.location }}
-          </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ eventDate }}
-          </p>
-          <p class="text-subtitle-1 font-weight-regular">
-            {{ eventTime }}
-          </p>
+          <p class="text-h5">{{ props.event.name }}</p>
+          <p class="text-subtitle-1">{{ props.event.location }}</p>
+          <p class="text-subtitle-1">{{ eventDate }}</p>
+          <p class="text-subtitle-1">{{ eventTime }}</p>
         </v-card-text>
       </v-col>
     </v-row>
   </v-card>
 </template>
 
-<style scoped>
+<style>
 .left-accent {
   width: 20px;
   border-radius: 20px 0px 0px 20px;
 }
+
 .cardContainer {
   max-width: 20vw;
   min-width: 280px;
   border-radius: 25px;
-}
-.cardButton {
-  border-radius: 13px;
+  margin: 4px;
 }
 </style>

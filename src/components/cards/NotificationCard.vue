@@ -1,11 +1,17 @@
 <template>
-  <v-card color="backgroundDarken" class="notification">
+  <v-card color="background" class="notification">
     <v-row class="notifContent">
       <img
         style="height: 40px; width: 40px; margin-right: 15px"
         src="../../../public/Birb.png"
       />
       <div class="textContent">
+        <v-card-text>
+          <strong style="font-size: 18px"
+            >{{ props.notification.user.firstName }}
+            {{ props.notification.user.lastName }}</strong
+          >
+        </v-card-text>
         <v-card-text>
           <p style="font-size: 18px">{{ props.notification.header }}</p>
         </v-card-text>
@@ -48,6 +54,14 @@ const props = defineProps({
   display: flex;
   align-items: center; /* Align items in the center vertically */
   border-radius: 8px; /* Optional: makes the card have rounded corners */
+}
+
+.read {
+  opacity: 0.4;
+}
+
+.unread {
+  background-color: #ffffff;
 }
 
 .notifContent {
