@@ -2,13 +2,15 @@
 // Props definition
 const props = defineProps({
   label: { type: String, default: "Label" },
+  addButton: { type: Boolean, default: true },
 });
 
 // Emit event functions
-const emit = defineEmits(["changed", "add"]);
+const emit = defineEmits(["changed", "add", "toggle-filters"]);
 
 const handleChange = (newValue) => emit("changed", newValue);
 const handleAdd = () => emit("add");
+const handleToggleFilters = () => emit("toggle-filters");
 </script>
 
 <template>
@@ -36,28 +38,31 @@ const handleAdd = () => emit("add");
     <!-- Buttons -->
     <v-col cols="auto" class="d-flex justify-end" style="min-width: 50px">
       <!-- Add button -->
-      <v-btn
-        v-if="$vuetify.display.smAndUp"
-        rounded="xl"
-        class="mr-2"
-        color="backgroundDarken"
-        @click="handleAdd"
-      >
-        <v-icon icon="mdi-plus"></v-icon>
-      </v-btn>
-      <v-btn
-        v-else
-        icon="mdi-plus"
-        color="backgroundDarken"
-        class="mr-1"
-        @click="handleAdd"
-      ></v-btn>
+      <div v-if="props.addButton">
+        <v-btn
+          v-if="$vuetify.display.smAndUp"
+          rounded="xl"
+          class="mr-2"
+          color="backgroundDarken"
+          @click="handleAdd"
+        >
+          <v-icon icon="mdi-plus"></v-icon>
+        </v-btn>
+        <v-btn
+          v-else
+          icon="mdi-plus"
+          color="backgroundDarken"
+          class="mr-1"
+          @click="handleAdd"
+        ></v-btn>
+      </div>
 
       <!-- Filter & Sort button (desktop) -->
       <v-btn
         v-if="$vuetify.display.smAndUp"
         color="backgroundDarken"
         rounded="xl"
+        @click="handleToggleFilters"
       >
         Filter & Sort
       </v-btn>

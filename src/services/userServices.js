@@ -3,6 +3,15 @@ export default {
   getAllUser() {
     return apiClient.get("/user");
   },
+  getAllUserForAdmin(page, pageSize, searchQuery) {
+    return apiClient.get("/user/admin", {
+      params: {
+        page: page,
+        pageSize: pageSize,
+        searchQuery: searchQuery,
+      },
+    });
+  },
   deleteUser(id) {
     return apiClient.delete(`/user/${id}`);
   },

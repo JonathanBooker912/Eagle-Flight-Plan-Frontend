@@ -39,7 +39,7 @@ const handleRouteClick = (routeName) => {
 </script>
 
 <template>
-  <v-container class="">
+  <v-container>
     <v-row>
       <v-col
         v-for="(route, index) in routes"
@@ -50,8 +50,8 @@ const handleRouteClick = (routeName) => {
       >
         <v-card
           class="pa-10 rounded-xl"
-          @click="handleRouteClick(route.routeName)"
           color="backgroundDarken"
+          @click="handleRouteClick(route.routeName)"
         >
           <v-card-text color="text" class="text-center text-h5">{{
             route.name

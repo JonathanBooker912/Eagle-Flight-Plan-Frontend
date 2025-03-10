@@ -9,6 +9,7 @@ const admin = [
   { "route-name": "admin-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
+  { "route-name": "maintenance", "link-text": "Maintenance" },
   { "route-name": "admin-search", "link-text": "Search" },
 ];
 
@@ -62,6 +63,7 @@ const getIcon = (linkText) => {
     Calendar: "mdi-calendar",
     Notifications: "mdi-bell",
     Search: "mdi-magnify",
+    Maintenance: "mdi-cog",
   };
 
   return icons[linkText] || "mdi-circle"; // Default if not found

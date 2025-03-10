@@ -18,12 +18,16 @@ const searchQuery = ref("");
 const count = ref(0);
 
 // Fetch rewards
-const getRewards = async (pageNumber = page.value) => {
+const getRewards = async (
+  pageNumber = page.value,
+  query = searchQuery.value,
+) => {
   try {
+    console.log(pageNumber);
     const result = await rewardServices.getAllRewards(
       pageNumber,
       PAGE_SIZE,
-      searchQuery.value,
+      query,
     );
     rewards.value = result.data.rewards || [];
     count.value = result.data.count || 0;
@@ -42,8 +46,11 @@ const handleShop = (rewardId) => {
   router.push({ name: "redeemReward", params: { id: rewardId } });
 };
 
-const handleDelete = async (rewardId) => {
+const handleDelete = async (rewardId, rewardFileName) => {
   try {
+    if (rewardFileName) {
+      await rewardServices.deleteRewardImage(rewardFileName);
+    }
     await rewardServices.deleteReward(rewardId);
     await getRewards(); // Re-fetch rewards after delete
   } catch (error) {

@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
+import EventCardPage from "../views/admin/EventsPage.vue";
+import EventAddEditPage from "../views/admin/event/EventAddEditPage.vue";
 import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
@@ -19,6 +21,7 @@ import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
+import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
@@ -33,6 +36,7 @@ import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
+import AdminUserFlightPlan from "../views/admin/user/AdminUserFlightPlan.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,7 +53,11 @@ const router = createRouter({
       component: AdminLanding,
       beforeEnter: isAdmin,
       children: [
-        { path: "calendar", name: "admin-calendar", component: AdminCalendar },
+        {
+          path: "calendar",
+          name: "admin-calendar",
+          component: AdminCalendar,
+        },
         {
           path: "flightPlan",
           name: "admin-flightPlan",
@@ -60,8 +68,16 @@ const router = createRouter({
           name: "admin-notifications",
           component: AdminNotification,
         },
-        { path: "profile", name: "admin-profile", component: AdminProfile },
-        { path: "search", name: "admin-search", component: AdminSearch },
+        {
+          path: "profile",
+          name: "admin-profile",
+          component: AdminProfile,
+        },
+        {
+          path: "search",
+          name: "admin-search",
+          component: AdminSearch,
+        },
         {
           path: "maintenance",
           name: "maintenance",
@@ -85,24 +101,24 @@ const router = createRouter({
           props: { isAdd: true },
         },
         {
-          path: "reward",
+          path: "/maintenance/reward",
           name: "reward",
           component: RewardPage,
         },
         {
-          path: "reward/edit/:id",
+          path: "/maintenance/reward/edit/:id",
           name: "editReward",
           component: RewardAddEditPage,
           props: { isAdd: false },
         },
         {
-          path: "reward/add",
+          path: "/maintenance/reward/add",
           name: "addReward",
           component: RewardAddEditPage,
           props: { isAdd: true },
         },
         {
-          path: "reward/redeem/:id",
+          path: "/maintenance/reward/redeem/:id",
           name: "redeemReward",
           component: RewardRedemptionPage,
         },
@@ -128,6 +144,33 @@ const router = createRouter({
           name: "badge",
           component: BadgeCardPage,
         },
+        {
+          path: "maintenance/user",
+          name: "user",
+          component: AdminUserPage,
+        },
+        {
+          path: "maintenance/user/studentFlightPlan/:id",
+          name: "adminStudentFlightPlan",
+          component: AdminUserFlightPlan,
+        },
+        {
+          path: "maintenance/event",
+          name: "event",
+          component: EventCardPage,
+        },
+        {
+          path: "maintenance/event/edit/:id",
+          name: "editEvent",
+          component: EventAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "maintenance/event/add",
+          name: "addEvent",
+          component: EventAddEditPage,
+          props: { isAdd: true },
+        },
         /** Put all further admin routes in here */
       ],
     },
@@ -152,8 +195,16 @@ const router = createRouter({
           name: "faculty-notifications",
           component: FacultyNotification,
         },
-        { path: "profile", name: "faculty-profile", component: FacultyProfile },
-        { path: "search", name: "faculty-search", component: FacultySearch },
+        {
+          path: "profile",
+          name: "faculty-profile",
+          component: FacultyProfile,
+        },
+        {
+          path: "search",
+          name: "faculty-search",
+          component: FacultySearch,
+        },
       ],
     },
     {
@@ -176,8 +227,16 @@ const router = createRouter({
           name: "student-notifications",
           component: StudentNotification,
         },
-        { path: "profile", name: "student-profile", component: StudentProfile },
-        { path: "search", name: "student-search", component: StudentSearch },
+        {
+          path: "profile",
+          name: "student-profile",
+          component: StudentProfile,
+        },
+        {
+          path: "search",
+          name: "student-search",
+          component: StudentSearch,
+        },
       ],
     },
     { path: "/:pathMatch(.*)*", component: NotFound },
