@@ -7,7 +7,8 @@ import { userStore } from "../stores/userStore";
 import NotFound from "../views/NotFound.vue";
 import Unauthorized from "../views/Unauthorized.vue";
 import TaskAddEditPage from "../views/admin/task/TaskAddEditPage.vue";
-import BadgeCardPage from "../views/admin/BadgeCardPage.vue";
+import BadgesPage from "../views/admin/BadgesPage.vue";
+import BadgeAddEditPage from "../views/admin/badge/BadgeAddEditPage.vue";
 import ExperienceAddEditPage from "../views/admin/experience/ExperienceAddEditPage.vue";
 import ExperiencesPage from "../views/admin/ExperiencesPage.vue";
 import RewardPage from "../views/admin/reward/RewardPage.vue";
@@ -142,7 +143,46 @@ const router = createRouter({
         {
           path: "maintenance/badge",
           name: "badge",
-          component: BadgeCardPage,
+          component: BadgesPage,
+        },
+        {
+          path: "badge/edit/:id",
+          name: "edit",
+          component: BadgeAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "badge/add",
+          name: "add",
+          component: BadgeAddEditPage,
+          props: { isAdd: true },
+        },
+        {
+          path: "maintenance/user",
+          name: "user",
+          component: AdminUserPage,
+        },
+        {
+          path: "maintenance/user/studentFlightPlan/:id",
+          name: "adminStudentFlightPlan",
+          component: AdminUserFlightPlan,
+        },
+        {
+          path: "maintenance/event",
+          name: "event",
+          component: EventCardPage,
+        },
+        {
+          path: "maintenance/event/edit/:id",
+          name: "editEvent",
+          component: EventAddEditPage,
+          props: { isAdd: false },
+        },
+        {
+          path: "maintenance/event/add",
+          name: "addEvent",
+          component: EventAddEditPage,
+          props: { isAdd: true },
         },
         {
           path: "maintenance/user",
