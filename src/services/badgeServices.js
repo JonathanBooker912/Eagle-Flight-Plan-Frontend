@@ -1,7 +1,7 @@
 import apiClient from "./services.js";
 export default {
-  getAllTasks(page, pageSize, searchQuery) {
-    return apiClient.get("/task", {
+  getAllBadges(page, pageSize, searchQuery) {
+    return apiClient.get("/badge", {
       params: {
         page: page,
         pageSize: pageSize,
@@ -9,7 +9,7 @@ export default {
       },
     });
   },
-  deleteTask(taskId) {
-    return apiClient.delete(`/task/${taskId}`);
+  deleteBadge(badgeId) {
+    return apiClient.delete(`/badge/${badgeId}`);
   },
 };

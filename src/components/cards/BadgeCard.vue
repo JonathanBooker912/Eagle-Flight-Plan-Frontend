@@ -43,7 +43,6 @@ const emit = defineEmits(["edit", "delete"]);
 <style scoped>
 .cardContainer {
   justify-items: center;
-  margin: 10px;
   display: block;
   width: 300px;
   height: auto;
