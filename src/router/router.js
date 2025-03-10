@@ -1,4 +1,4 @@
- import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import TasksPage from "../views/admin/TasksPage.vue";
 import EventCardPage from "../views/admin/EventsPage.vue";
