@@ -4,6 +4,6 @@ export default {
     return apiClient.get(`/flightPlan/student/${studentId}`);
   },
   getFlightPlanProgressForFlightPlan(flightPlanId) {
-    return apiClient.get(`/flightPlanItem/flightPlan/progress/${flightPlanId}`);
+    return apiClient.get(`/flightPlan/progress/${flightPlanId}`);
   },
 };
