@@ -6,8 +6,6 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
-const emit = defineEmits(["edit", "delete"]);
-
 const store = userStore();
 const isAdmin = ref(false);
 
@@ -35,10 +33,6 @@ const eventTime = computed(() => {
 });
 
 const viewCard = () => {};
-
-const editEvent = () => {
-  emit("edit", props.event.id);
-};
 
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();

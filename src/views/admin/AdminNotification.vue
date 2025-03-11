@@ -7,7 +7,6 @@ import moment from "moment";
 
 const notifications = ref([]);
 const selectedNotif = ref({});
-const isLoaded = ref(false);
 const showsidebar = ref(false);
 
 const currentPage = ref(1);
