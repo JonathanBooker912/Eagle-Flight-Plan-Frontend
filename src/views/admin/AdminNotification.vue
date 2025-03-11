@@ -10,15 +10,46 @@ const selectedNotif = ref({});
 const isLoaded = ref(false);
 const showsidebar = ref(false);
 
-const getNotifications = async () => {
-  await notificationServices
-    .getAllNotificationsForUser(1)
-    .then((res) => {
-      notifications.value = res.data;
-      isLoaded.value = true;
-      console.log(notifications);
-    })
-    .catch((err) => console.log(err));
+const currentPage = ref(1);
+const pageSize = ref(14);
+const totalPages = ref(1);
+
+const getNotifications = async (page = 1) => {
+  try {
+    const res = await notificationServices.getAllNotificationsForUser(
+      11,
+      page,
+      pageSize.value,
+    );
+
+    notifications.value.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    );
+
+    notifications.value = res.data.notifications; // Update the notifications array
+    totalPages.value = Math.ceil(res.data.total / pageSize.value);
+    currentPage.value = page; // Ensure currentPage updates correctly
+
+    console.log("Updated Notifications:", notifications.value); // Debugging: Check if notifications update
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+  }
+};
+
+const nextPage = () => {
+  console.log("Page going next");
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    getNotifications(currentPage.value);
+  }
+};
+
+const prevPage = () => {
+  console.log("Page going back");
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    getNotifications(currentPage.value);
+  }
 };
 
 const formattedDateTime = (item) => {
@@ -28,14 +59,29 @@ const formattedDateTime = (item) => {
 onMounted(() => {
   getNotifications();
 });
-
 const editItem = async (item) => {
-  item.read = true;
+  try {
+    const response = await apiClient.put(
+      `/notification/user/${item.userId}/notification/${item.id}`,
+      {
+        read: true, // or other data you want to update
+      },
+    );
+
+    console.log("API Response:", response);
+
+    if (response.status === 200) {
+      item.read = true; // Update the notification locally after successful API call
+      console.log("Notification marked as read:", item);
+    } else {
+      console.error("Failed to update notification:", response);
+    }
+  } catch (error) {
+    console.error("Error updating notification:", error);
+  }
+
   selectedNotif.value = item;
   showsidebar.value = true;
-  const response = await apiClient.put(`/notification/${item.id}`, {
-    read: true,
-  });
 };
 </script>
 
@@ -77,6 +123,26 @@ const editItem = async (item) => {
         <p class="description">{{ selectedNotif.description }}</p>
       </v-card>
     </div>
+
+    <v-row justify="center" align="center" class="pagination">
+      <v-btn
+        @click="prevPage"
+        :disabled="currentPage === 1"
+        color="primary"
+        class="mx-2"
+      >
+        Prev
+      </v-btn>
+      <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
+      <v-btn
+        @click="nextPage"
+        :disabled="currentPage === totalPages"
+        color="primary"
+        class="mx-2"
+      >
+        Next
+      </v-btn>
+    </v-row>
   </v-card>
 </template>
 
@@ -85,21 +151,22 @@ const editItem = async (item) => {
   display: flex;
   height: 90vh;
   margin-top: 2%;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 .notifContainer {
   flex: 1;
   padding-left: 2vw;
   padding-right: 2vw;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 .header {
   font-size: 24px;
 }
 
-.description {
-  font-size: 18px;
-}
 .infoSidebar {
   width: 40vw;
   margin: 2vh 2vw 2vh 2vw;

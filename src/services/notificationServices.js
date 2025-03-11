@@ -1,7 +1,9 @@
 import apiClient from "./services.js";
 
 export default {
-  getAllNotificationsForUser(id) {
-    return apiClient.get(`/notification/user/${id}`);
+  getAllNotificationsForUser(id, page = 1, pageSize = 10) {
+    return apiClient.get(`/notification/user/${id}`, {
+      params: { page, pageSize },
+    });
   },
 };
