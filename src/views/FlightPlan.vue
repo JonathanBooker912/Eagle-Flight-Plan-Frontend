@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import CardHeader from "../components/CardHeader.vue";
 import CardTable from "../components/CardTable.vue";
 import SortSelect from "../components/SortSelect.vue";
@@ -28,6 +28,7 @@ const sortProperties = [
 ];
 
 const route = useRoute();
+const router = useRouter();
 const flightPlan = ref(null);
 const flightPlanItems = ref([]);
 const page = ref(1);
@@ -51,7 +52,7 @@ const sortOptions = ref({
 const display = useDisplay();
 
 const numCardColumns = computed(() => {
-  if (display.xxl.value) return 3;
+  if (display.xxl.value) return 4;
   if (display.xl.value) return 3;
   if (display.lg.value) return 3;
   if (display.md.value) return showFilters.value ? 1 : 2;
@@ -104,6 +105,10 @@ const handleSearchChange = (input) => {
   page.value = 1; // Reset to first page on search change
 };
 
+const handleAdd = () => {
+  router.push({ name: "addItemToFlightPlan" });
+};
+
 const handleChangeFilters = () => {
   fetchFlightPlanAndItems();
 };
@@ -137,10 +142,13 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
         bg-color="backgroundLighten"
         height="20"
         rounded
-      ></v-progress-linear>
+      >
+        <strong>{{ progress }}%</strong></v-progress-linear
+      >
     </v-container>
     <CardHeader
-      :add-button="false"
+      :add-button="props.isAdmin ? true : false"
+      @add="handleAdd"
       @changed="handleSearchChange"
       @toggle-filters="showFilters = !showfilters"
     ></CardHeader>
