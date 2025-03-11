@@ -23,7 +23,6 @@ const getRewards = async (
   query = searchQuery.value,
 ) => {
   try {
-    console.log(pageNumber);
     const result = await rewardServices.getAllRewards(
       pageNumber,
       PAGE_SIZE,
