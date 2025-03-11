@@ -36,7 +36,7 @@ watch(
     } else if (oldShowFilters && newShowInfo) {
       emit("close-filter-menu");
     }
-  }
+  },
 );
 
 // Return the number of columns based on the screen size
