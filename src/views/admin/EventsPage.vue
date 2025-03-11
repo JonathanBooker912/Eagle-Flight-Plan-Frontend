@@ -45,6 +45,9 @@ const filters = ref({
   strengths: null,
 });
 
+const showInfo = ref(false);
+const eventToShow = ref({});
+
 const sortOptions = ref({
   sortAttribute: sortProperties[0].value,
   sortDirection: "asc",
@@ -54,15 +57,16 @@ const display = useDisplay();
 
 const numCardColumns = computed(() => {
   if (display.xxl.value) return 4;
-  if (display.xl.value) return showFilters.value ? 3 : 4;
-  if (display.lg.value) return showFilters.value ? 3 : 4;
-  if (display.md.value) return showFilters.value ? 2 : 3;
-  if (display.sm.value) return showFilters.value ? 1 : 2;
+  if (display.xl.value) return showInfo.value ? 3 : 4;
+  if (display.lg.value) return showFilters.value || showInfo.value ? 3 : 4;
+  if (display.md.value) return showFilters.value || showInfo.value ? 2 : 3;
+  if (display.sm.value) return showFilters.value || showInfo.value ? 1 : 2;
   return 1; // Default for xs
 });
 const pageSize = computed(() => numCardColumns.value * 2);
 
 watch(showFilters, () => getEvents());
+watch(showInfo, () => getEvents());
 
 // Fetch events
 const getEvents = async (pageNumber = page.value) => {
@@ -71,7 +75,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value },
+      { ...filters.value, ...sortOptions.value }
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -109,7 +113,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id,
+      (strength) => strength.id
     );
   }
   getEvents();
@@ -121,6 +125,11 @@ const handleClearFilters = () => {
     location: null,
   };
   getEvents();
+};
+
+const handleShowInfo = (eventId) => {
+  eventToShow.value = events.value.find((event) => event.id == eventId);
+  showInfo.value = true;
 };
 
 // Initial fetch
@@ -139,19 +148,23 @@ onMounted(() => {
     ></CardHeader>
     <CardTable
       :items="events"
-      :per-row-lg="showFilters ? 3 : 4"
-      :per-row-md="showFilters ? 2 : 3"
-      :per-row-sm="showFilters ? 1 : 2"
+      :per-row-lg="showFilters || showInfo ? 3 : 4"
+      :per-row-md="showFilters || showInfo ? 2 : 3"
+      :per-row-sm="showFilters || showInfo ? 1 : 2"
       :show-filters="showFilters"
+      :show-info="showInfo"
+      :info-label="eventToShow.name"
       @update-filters="handleChangeFilters"
-      @clear-filters="handleClearFilters"
       @close-filter-menu="showFilters = false"
+      @close-info="showInfo = false"
+      @clear-filters="handleClearFilters"
     >
       <template #item="{ item }">
         <EventCard
           :event="item"
           @edit="handleEdit"
           @delete="handleDelete"
+          @show-info="handleShowInfo"
         ></EventCard>
       </template>
       <template #filters>
@@ -175,6 +188,13 @@ onMounted(() => {
           v-model="sortOptions"
           :sort-options="sortProperties"
         ></SortSelect>
+      </template>
+      <template #info>
+        <br />
+        <h3>{{ eventToShow.description }}</h3>
+        <br />
+        <h4>Attendance: {{ eventToShow.attendanceType }}</h4>
+        <h4>Registration Type: {{ eventToShow.registration }}</h4>
       </template>
       <template #pagination>
         <v-pagination
