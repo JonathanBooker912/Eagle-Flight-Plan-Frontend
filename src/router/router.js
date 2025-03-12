@@ -15,6 +15,7 @@ import RewardPage from "../views/admin/reward/RewardPage.vue";
 import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
 import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
+import Profile from "../views/Profile.vue";
 
 import AdminLanding from "../views/admin/AdminLanding.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
@@ -72,7 +73,7 @@ const router = createRouter({
         {
           path: "profile",
           name: "admin-profile",
-          component: AdminProfile,
+          component: Profile,
         },
         {
           path: "search",
@@ -238,7 +239,7 @@ const router = createRouter({
         {
           path: "profile",
           name: "faculty-profile",
-          component: FacultyProfile,
+          component: Profile,
         },
         {
           path: "search",
@@ -270,7 +271,7 @@ const router = createRouter({
         {
           path: "profile",
           name: "student-profile",
-          component: StudentProfile,
+          component: Profile,
         },
         {
           path: "search",
