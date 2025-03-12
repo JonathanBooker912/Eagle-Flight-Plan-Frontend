@@ -1,9 +1,10 @@
 <script setup>
+import { onMounted, ref, watch } from "vue";
 import NotificationCard from "../../components/cards/NotificationCard.vue";
 import notificationServices from "../../services/notificationServices";
 import apiClient from "../../services/services";
-import { onMounted, ref } from "vue";
 import moment from "moment";
+import { userStore } from "../../stores/userStore";
 
 const notifications = ref([]);
 const selectedNotif = ref({});
@@ -12,17 +13,14 @@ const showsidebar = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
+const store = userStore();
 
 const getNotifications = async (page = 1) => {
   try {
     const res = await notificationServices.getAllNotificationsForUser(
-      11,
+      store.user.userId,
       page,
-      pageSize.value,
-    );
-
-    notifications.value.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      pageSize.value
     );
 
     notifications.value = res.data.notifications; // Update the notifications array
@@ -35,39 +33,25 @@ const getNotifications = async (page = 1) => {
   }
 };
 
-const nextPage = () => {
-  console.log("Page going next");
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-    getNotifications(currentPage.value);
-  }
-};
+// Watcher for pagination changes
+watch(currentPage, (newPage) => {
+  getNotifications(newPage);
+});
 
-const prevPage = () => {
-  console.log("Page going back");
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    getNotifications(currentPage.value);
-  }
-};
+onMounted(() => {
+  getNotifications();
+});
 
 const formattedDateTime = (item) => {
   return moment(item.dateTime).format("MM/DD/YYYY hh:mm A");
 };
 
-onMounted(() => {
-  getNotifications();
-});
 const editItem = async (item) => {
   try {
     const response = await apiClient.put(
       `/notification/user/${item.userId}/notification/${item.id}`,
-      {
-        read: true, // or other data you want to update
-      },
+      { read: true }
     );
-
-    console.log("API Response:", response);
 
     if (response.status === 200) {
       item.read = true; // Update the notification locally after successful API call
@@ -85,7 +69,7 @@ const editItem = async (item) => {
 </script>
 
 <template>
-  <v-card class="background" color="backgroundDarken">
+  <v-card color="backgroundDarken">
     <div class="container">
       <div class="notifContainer">
         <h1>Notifications</h1>
@@ -97,17 +81,17 @@ const editItem = async (item) => {
             :notification="item"
             :class="{ unread: !item.read, read: item.read }"
             @click="editItem(item)"
-          >
-          </NotificationCard>
+          />
         </div>
       </div>
+
       <v-card v-if="showsidebar" class="infoSidebar" color="background">
         <strong class="header">{{ selectedNotif.header }}</strong>
         <v-btn
           icon
-          @click="showsidebar = false"
           class="close-btn"
           aria-label="Close Sidebar"
+          @click="showsidebar = false"
         >
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -115,7 +99,6 @@ const editItem = async (item) => {
           Sent By: {{ selectedNotif.user.fName }} {{ selectedNotif.user.lName }}
         </p>
         <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
-        <p></p>
         <p>
           ------------------------------------------------------------------------
         </p>
@@ -124,23 +107,11 @@ const editItem = async (item) => {
     </div>
 
     <v-row justify="center" align="center" class="pagination">
-      <v-btn
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        color="primary"
-        class="mx-2"
-      >
-        Prev
-      </v-btn>
-      <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
-      <v-btn
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        color="primary"
-        class="mx-2"
-      >
-        Next
-      </v-btn>
+      <v-pagination
+        v-model="currentPage"
+        :length="totalPages"
+        :total-visible="5"
+      ></v-pagination>
     </v-row>
   </v-card>
 </template>

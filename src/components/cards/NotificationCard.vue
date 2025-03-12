@@ -1,42 +1,33 @@
 <template>
   <v-card
     color="background"
-    class="notification"
-    :class="{ read: props.notification.read, unread: !props.notification.read }"
+    :class="{
+      'opacity-40': props.notification.read,
+      'opacity-100': !props.notification.read,
+    }"
+    class="pa-3 my-2 rounded-lg"
   >
-    <v-row class="notifContent" align="center">
-      <!-- Notification Image -->
+    <v-row align="center" class="d-flex w-100">
       <v-img
-        class="notifImage"
         src="../../../public/Birb.png"
         alt="Notification Image"
         max-width="40"
         max-height="40"
+        class="mr-3 flex-shrink-0"
       />
 
-      <v-col class="textContainer">
-        <!-- User Information -->
-        <div class="textColumn">
-          <v-typography class="userName" font-weight="bold">
-            {{ props.notification.user.fName }}
-            {{ props.notification.user.lName }}
-          </v-typography>
-        </div>
+      <v-typography class="font-weight-bold mr-3">
+        {{ props.notification.user.fName }}
+        {{ props.notification.user.lName }}
+      </v-typography>
 
-        <!-- Notification Header -->
-        <div class="textColumn">
-          <v-typography class="notifHeader">{{
-            props.notification.header
-          }}</v-typography>
-        </div>
+      <v-typography class="mr-3">
+        {{ props.notification.header }}
+      </v-typography>
 
-        <!-- Description -->
-        <div class="textColumn">
-          <v-typography class="description">{{
-            props.notification.description
-          }}</v-typography>
-        </div>
-      </v-col>
+      <v-typography class="text-body-2">
+        {{ props.notification.description }}
+      </v-typography>
     </v-row>
   </v-card>
 </template>
@@ -45,11 +36,9 @@
 import { ref, onMounted } from "vue";
 import { userStore } from "../../stores/userStore";
 
-// Store and isAdmin initialization
 const store = userStore();
 const isAdmin = ref(false);
 
-// Check admin status on mounted
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
 });
@@ -61,50 +50,3 @@ const props = defineProps({
   },
 });
 </script>
-
-<style scoped>
-.notification {
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 8px;
-}
-
-.notifContent {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.notifImage {
-  flex-shrink: 0;
-  margin-right: 15px;
-}
-
-.textContainer {
-  display: flex;
-  justify-content: space-between;
-}
-
-.textColumn {
-  flex: 1;
-  text-align: center;
-  font-size: 16px;
-}
-
-.description {
-  font-size: 14px;
-}
-
-.read {
-  opacity: 0.4;
-}
-
-.unread {
-  background-color: #ffffff;
-}
-
-.status-chip {
-  margin-top: 10px;
-  text-transform: capitalize;
-}
-</style>
