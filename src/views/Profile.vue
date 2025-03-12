@@ -1,6 +1,8 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref, watch } from "vue";
+import apiClient from "../../services/services";
+import { userStore } from "../../stores/userStore";
+
 
 </script>
 
@@ -25,6 +27,8 @@ import { useRouter } from "vue-router";
                 border-radius: 50%;
               "
             />
+            <p>{ NAME }</p>
+            <p>{ GRADE }</p>
           </v-col>
           <v-col class="text-center">
             <p>
