@@ -20,7 +20,7 @@ const getNotifications = async (page = 1) => {
     const res = await notificationServices.getAllNotificationsForUser(
       store.user.userId,
       page,
-      pageSize.value
+      pageSize.value,
     );
 
     notifications.value = res.data.notifications; // Update the notifications array
@@ -50,7 +50,7 @@ const editItem = async (item) => {
   try {
     const response = await apiClient.put(
       `/notification/user/${item.userId}/notification/${item.id}`,
-      { read: true }
+      { read: true },
     );
 
     if (response.status === 200) {
