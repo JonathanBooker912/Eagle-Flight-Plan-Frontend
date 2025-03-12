@@ -1,9 +1,15 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import apiClient from "../../services/services";
-import { userStore } from "../../stores/userStore";
+import apiClient from "../services/services"
+import { userStore } from "../stores/userStore";
 
+const currentPage = ref(1);
+const store = userStore();
+const user = store.user;
 
+onMounted(() => {
+    console.log(user);
+});
 </script>
 
 <template>
@@ -23,11 +29,12 @@ import { userStore } from "../../stores/userStore";
                 top: -50px;
                 z-index: 10000;
                 left: 50%;
+                margin-bottom: 20px;
                 transform: translateX(-50%);
                 border-radius: 50%;
               "
             />
-            <p>{ NAME }</p>
+            <p>{{ user.fullName }}</p>
             <p>{ GRADE }</p>
           </v-col>
           <v-col class="text-center">
@@ -38,7 +45,7 @@ import { userStore } from "../../stores/userStore";
           </v-col>
           <v-col class="text-center">
             <p>{ MAJOR }</p>
-            <p>{ EMAIL }</p>
+            <p>{{ user.email }}</p>
             <p>{ PO BOX }</p>
           </v-col>
           <v-col class="text-center">
