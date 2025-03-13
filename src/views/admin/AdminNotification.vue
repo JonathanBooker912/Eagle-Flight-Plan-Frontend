@@ -16,15 +16,14 @@ const totalPages = ref(1);
 const store = userStore();
 
 const getNotifications = async (page = 1) => {
-  console.log(store.user.userId);
-
   try {
     const res = await notificationServices.getAllNotificationsForUser(
       store.user.userId,
       page,
       pageSize.value,
     );
-    notifications.value = res.data; // Update the notifications array
+
+    notifications.value = res.data.notifications; // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
 
@@ -44,14 +43,13 @@ onMounted(() => {
 });
 
 const formattedDateTime = (item) => {
-  console.log(item);
   return moment(item.dateTime).format("MM/DD/YYYY hh:mm A");
 };
 
 const editItem = async (item) => {
   try {
     const response = await apiClient.put(
-      `/notification/user/${item.user.userId}/notification/${item.id}`,
+      `/notification/user/${item.userId}/notification/${item.id}`,
       { read: true },
     );
 
@@ -71,7 +69,7 @@ const editItem = async (item) => {
 </script>
 
 <template>
-  <v-card color="background">
+  <v-card color="backgroundDarken">
     <div class="container">
       <div class="notifContainer">
         <h1>Notifications</h1>
@@ -87,7 +85,7 @@ const editItem = async (item) => {
         </div>
       </div>
 
-      <v-card v-if="showsidebar" class="infoSidebar" color="backgroundDarken">
+      <v-card v-if="showsidebar" class="infoSidebar" color="background">
         <strong class="header">{{ selectedNotif.header }}</strong>
         <v-btn
           icon
@@ -100,7 +98,7 @@ const editItem = async (item) => {
         <p>
           Sent By: {{ selectedNotif.user.fName }} {{ selectedNotif.user.lName }}
         </p>
-        <p>Sent On: {{ formattedDateTime(selectedNotif) }}</p>
+        <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
         <p>
           ------------------------------------------------------------------------
         </p>
@@ -125,7 +123,6 @@ const editItem = async (item) => {
   margin-top: 2%;
   overflow-y: auto;
   overflow-x: auto;
-  width: 90vw;
 }
 
 .notifContainer {
