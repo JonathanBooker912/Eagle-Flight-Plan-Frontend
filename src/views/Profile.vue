@@ -1,13 +1,14 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import linkServices from "../services/linkServices";
+import strengthServices from "../services/strengthServices";
 import { userStore } from "../stores/userStore";
 
-const currentPage = ref(1);
 const store = userStore();
 const user = store.user;
 
 const links = ref([]);
+const strengths = ref([]);
 
 const getLinks = async () => {
   console.log(store.user.userId); // Check if userId is correctly populated
@@ -20,8 +21,19 @@ const getLinks = async () => {
   }
 };
 
+const getStrengths = async () => {
+  try {
+    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
+    strengths.value = res.data; // Update links
+    console.log(strengths.value); // Check if links are returned
+  } catch (err) {
+    console.error("Error fetching strengths:", err); // Error handling
+  }
+}
+
 onMounted(() => {
   getLinks(); // Fetch links on component mount
+  getStrengths();
 });
 </script>
 
@@ -31,7 +43,6 @@ onMounted(() => {
       <v-container>
         <v-row no-gutters justify="space-evenly">
           <v-col class="text-center" style="position: relative">
-            <!-- Profile Picture extending above the box -->
             <v-img
               src="../../public/Birb.png"
               height="150"
@@ -42,16 +53,17 @@ onMounted(() => {
                 top: -50px;
                 z-index: 10000;
                 left: 50%;
-                margin-bottom: 20px;
                 transform: translateX(-50%);
                 border-radius: 50%;
               "
             />
-            <p>{{ user.fullName }}</p>
-            <p>{ GRADE }</p>
+            <div style="margin-top: 80px; padding-bottom: 20px">
+              <p class="text-h5 font-weight-bold">{{ user.fullName }}</p>
+              <p class="text-subtitle-1">{{ user.major }}</p>
+            </div>
           </v-col>
           <v-col class="text-center">
-            <p>
+            <p style="text-align: left;">
               I am currently a Software Development Engineer In Test (SDET)
               Intern for Paycom during the Fall 2024 semester working part-time.
             </p>
@@ -62,9 +74,10 @@ onMounted(() => {
             <p>{ PO BOX }</p>
           </v-col>
           <v-col class="text-center">
-            <p>{ Link one }</p>
-            <p>{ Link two }</p>
-            <p>{ Link three }</p>
+            <p v-for="(link, index) in links.slice(0, 3)" :key="index">
+              {{ link.websiteName }} -
+              <a :href="link.link" target="_blank">{{ link.link }}</a>
+            </p>
           </v-col>
         </v-row>
       </v-container>
