@@ -1,6 +1,6 @@
 <template>
   <v-card
-    color="background"
+    color="backgroundDarken"
     :class="{
       'opacity-40': props.notification.read,
       'opacity-100': !props.notification.read,
