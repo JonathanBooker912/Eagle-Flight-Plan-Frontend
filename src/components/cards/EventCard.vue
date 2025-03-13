@@ -6,16 +6,14 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
+const emit = defineEmits(["edit", "delete", "show-info"]);
+
 const store = userStore();
 const isAdmin = ref(false);
 
 const props = defineProps({
   event: {
     type: Object,
-    required: true,
-  },
-  isEdit: {
-    type: Boolean,
     required: true,
   },
 });
@@ -34,66 +32,104 @@ const eventTime = computed(() => {
 
 const viewCard = () => {};
 
+const editEvent = () => {
+  emit("edit", props.event.id);
+};
+
+const showEventInfo = () => {
+  emit("show-info", props.event.id);
+};
+
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
 });
 </script>
-
 <template>
-  <v-card
-    v-if="isAdmin && isEdit"
-    color="backgroundDarken"
-    class="d-flex flex-column rounded-xl ma-2 p-4"
-  >
+  <v-card v-if="isAdmin" color="backgroundDarken" class="cardContainer">
     <v-row no-gutters>
       <v-col>
         <v-card-text>
-          <p class="text-h5">{{ props.event.name }}</p>
-          <p class="text-subtitle-1">{{ props.event.location }}</p>
-          <p class="text-subtitle-1">{{ eventDate }}</p>
-          <p class="text-subtitle-1">{{ eventTime }}</p>
+          <p class="text-h5 text-no-wrap text-truncate">
+            {{ props.event.name }}
+          </p>
+          <p
+            class="text-subtitle-1 font-weight-regular text-no-wrap text-truncate"
+          >
+            {{ props.event.location || "No Location" }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ eventDate }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ eventTime }}
+          </p>
         </v-card-text>
-        <v-row class="ma-2 justify-end">
-          <v-btn color="warning" class="elevation-0">
+        <v-row class="ma-2 float-right">
+          <v-btn
+            color="primary"
+            class="mr-2 cardButton elevation-0"
+            @click="showEventInfo"
+          >
+            <v-icon icon="mdi-eye" color="text" size="x-large"></v-icon>
+          </v-btn>
+          <v-btn
+            color="warning"
+            class="mr-2 cardButton elevation-0"
+            @click="editEvent"
+          >
             <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
           </v-btn>
-          <v-btn color="danger" class="elevation-0">
-            <v-icon icon="mdi-delete" color="text" size="x-large"></v-icon>
-          </v-btn>
+          <v-btn
+            color="danger"
+            class="cardButton elevation-0"
+            @click="emit('delete', props.event.id)"
+            ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
+          ></v-btn>
         </v-row>
       </v-col>
     </v-row>
   </v-card>
-
   <v-card
     v-else
     color="backgroundDarken"
-    class="d-flex flex-column rounded-xl ma-2 p-4"
+    class="cardContainer"
     @click="viewCard"
   >
     <v-row no-gutters>
       <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>
         <v-card-text>
-          <p class="text-h5">{{ props.event.name }}</p>
-          <p class="text-subtitle-1">{{ props.event.location }}</p>
-          <p class="text-subtitle-1">{{ eventDate }}</p>
-          <p class="text-subtitle-1">{{ eventTime }}</p>
+          <p class="text-h5 text-truncate w-100">
+            {{ props.event.name }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ props.event.location }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ eventDate }}
+          </p>
+          <p class="text-subtitle-1 font-weight-regular">
+            {{ eventTime }}
+          </p>
         </v-card-text>
       </v-col>
     </v-row>
   </v-card>
 </template>
 
-<style>
+<style scoped>
 .left-accent {
   width: 20px;
   border-radius: 20px 0px 0px 20px;
 }
-
 .cardContainer {
   min-width: 250px;
   border-radius: 25px;
-  margin: 4px;
+}
+.card-radius {
+  border-radius: 25px;
+}
+.cardButton {
+  border-radius: 13px;
 }
 </style>
