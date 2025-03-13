@@ -23,13 +23,16 @@ const getLinks = async () => {
 
 const getStrengths = async () => {
   try {
-    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
+    const res = await strengthServices.getStrengthsForStudent(
+      store.user.userId,
+    ); // API call
+    console.log(res);
     strengths.value = res.data; // Update links
     console.log(strengths.value); // Check if links are returned
   } catch (err) {
     console.error("Error fetching strengths:", err); // Error handling
   }
-}
+};
 
 onMounted(() => {
   getLinks(); // Fetch links on component mount
@@ -63,7 +66,7 @@ onMounted(() => {
             </div>
           </v-col>
           <v-col class="text-center">
-            <p style="text-align: left;">
+            <p style="text-align: left">
               I am currently a Software Development Engineer In Test (SDET)
               Intern for Paycom during the Fall 2024 semester working part-time.
             </p>
@@ -87,6 +90,10 @@ onMounted(() => {
     </v-card>
     <v-card color="backgroundDarken" class="adminItem adminItemBig">
       <p>Strengths</p>
+      <p v-for="(strength, index) in strengths
+      .slice(0, 5)" :key="index">
+        {{ strength.domain }} - {{ strength.name }} - {{ strength.number }}
+      </p>
     </v-card>
   </v-row>
 </template>
