@@ -86,15 +86,19 @@ onMounted(() => {
         </v-row>
       </v-container>
     </v-card>
-    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
+    <v-card color="backgroundDarken" class="adminItem adminItemBig">
       <p>Awards</p>
     </v-card>
-    <v-card color="backgroundDarken" class="adminItem adminItemBig">
+    <div class="adminItem adminItemSmall">
+      <v-card color="backgroundDarken">
       <h2>Clifton Strengths</h2>
-      <p v-for="(strength, index) in strengths.slice(0, 5)" :key="index">
-        {{ strength.domain }} - {{ strength.name }} - {{ strength.number }}
-      </p>
     </v-card>
+      <StrengthCard
+        v-for="(item, index) in strengths.slice(0, 5)"
+        :key="index"
+        :strength="item"
+      />
+    </div>
   </v-row>
 </template>
 

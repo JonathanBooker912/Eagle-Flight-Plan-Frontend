@@ -1,7 +1,5 @@
 <script setup>
-import { ref } from "vue";
-
-const isAdmin = ref(false);
+import { computed } from "vue";
 
 const props = defineProps({
   strength: {
@@ -10,21 +8,58 @@ const props = defineProps({
   },
 });
 
+// Map domain values to colors
+const categoryColor = computed(() => {
+  const domainColors = {
+    "Executing": "#8B5CF6",  // Blue
+    "Influencing": "#D97706", // Orange
+    "Relationship Building": "#0070CA", // Green
+    "Strategic Planning": "#10B981", // Purple
+  };
 
+  return domainColors[props.strength.domain] || "#0070CA"; // Default to blue if no match
+});
 </script>
 
 <template>
-  <v-card color="backgroundDarken">
+  <v-card color="backgroundDarken" class="pa-3 my-2 rounded-lg strengthCard">
     <v-row align="center">
-      <v-typography class="mr-3">
-        {{ props.strength.number }}
-      </v-typography>
-      <v-typography class="mr-3">
+      <v-card class="category" :style="{ backgroundColor: categoryColor }">
+        <h3>
+          {{ props.strength.number }}
+        </h3>  
+      </v-card>
+      <h3>
         {{ props.strength.name }}
-      </v-typography>
-      <v-typography class="mr-3">
+      </h3>
+      <p class="ml-auto domain">
         {{ props.strength.domain }}
-      </v-typography>
+      </p>
     </v-row>
   </v-card>
 </template>
+
+<style>
+.strengthCard {
+    height: 5vh;
+    display: inline-flex;
+    align-items: center;
+}
+
+.category {
+    height: 5vh;
+    width: 40px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.domain {
+    margin-right: 20px;
+}
+</style>
