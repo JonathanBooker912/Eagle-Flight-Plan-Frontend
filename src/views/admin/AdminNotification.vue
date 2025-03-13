@@ -49,7 +49,7 @@ const formattedDateTime = (item) => {
 const editItem = async (item) => {
   try {
     const response = await apiClient.put(
-      `/notification/user/${item.userId}/notification/${item.id}`,
+      `/notification/user/${store.user.userId}/notification/${item.id}`,
       { read: true },
     );
 
@@ -69,51 +69,49 @@ const editItem = async (item) => {
 </script>
 
 <template>
-  <v-card color="backgroundDarken">
-    <div class="container">
-      <div class="notifContainer">
-        <h1>Notifications</h1>
-        <div id="notifList">
-          <NotificationCard
-            v-for="(item, index) in notifications"
-            :key="index"
-            :to="{ name: 'admin-notifications' }"
-            :notification="item"
-            :class="{ unread: !item.read, read: item.read }"
-            @click="editItem(item)"
-          />
-        </div>
+  <div class="container">
+    <div class="notifContainer">
+      <h1>Notifications</h1>
+      <div id="notifList">
+        <NotificationCard
+          v-for="(item, index) in notifications"
+          :key="index"
+          :to="{ name: 'admin-notifications' }"
+          :notification="item"
+          :class="{ unread: !item.read, read: item.read }"
+          @click="editItem(item)"
+        />
       </div>
-
-      <v-card v-if="showsidebar" class="infoSidebar" color="background">
-        <strong class="header">{{ selectedNotif.header }}</strong>
-        <v-btn
-          icon
-          class="close-btn"
-          aria-label="Close Sidebar"
-          @click="showsidebar = false"
-        >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <p>
-          Sent By: {{ selectedNotif.user.fName }} {{ selectedNotif.user.lName }}
-        </p>
-        <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
-        <p>
-          ------------------------------------------------------------------------
-        </p>
-        <p class="description">{{ selectedNotif.description }}</p>
-      </v-card>
     </div>
 
-    <v-row justify="center" align="center" class="pagination">
-      <v-pagination
-        v-model="currentPage"
-        :length="totalPages"
-        :total-visible="5"
-      ></v-pagination>
-    </v-row>
-  </v-card>
+    <v-card v-if="showsidebar" class="infoSidebar" color="backgroundDarken">
+      <strong class="header">{{ selectedNotif.header }}</strong>
+      <v-btn
+        icon
+        class="close-btn"
+        aria-label="Close Sidebar"
+        @click="showsidebar = false"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+      <p>
+        Sent By: {{ selectedNotif.user.fName }} {{ selectedNotif.user.lName }}
+      </p>
+      <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
+      <p>
+        ------------------------------------------------------------------------
+      </p>
+      <p class="description">{{ selectedNotif.description }}</p>
+    </v-card>
+  </div>
+
+  <v-row justify="center" align="center" class="pagination">
+    <v-pagination
+      v-model="currentPage"
+      :length="totalPages"
+      :total-visible="5"
+    ></v-pagination>
+  </v-row>
 </template>
 
 <style>
