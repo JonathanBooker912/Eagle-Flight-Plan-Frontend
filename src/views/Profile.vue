@@ -17,6 +17,7 @@ const router = useRouter();
 const user = store.user;
 
 const links = ref([]);
+const strengths = ref([]);
 
 const getLinks = async () => {
   console.log(store.user.userId); // Check if userId is correctly populated
@@ -28,6 +29,16 @@ const getLinks = async () => {
     console.error("Error fetching links:", err); // Error handling
   }
 };
+
+const getStrengths = async () => {
+  try {
+    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
+    strengths.value = res.data; // Update links
+    console.log(strengths.value); // Check if links are returned
+  } catch (err) {
+    console.error("Error fetching strengths:", err); // Error handling
+  }
+}
 
 const noBadges = ref(false);
 const noStrengths = ref(false);
