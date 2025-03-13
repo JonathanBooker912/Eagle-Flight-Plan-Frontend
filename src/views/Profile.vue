@@ -1,14 +1,27 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
-import apiClient from "../services/services"
+import { onMounted, ref } from "vue";
+import linkServices from "../services/linkServices";
 import { userStore } from "../stores/userStore";
 
 const currentPage = ref(1);
 const store = userStore();
 const user = store.user;
 
+const links = ref([]);
+
+const getLinks = async () => {
+  console.log(store.user.userId); // Check if userId is correctly populated
+  try {
+    const res = await linkServices.getAllLinksForUser(store.user.userId); // API call
+    links.value = res.data; // Update links
+    console.log(links.value); // Check if links are returned
+  } catch (err) {
+    console.error("Error fetching links:", err); // Error handling
+  }
+};
+
 onMounted(() => {
-    console.log(user);
+  getLinks(); // Fetch links on component mount
 });
 </script>
 
@@ -39,8 +52,8 @@ onMounted(() => {
           </v-col>
           <v-col class="text-center">
             <p>
-              I am currently a Software Development Engineer In test (SDET)
-              Intern for Paycom during the Fall 2024 semester working part time.
+              I am currently a Software Development Engineer In Test (SDET)
+              Intern for Paycom during the Fall 2024 semester working part-time.
             </p>
           </v-col>
           <v-col class="text-center">
