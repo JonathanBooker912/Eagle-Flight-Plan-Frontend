@@ -32,13 +32,16 @@ const getLinks = async () => {
 
 const getStrengths = async () => {
   try {
-    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
+    const res = await strengthServices.getStrengthsForStudent(
+      store.user.userId,
+    ); // API call
+    console.log(res);
     strengths.value = res.data; // Update links
     console.log(strengths.value); // Check if links are returned
   } catch (err) {
     console.error("Error fetching strengths:", err); // Error handling
   }
-}
+};
 
 const noBadges = ref(false);
 const noStrengths = ref(false);
