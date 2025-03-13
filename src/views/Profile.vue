@@ -16,6 +16,19 @@ const router = useRouter();
 
 const user = store.user;
 
+const links = ref([]);
+
+const getLinks = async () => {
+  console.log(store.user.userId); // Check if userId is correctly populated
+  try {
+    const res = await linkServices.getAllLinksForUser(store.user.userId); // API call
+    links.value = res.data; // Update links
+    console.log(links.value); // Check if links are returned
+  } catch (err) {
+    console.error("Error fetching links:", err); // Error handling
+  }
+};
+
 const noBadges = ref(false);
 const noStrengths = ref(false);
 
