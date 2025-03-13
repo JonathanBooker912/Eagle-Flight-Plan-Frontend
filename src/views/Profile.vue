@@ -89,9 +89,8 @@ onMounted(() => {
       <p>Awards</p>
     </v-card>
     <v-card color="backgroundDarken" class="adminItem adminItemBig">
-      <p>Strengths</p>
-      <p v-for="(strength, index) in strengths
-      .slice(0, 5)" :key="index">
+      <h2>Clifton Strengths</h2>
+      <p v-for="(strength, index) in strengths.slice(0, 5)" :key="index">
         {{ strength.domain }} - {{ strength.name }} - {{ strength.number }}
       </p>
     </v-card>
@@ -127,8 +126,6 @@ onMounted(() => {
 }
 
 .adminItemBig {
-  justify-content: center;
-  align-items: center;
   width: 45vw;
 }
 
