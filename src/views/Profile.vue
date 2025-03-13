@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import linkServices from "../services/linkServices";
 import strengthServices from "../services/strengthServices";
+import StrengthCard from "../components/cards/StrengthCard.vue";
 import { userStore } from "../stores/userStore";
 
 const store = userStore();
