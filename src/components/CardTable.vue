@@ -28,9 +28,6 @@ const props = defineProps({
 watch(
   () => [props.showFilters, props.showInfo],
   ([newShowFilters, newShowInfo], [oldShowFilters, oldShowInfo]) => {
-    console.log("New:", newShowFilters, newShowInfo);
-    console.log("Old:", oldShowFilters, oldShowInfo);
-
     if (oldShowInfo && newShowFilters) {
       emit("close-info");
     } else if (oldShowFilters && newShowInfo) {
