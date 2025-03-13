@@ -39,7 +39,7 @@ const handleCardClick = (id, user, isAdmin) => {
   } else {
     studentPopup.value = true;
     popUpName.value = user.fullName;
-    popUpId.value = id;
+    popUpId.value = user.student.id;
   }
 };
 
@@ -54,7 +54,6 @@ const handleDialogClick = (optionNumber) => {
         params: { id: popUpId.value, studentName: popUpName.value },
       });
 };
-
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
 <template>
