@@ -1,7 +1,7 @@
 <script setup>
 // Props definition
 const props = defineProps({
-  label: { type: String, default: "Label" },
+  label: { type: String, default: null },
   addButton: { type: Boolean, default: true },
 });
 
@@ -16,7 +16,12 @@ const handleToggleFilters = () => emit("toggle-filters");
 <template>
   <v-row align="center" class="mt-12" no-gutters>
     <!-- Header -->
-    <v-col cols="auto" class="d-flex justify-center" style="min-width: 100px">
+    <v-col
+      v-if="props.label"
+      cols="auto"
+      class="d-flex justify-center"
+      style="min-width: 100px"
+    >
       <h2 class="text-h5">{{ props.label }}</h2>
     </v-col>
 
