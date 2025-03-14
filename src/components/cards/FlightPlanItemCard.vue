@@ -16,15 +16,6 @@ const color = computed(
     })[props.flightPlanItem.status] || "primary",
 );
 
-const headerText = computed(() => {
-  return (
-    {
-      Task: props.flightPlanItem.task.name,
-      Experience: props.flightPlanItem.experience.name,
-    }[props.flightPlanItem.flightPlanItemType] || "No Name"
-  );
-});
-
 const points = computed(() => {
   return {
     Task: props.flightPlanItem.task.points,
@@ -46,10 +37,10 @@ const points = computed(() => {
               <!-- eslint-disable-next-line vue/no-template-shadow -->
               <template v-slot:activator="{ props }">
                 <p v-bind="props" class="text-h6 mb-2 truncate-text">
-                  {{ headerText }}
+                  {{ flightPlanItem.name }}
                 </p>
               </template>
-              <span>{{ headerText }}</span>
+              <span>{{ flightPlanItem.name }}</span>
             </v-tooltip>
             <p>{{ flightPlanItem.flightPlanItemType }}</p>
             <p>{{ flightPlanItem.status }}</p>
