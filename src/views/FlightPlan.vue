@@ -164,13 +164,13 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
     >
       <template #item="{ item }">
         <FlightPlanItemCard
-          :flight-plan-item="item"
           :key="item.id"
+          :flight-plan-item="item"
         ></FlightPlanItemCard>
       </template>
       <template #filters>
         <v-select
-          v-model="filters.flightPlanItemType"
+          v-model="filters.flightPlanpnItemType"
           :items="flightPlanItemTypes"
           label="Type"
         ></v-select>

@@ -1,7 +1,7 @@
 <script setup>
 // Props definition
 const props = defineProps({
-  label: { type: String, required: false },
+  label: { type: String, default: null },
   addButton: { type: Boolean, default: true },
 });
 
