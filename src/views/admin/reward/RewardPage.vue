@@ -13,7 +13,7 @@ const label = "Rewards";
 
 const sortProperties = [
   {
-    title: "Redeption Type",
+    title: "Redemption Type",
     value: "redemptionType",
   },
 ];
