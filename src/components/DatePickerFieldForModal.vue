@@ -14,7 +14,7 @@ const emit = defineEmits(["update:modelValue"]);
 
 const menu = ref(false);
 const selectedDate = ref(
-  props.modelValue ? dayjs(props.modelValue).toDate() : null,
+  props.modelValue ? dayjs(props.modelValue).toDate() : null
 );
 
 // Watch for changes in the prop modelValue
@@ -22,7 +22,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     selectedDate.value = newValue ? dayjs(newValue).toDate() : null;
-  },
+  }
 );
 
 // Emit updated value when selectedDate changes
@@ -34,7 +34,7 @@ const fieldLabel = ref(props.label);
 
 // Format the date for display using day.js
 const formattedDate = computed(() =>
-  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : "",
+  selectedDate.value ? dayjs(selectedDate.value).format("MMM D, YYYY") : ""
 );
 
 // Clear the date selection
@@ -53,9 +53,9 @@ const clearDate = () => {
   >
     <template #activator="{ props }">
       <v-text-field
+        v-model="formattedDate"
         variant="solo"
         v-bind="props"
-        v-model="formattedDate"
         :label="fieldLabel"
         prepend-inner-icon="mdi-calendar"
         readonly

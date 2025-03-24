@@ -65,7 +65,7 @@ const handleSubmit = async () => {
     console.error(
       "Invalid time values:",
       formData.value.startTime,
-      formData.value.endTime,
+      formData.value.endTime
     );
     return;
   }
@@ -126,7 +126,7 @@ const filteredEndTimeOptions = computed(() => {
   if (!formData.value.startTime) return timeOptions.value;
   const start = parseTimeString(formData.value.startTime, "01/01/2000");
   return timeOptions.value.filter(
-    (time) => parseTimeString(time, "01/01/2000") > start,
+    (time) => parseTimeString(time, "01/01/2000") > start
   );
 });
 
@@ -161,7 +161,7 @@ const validateEndTimeWrapper = (value) => {
         </v-col>
       </v-row>
 
-      <v-row no-gutters v-if="selectedDate">
+      <v-row v-if="selectedDate" no-gutters>
         <v-col cols="5" class="mr-2">
           <v-combobox
             v-model="formData.startTime"
@@ -171,7 +171,7 @@ const validateEndTimeWrapper = (value) => {
             rounded="lg"
             :rules="[validateTime]"
             :disabled="isAllDay"
-            @update:modelValue="
+            @update:model-value="
               (value) => (formData.startTime = formatTimeOptions(value))
             "
           />
@@ -185,7 +185,7 @@ const validateEndTimeWrapper = (value) => {
             rounded="lg"
             :rules="[validateTime, validateEndTimeWrapper]"
             :disabled="isAllDay"
-            @update:modelValue="
+            @update:model-value="
               (value) => (formData.endTime = formatTimeOptions(value))
             "
           />
