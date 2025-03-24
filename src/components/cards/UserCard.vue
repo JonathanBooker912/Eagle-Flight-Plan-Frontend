@@ -19,7 +19,7 @@ onMounted(() => {
   <v-card
     color="backgroundDarken"
     class="cardContainer pa-0 ma-0"
-    @click="emit('cardPressed', props.user.id, isAdmin)"
+    @click="emit('cardPressed', props.user.id, props.user, isAdmin)"
   >
     <v-container class="pa-2">
       <v-row no-gutters style="align-self: stretch">

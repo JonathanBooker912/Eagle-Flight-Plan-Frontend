@@ -1,14 +1,21 @@
 <script setup>
 // Props definition
 const props = defineProps({
-  label: { type: String, default: "Label" },
+  label: { type: String, default: null },
   addButton: { type: Boolean, default: true },
 });
 
 // Emit event functions
 const emit = defineEmits(["changed", "add", "toggle-filters"]);
 
-const handleChange = (newValue) => emit("changed", newValue);
+let timeout = null;
+
+const handleChange = (newValue) => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    emit("changed", newValue);
+  }, 200);
+};
 const handleAdd = () => emit("add");
 const handleToggleFilters = () => emit("toggle-filters");
 </script>
@@ -16,7 +23,12 @@ const handleToggleFilters = () => emit("toggle-filters");
 <template>
   <v-row align="center" class="mt-12" no-gutters>
     <!-- Header -->
-    <v-col cols="auto" class="d-flex justify-center" style="min-width: 100px">
+    <v-col
+      v-if="props.label"
+      cols="auto"
+      class="d-flex justify-center"
+      style="min-width: 100px"
+    >
       <h2 class="text-h5">{{ props.label }}</h2>
     </v-col>
 

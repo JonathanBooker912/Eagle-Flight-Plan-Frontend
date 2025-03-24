@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
-import TasksPage from "../views/admin/TasksPage.vue";
+import TasksPage from "../views/admin/task/TasksPage.vue";
 import EventCardPage from "../views/admin/EventsPage.vue";
 import EventAddEditPage from "../views/admin/event/EventAddEditPage.vue";
 import { userStore } from "../stores/userStore";
@@ -18,7 +18,6 @@ import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 
 import AdminLanding from "../views/admin/AdminLanding.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminFlightPlan from "../views/admin/AdminFlightPlan.vue";
 import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
@@ -37,7 +36,8 @@ import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
-import AdminUserFlightPlan from "../views/admin/user/AdminUserFlightPlan.vue";
+import FlightPlan from "../views/FlightPlan.vue";
+import AddFlightPlanItem from "../views/admin/flightPlan/AddFlightPlanItem.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,11 +58,6 @@ const router = createRouter({
           path: "calendar",
           name: "admin-calendar",
           component: AdminCalendar,
-        },
-        {
-          path: "flightPlan",
-          name: "admin-flightPlan",
-          component: AdminFlightPlan,
         },
         {
           path: "notifications",
@@ -163,9 +158,21 @@ const router = createRouter({
           component: AdminUserPage,
         },
         {
-          path: "maintenance/user/studentFlightPlan/:id",
+          path: "maintenance/user/:studentName/studentFlightPlan/:id",
           name: "adminStudentFlightPlan",
-          component: AdminUserFlightPlan,
+          component: FlightPlan,
+          props: { isAdmin: true },
+        },
+        {
+          path: "user/:studentName/flightPlan/:id/add",
+          name: "addItemToFlightPlan",
+          component: AddFlightPlanItem,
+        },
+        {
+          path: "user/profile/:id",
+          name: "adminProfile",
+          component: AdminProfile,
+          props: { isAdmin: true },
         },
         {
           path: "maintenance/event",
@@ -188,11 +195,6 @@ const router = createRouter({
           path: "maintenance/user",
           name: "user",
           component: AdminUserPage,
-        },
-        {
-          path: "maintenance/user/studentFlightPlan/:id",
-          name: "adminStudentFlightPlan",
-          component: AdminUserFlightPlan,
         },
         {
           path: "maintenance/event",

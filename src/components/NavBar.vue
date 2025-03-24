@@ -6,7 +6,6 @@ import { userStore } from "../stores/userStore"; // Adjust this import based on 
 const admin = [
   { "route-name": "admin-profile", "link-text": "Profile" },
   { "route-name": "admin", "link-text": "Dashboard" },
-  { "route-name": "admin-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
   { "route-name": "maintenance", "link-text": "Maintenance" },
