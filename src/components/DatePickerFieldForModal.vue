@@ -17,14 +17,17 @@ const selectedDate = ref(
   props.modelValue ? dayjs(props.modelValue).toDate() : null
 );
 
-watch(props, () => {
-  if (props.modelValue == null) {
-    selectedDate.value = null;
+// Watch for changes in the prop modelValue
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    selectedDate.value = newValue ? dayjs(newValue).toDate() : null;
   }
-});
+);
 
+// Emit updated value when selectedDate changes
 watch(selectedDate, (newValue) => {
-  emit("update:modelValue", newValue); // Emit the updated value to the parent
+  emit("update:modelValue", newValue ? dayjs(newValue).toISOString() : null);
 });
 
 const fieldLabel = ref(props.label);

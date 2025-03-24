@@ -75,7 +75,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value },
+      { ...filters.value, ...sortOptions.value }
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -97,7 +97,7 @@ const handleEdit = (eventId) =>
 
 const handleDelete = async (eventId) => {
   try {
-    await EventServices.deleteTask(eventId);
+    await EventServices.deleteEvent(eventId);
     await getEvents(); // Re-fetch events after delete
   } catch (error) {
     console.error("Error deleting Event:", error);
@@ -113,7 +113,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id,
+      (strength) => strength.id
     );
   }
   getEvents();

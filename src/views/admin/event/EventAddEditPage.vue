@@ -1,30 +1,79 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { required } from "../../../utils/formValidators";
 import eventServices from "../../../services/eventServices";
+import {
+  validateEndTime,
+  validateTime,
+  formatTimeOptions,
+  formatTime,
+  parseTimeString,
+  generateTimeOptions,
+} from "../../../utils/dateTimeHelpers";
+import { required } from "../../../utils/formValidators";
 import DatePickerFieldForModal from "../../../components/DatePickerFieldForModal.vue";
-import DatePickerField from "../../../components/DatePickerField.vue";
 
 const props = defineProps({ isAdd: Boolean });
 
 const form = ref(null);
 const formData = ref({});
+const selectedDate = ref();
 const registrationTypes = ref([]);
 const attendanceTypes = ref([]);
 const eventTypes = ref([]);
 const completionTypes = ref([]);
+const timeOptions = ref(generateTimeOptions());
+
+const isAllDay = ref(false);
+
+const tempStartTime = ref();
+const tempEndTime = ref();
 
 const route = useRoute();
 const router = useRouter();
 
-const handleCancel = () => {
-  router.push({ name: "event" });
+const onAllDayToggle = () => {
+  if (isAllDay.value) {
+    tempStartTime.value = formData.value.startTime;
+    tempEndTime.value = formData.value.endTime;
+    formData.value.startTime = "12:00 AM";
+    formData.value.endTime = "11:59 PM";
+  } else {
+    formData.value.startTime = tempStartTime.value;
+    formData.value.endTime = tempEndTime.value;
+  }
+  console.log("All day toggled:", isAllDay.value);
 };
+
+const handleCancel = () => router.push({ name: "event" });
 
 const handleSubmit = async () => {
   const isValid = (await form.value?.validate())?.valid;
-  if (!isValid) return;
+  if (!isValid || !selectedDate.value) return;
+
+  const date = new Date(selectedDate.value); // Ensure it's a valid Date object
+  if (isNaN(date.getTime())) {
+    console.error("Invalid date selected:", selectedDate.value);
+    return;
+  }
+
+  // Convert startTime and endTime to ISO format
+  const startTime = parseTimeString(formData.value.startTime, date);
+  const endTime = parseTimeString(formData.value.endTime, date);
+
+  if (!startTime || !endTime) {
+    console.error(
+      "Invalid time values:",
+      formData.value.startTime,
+      formData.value.endTime
+    );
+    return;
+  }
+
+  // Update formData with ISO formatted values
+  formData.value.date = date.toISOString();
+  formData.value.startTime = startTime.toISOString();
+  formData.value.endTime = endTime.toISOString();
 
   try {
     if (props.isAdd) {
@@ -40,39 +89,50 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [
-      completionTypesRes,
-      attendanceTypesRes,
-      eventTypesRes,
-      registrationTypesRes,
-    ] = await Promise.all([
-      eventServices.getCompletionTypes(),
-      eventServices.getAttendanceTypes(),
-      eventServices.getEventTypes(),
-      eventServices.getRegistrationTypes(),
-    ]);
+    const [completionTypesRes, attendanceTypesRes, registrationTypesRes] =
+      await Promise.all([
+        eventServices.getCompletionTypes(),
+        eventServices.getAttendanceTypes(),
+        eventServices.getRegistrationTypes(),
+      ]);
 
     completionTypes.value = completionTypesRes.data;
     attendanceTypes.value = attendanceTypesRes.data;
-    eventTypes.value = eventTypesRes.data;
     registrationTypes.value = registrationTypesRes.data;
 
     if (!props.isAdd) {
       formData.value = (await eventServices.getEvent(route.params.id)).data;
+      formData.value.startTime = formatTime(new Date(formData.value.startTime));
+      formData.value.endTime = formatTime(new Date(formData.value.endTime));
+      selectedDate.value = new Date(formData.value.date);
     }
   } catch (error) {
     console.error("Error fetching data:", error);
   }
+
+  console.log(formData.value.startTime);
+  console.log(formData.value.endTime);
+
+  if (
+    formData.value.startTime == "12:00 AM" &&
+    formData.value.endTime == "11:59 PM"
+  ) {
+    isAllDay.value = true;
+    onAllDayToggle();
+  }
 });
 
-// Format hours and minutes with leading zeros
-const hours = Array.from({ length: 12 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
-);
-const minutes = Array.from({ length: 60 }, (_, i) =>
-  String(i).padStart(2, "0")
-);
-const amPm = ["AM", "PM"];
+const filteredEndTimeOptions = computed(() => {
+  if (!formData.value.startTime) return timeOptions.value;
+  const start = parseTimeString(formData.value.startTime, "01/01/2000");
+  return timeOptions.value.filter(
+    (time) => parseTimeString(time, "01/01/2000") > start
+  );
+});
+
+const validateEndTimeWrapper = (value) => {
+  return validateEndTime(value, formData.value);
+};
 </script>
 
 <template>
@@ -88,150 +148,103 @@ const amPm = ["AM", "PM"];
         label="Name"
         :rules="[required]"
       ></v-text-field>
+      <v-text-field
+        v-model="formData.location"
+        variant="solo"
+        rounded="lg"
+        label="Location"
+      ></v-text-field>
 
-      <v-row>
-        <v-col>
-          <h3>Start Time</h3>
+      <v-row no-gutters>
+        <v-col size="6">
+          <DatePickerFieldForModal v-model="selectedDate" :rules="[required]" />
         </v-col>
-        <v-col> <h3>End Time</h3> </v-col>
       </v-row>
 
-      <v-row no-gutters>
-        <v-row no-gutters>
-          <v-col>
-            <v-select
-              v-model="formData.startTimeHour"
-              variant="solo"
-              rounded="lg"
-              label="Hour"
-              clearable
-              :items="hours"
-              :rules="[required]"
-              class="pa-2"
-            ></v-select>
-          </v-col>
-          <h2 style="padding-top: 17px">:</h2>
-          <v-col>
-            <v-select
-              v-model="formData.startTimeMinute"
-              variant="solo"
-              rounded="lg"
-              label="Minute"
-              clearable
-              :items="minutes"
-              :rules="[required]"
-              class="pa-2"
-            ></v-select>
-          </v-col>
-          <v-col>
-            <v-select
-              v-model="formData.startTimeAmPm"
-              variant="solo"
-              rounded="lg"
-              label="AM/PM"
-              clearable
-              :items="amPm"
-              :rules="[required]"
-              class="pa-2"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <h1 style="padding-top: 10px">-</h1>
-
-        <v-row no-gutters>
-          <v-col>
-            <v-select
-              v-model="formData.endTimeHour"
-              variant="solo"
-              rounded="lg"
-              label="Hour"
-              clearable
-              :items="hours"
-              :rules="[required]"
-              class="pa-2"
-            ></v-select>
-          </v-col>
-          <h2 style="padding-top: 17px">:</h2>
-          <v-col>
-            <v-select
-              v-model="formData.endTimeMinute"
-              variant="solo"
-              rounded="lg"
-              label="Minute"
-              clearable
-              :items="minutes"
-              :rules="[required]"
-              class="pa-2"
-            ></v-select>
-          </v-col>
-          <v-col>
-            <v-select
-              v-model="formData.endTimeAmPm"
-              variant="solo"
-              rounded="lg"
-              label="AM/PM"
-              clearable
-              :items="amPm"
-              :rules="[required]"
-              class="pa-2"
-            ></v-select>
-          </v-col>
-        </v-row>
-      </v-row>
-
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <DatePickerFieldForModal></DatePickerFieldForModal>
+      <v-row no-gutters v-if="selectedDate">
+        <v-col cols="5" class="mr-2">
+          <v-combobox
+            v-model="formData.startTime"
+            :items="timeOptions"
+            label="Start Time"
+            variant="solo"
+            rounded="lg"
+            :rules="[validateTime]"
+            :disabled="isAllDay"
+            @update:modelValue="
+              (value) => (formData.startTime = formatTimeOptions(value))
+            "
+          />
+        </v-col>
+        <v-col cols="5" class="mr-2">
+          <v-combobox
+            v-model="formData.endTime"
+            :items="filteredEndTimeOptions"
+            label="End Time"
+            variant="solo"
+            rounded="lg"
+            :rules="[validateTime, validateEndTimeWrapper]"
+            :disabled="isAllDay"
+            @update:modelValue="
+              (value) => (formData.endTime = formatTimeOptions(value))
+            "
+          />
+        </v-col>
+        <v-col cols="1" class="ml-5">
+          <v-checkbox
+            v-model="isAllDay"
+            label="All day"
+            @change="onAllDayToggle"
+          />
         </v-col>
       </v-row>
 
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
           <v-select
-            v-model="formData.registrationTypes"
+            v-model="formData.registration"
             variant="solo"
             rounded="lg"
+            clearable
             label="Registration Type"
             :items="registrationTypes"
             :rules="[required]"
-            class="pa-2"
-          ></v-select>
+          />
         </v-col>
         <v-col size="6">
           <v-select
-            v-model="formData.eventTypes"
+            v-model="formData.eventType"
             variant="solo"
             rounded="lg"
+            clearable
             label="Event Type"
             :items="eventTypes"
-            :rules="[required]"
-            class="pa-2"
-          ></v-select>
+          />
         </v-col>
       </v-row>
 
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
           <v-select
-            v-model="formData.completionTypes"
+            v-model="formData.completionType"
             variant="solo"
             rounded="lg"
-            label="Completion Types"
+            clearable
+            label="Completion Type"
             :items="completionTypes"
             :rules="[required]"
-            class="pa-2"
-          ></v-select>
+          />
         </v-col>
         <v-col size="6">
           <v-select
-            v-model="formData.attendanceTypes"
+            v-model="formData.attendanceType"
             variant="solo"
             rounded="lg"
+            clearable
             label="Attendance Type"
             :items="attendanceTypes"
             :rules="[required]"
-            class="pa-2"
-          ></v-select>
+          />
         </v-col>
       </v-row>
 
@@ -240,8 +253,6 @@ const amPm = ["AM", "PM"];
         variant="solo"
         rounded="lg"
         label="Description"
-        :rules="[required]"
-        class="pa-2"
       ></v-textarea>
 
       <v-row class="justify-center mb-1">
