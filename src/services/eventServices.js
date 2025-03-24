@@ -15,7 +15,33 @@ export default {
       },
     });
   },
-  deleteTask(taskId) {
-    return apiClient.delete(`/event/${taskId}`);
+
+  getEvent(eventId) {
+    return apiClient.get(`/event/${eventId}`);
+  },
+  deleteEvent(eventId) {
+    return apiClient.delete(`/event/${eventId}`);
+  },
+  createEvent(eventData) {
+    return apiClient.post("/event", eventData);
+  },
+  updateEvent(eventId, eventData) {
+    return apiClient.put(`/event/${eventId}`, eventData);
+  },
+
+  getCompletionTypes() {
+    return apiClient.get("/event/types/completionTypes");
+  },
+
+  getAttendanceTypes() {
+    return apiClient.get("/event/types/attendanceTypes");
+  },
+
+  // getEventTypes() {
+  //   return apiClient.get("/event/types/eventTypes");
+  // },
+
+  getRegistrationTypes() {
+    return apiClient.get("/event/types/registrationTypes");
   },
 };

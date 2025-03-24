@@ -97,7 +97,7 @@ const handleEdit = (eventId) =>
 
 const handleDelete = async (eventId) => {
   try {
-    await EventServices.deleteTask(eventId);
+    await EventServices.deleteEvent(eventId);
     await getEvents(); // Re-fetch events after delete
   } catch (error) {
     console.error("Error deleting Event:", error);
