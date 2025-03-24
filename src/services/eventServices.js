@@ -44,5 +44,4 @@ export default {
   getRegistrationTypes() {
     return apiClient.get("/event/types/registrationTypes");
   },
-  
 };
