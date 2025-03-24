@@ -8,7 +8,14 @@ const props = defineProps({
 // Emit event functions
 const emit = defineEmits(["changed", "add", "toggle-filters"]);
 
-const handleChange = (newValue) => emit("changed", newValue);
+let timeout = null;
+
+const handleChange = (newValue) => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    emit("changed", newValue);
+  }, 200);
+};
 const handleAdd = () => emit("add");
 const handleToggleFilters = () => emit("toggle-filters");
 </script>
