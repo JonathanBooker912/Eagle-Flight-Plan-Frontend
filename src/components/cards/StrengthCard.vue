@@ -63,7 +63,9 @@ const categoryColor = computed(() => {
   height: 5vh;
 
   align-items: center;
-  transition: height 0.3s ease, opacity 0.3s ease;
+  transition:
+    height 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* Hide other strengths when hovering */
@@ -72,7 +74,9 @@ const categoryColor = computed(() => {
   display: none !important;
   height: 0 !important;
   overflow: hidden;
-  transition: height 0.3s ease, opacity 0.3s ease;
+  transition:
+    height 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* Expand hovered strength */
