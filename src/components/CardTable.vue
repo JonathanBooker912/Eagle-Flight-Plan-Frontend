@@ -1,22 +1,40 @@
 <script setup>
+import { watch } from "vue";
 import { VRow, VCol, VCard } from "vuetify/components";
 
 const emit = defineEmits([
   "update-filters",
   "clear-filters",
   "close-filter-menu",
+  "close-info",
 ]);
 
 // Props for number of items per row and items array
 const props = defineProps({
   items: { type: Array, required: true },
   showFilters: Boolean,
+  showInfo: Boolean,
+  infoLabel: {
+    type: String,
+    default: "Info",
+  },
   perRow: { type: Number, default: 4 },
   perRowLg: { type: Number, default: 3 },
   perRowMd: { type: Number, default: 2 },
   perRowSm: { type: Number, default: 1 },
   perRowXs: { type: Number, default: 1 },
 });
+
+watch(
+  () => [props.showFilters, props.showInfo],
+  ([newShowFilters, newShowInfo], [oldShowFilters, oldShowInfo]) => {
+    if (oldShowInfo && newShowFilters) {
+      emit("close-info");
+    } else if (oldShowFilters && newShowInfo) {
+      emit("close-filter-menu");
+    }
+  },
+);
 
 // Return the number of columns based on the screen size
 const getCols = (screenSize) => {
@@ -39,6 +57,9 @@ const handleUpdateFilters = () => {
 const handleCloseFilters = () => {
   emit("close-filter-menu");
 };
+const handleCloseInfo = () => {
+  emit("close-info");
+};
 </script>
 
 <template>
@@ -46,7 +67,10 @@ const handleCloseFilters = () => {
     <v-row>
       <v-slide-x-transition>
         <v-col v-if="showFilters" cols="12" md="3" lg="3">
-          <v-card class="pa-4 filter-card elevation-0" color="backgroundDarken">
+          <v-card
+            class="pa-4 filter-card card-radius elevation-0"
+            color="backgroundDarken"
+          >
             <v-row class="justify-space-between align-center" no-gutters>
               <v-card-title>Filters</v-card-title>
               <v-icon class="mr-2" @click="handleCloseFilters">
@@ -108,6 +132,34 @@ const handleCloseFilters = () => {
         </v-row>
         <slot name="pagination"></slot>
       </v-col>
+      <v-slide-x-reverse-transition>
+        <v-col
+          v-if="showInfo"
+          cols="12"
+          md="3"
+          lg="3"
+          class="align-start ml-2a"
+        >
+          <v-card
+            class="pa-4 h-100 card-radius elevation-0 px-6"
+            color="backgroundDarken"
+          >
+            <v-row
+              class="justify-space-between align-center flex-nowrap"
+              no-gutters
+            >
+              <h2>{{ props.infoLabel }}</h2>
+              <v-icon @click="handleCloseInfo"> mdi-close </v-icon>
+            </v-row>
+
+            <slot name="info">
+              <v-card-text>
+                <p>No Info Available</p>
+              </v-card-text>
+            </slot>
+          </v-card>
+        </v-col>
+      </v-slide-x-reverse-transition>
     </v-row>
   </v-container>
 </template>
@@ -125,6 +177,9 @@ const handleCloseFilters = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.card-radius {
   border-radius: 25px;
 }
 </style>
