@@ -27,7 +27,9 @@ const getLinks = async () => {
 
 const getStrengths = async () => {
   try {
-    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
+    const res = await strengthServices.getStrengthsForStudent(
+      store.user.userId,
+    ); // API call
     console.log(res);
     strengths.value = res.data; // Update strengths
     console.log(strengths.value); // Check if strengths are returned
@@ -66,7 +68,14 @@ onMounted(() => {
               height="150"
               width="150"
               class="profile-pic"
-              style="position: absolute; top: -20px; z-index: 10000; left: 50%; transform: translateX(-50%); border-radius: 50%;"
+              style="
+                position: absolute;
+                top: -20px;
+                z-index: 10000;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 50%;
+              "
             />
             <div style="margin-top: 90px">
               <p class="text-h5 font-weight-bold">{{ user.fullName }}</p>
@@ -75,7 +84,7 @@ onMounted(() => {
           </v-col>
           <v-col class="text-center">
             <p style="text-align: left">
-             {{ user.profileDescription }}
+              {{ user.profileDescription }}
             </p>
           </v-col>
           <v-col class="text-center">
@@ -84,7 +93,8 @@ onMounted(() => {
           </v-col>
           <v-col class="text-center">
             <p v-for="(link, index) in links.slice(0, 3)" :key="index">
-              {{ link.websiteName }} - <a :href="link.link" target="_blank">{{ link.link }}</a>
+              {{ link.websiteName }} -
+              <a :href="link.link" target="_blank">{{ link.link }}</a>
             </p>
           </v-col>
         </v-row>
@@ -100,7 +110,12 @@ onMounted(() => {
             <h2>Awards</h2>
           </v-card>
           <v-row>
-            <v-col v-for="(item, index) in badges.slice(0, 6)" :key="index" cols="12" md="4">
+            <v-col
+              v-for="(item, index) in badges.slice(0, 6)"
+              :key="index"
+              cols="12"
+              md="4"
+            >
               <BadgeCard :badge="item" :isProfilePage="true" />
             </v-col>
           </v-row>
@@ -115,7 +130,12 @@ onMounted(() => {
           </v-card>
           <!-- Stacked Strengths (Stretching Full Width) -->
           <v-row class="strengths-list">
-            <v-col v-for="(item, index) in strengths.slice(0, 5)" :key="index" cols="12" style="padding: 0px 10px;">
+            <v-col
+              v-for="(item, index) in strengths.slice(0, 5)"
+              :key="index"
+              cols="12"
+              style="padding: 0px 10px"
+            >
               <StrengthCard :strength="item" />
             </v-col>
           </v-row>
@@ -145,5 +165,4 @@ onMounted(() => {
   padding: 15px 0px 5px 0px;
   border-radius: 25px;
 }
-
 </style>

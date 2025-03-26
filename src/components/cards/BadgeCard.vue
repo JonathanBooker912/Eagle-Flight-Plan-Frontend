@@ -5,7 +5,7 @@ import { loadImage, cleanupImage } from "../componentUtilities";
 
 const props = defineProps({
   badge: { type: Object, required: true },
-  isProfilePage: { type: Boolean, default: false }, 
+  isProfilePage: { type: Boolean, default: false },
 });
 const emit = defineEmits(["edit", "delete"]);
 
@@ -29,11 +29,9 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 
 // Computed property to determine the card style
 const cardClass = computed(() => {
-
   if (props.isProfilePage) {
     console.log("I am in the prof page!");
   }
-
 
   return props.isProfilePage ? "profile-card" : "";
 });
