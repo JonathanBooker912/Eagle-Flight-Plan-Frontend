@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import userServices from "../../services/userServices";
 import UserCard from "../../components/cards/UserCard.vue";
-import User from "../../../../Eagle-Flight-Plan-Backend/app/models/user.model";
 
 const users = ref([]);
 
@@ -22,7 +21,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1>Student Search Page</h1>
-
-  <p>Test Change</p>
+   <v-row>
+    <v-col
+      v-for="(item, index) in users"
+      :key="index"
+      cols="12"
+      style="padding: 0px 10px"
+    >
+      <UserCard :user="item" />
+    </v-col>
+  </v-row>
 </template>
