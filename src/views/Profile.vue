@@ -18,6 +18,7 @@ const user = store.user;
 
 const links = ref([]);
 const strengths = ref([]);
+const badges = ref([]);
 
 const getLinks = async () => {
   console.log(store.user.userId); // Check if userId is correctly populated
@@ -32,14 +33,23 @@ const getLinks = async () => {
 
 const getStrengths = async () => {
   try {
-    const res = await strengthServices.getStrengthsForStudent(
-      store.user.userId,
-    ); // API call
+    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
     console.log(res);
-    strengths.value = res.data; // Update links
-    console.log(strengths.value); // Check if links are returned
+    strengths.value = res.data; // Update strengths
+    console.log(strengths.value); // Check if strengths are returned
   } catch (err) {
     console.error("Error fetching strengths:", err); // Error handling
+  }
+};
+
+const getBadges = async () => {
+  try {
+    const res = await badgeServices.getBadgesForStudent(store.user.userId); // API call
+    console.log(res);
+    badges.value = res.data.badges; // Update badges
+    console.log(badges.value); // Check if badges are returned
+  } catch (err) {
+    console.error("Error fetching badges:", err); // Error handling
   }
 };
 
