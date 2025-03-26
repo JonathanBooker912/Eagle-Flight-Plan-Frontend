@@ -40,4 +40,8 @@ export default {
   updateBadge(badgeId, badgeData) {
     return apiClient.put(`/badge/${badgeId}`, badgeData);
   },
+
+  getBadgesForStudent(studentId) {
+    return apiClient.get(`/badge/student/${studentId}`);
+  },
 };

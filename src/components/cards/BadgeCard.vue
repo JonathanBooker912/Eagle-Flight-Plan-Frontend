@@ -1,17 +1,15 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import defaultImage from "../../assets/DefaultBadgeImage.png";
 
-// Define statements for vue
 const props = defineProps({
   badge: { type: Object, required: true },
+  isProfilePage: { type: Boolean, default: false }, 
 });
 const emit = defineEmits(["edit", "delete"]);
 
-// Reactive states
 const imageSrc = ref("");
 
-// Functions
 const loadImage = (image) => {
   if (!image || !image.data) return;
 
@@ -28,9 +26,21 @@ onMounted(() => {
   loadImage(props.badge.image);
 });
 onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
+
+// Computed property to determine the card style
+const cardClass = computed(() => {
+
+  if (props.isProfilePage) {
+    console.log("I am in the prof page!");
+  }
+
+
+  return props.isProfilePage ? "profile-card" : "";
+});
 </script>
+
 <template>
-  <v-card color="backgroundDarken" class="cardContainer">
+  <v-card :class="['cardContainer', cardClass]">
     <v-card-text>
       <v-img
         v-if="imageSrc"
@@ -43,12 +53,11 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
         class="image"
         :src="defaultImage"
         alt="Generic Merchandise Image"
-      >
-      </v-img>
-      <p class="text-h5 text-center my-2">
+      ></v-img>
+      <p class="text-subtitle-1 text-center my-2">
         {{ props.badge.name }}
       </p>
-      <v-row class="ma-2 justify-center">
+      <v-row v-show="!props.isProfilePage" class="ma-2 justify-center">
         <v-btn
           color="warning"
           class="mr-2 cardButton"
@@ -60,8 +69,9 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
           color="danger"
           class="cardButton"
           @click="emit('delete', props.badge.id, props.badge.imageName)"
-          ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
-        ></v-btn>
+        >
+          <v-icon icon="mdi-delete" color="text" size="x-large"></v-icon>
+        </v-btn>
       </v-row>
     </v-card-text>
   </v-card>
@@ -70,11 +80,21 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 <style scoped>
 .cardContainer {
   border-radius: 25px;
+  /* Original styling */
 }
 .cardButton {
   border-radius: 13px;
 }
 .image {
   max-height: 150px;
+}
+
+.profile-card {
+  max-width: 200px; /* Smaller card for profile page */
+  font-size: 12px;
+}
+
+.profile-card .image {
+  max-height: 100px; /* Smaller image for profile page */
 }
 </style>

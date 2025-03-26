@@ -1,36 +1,5 @@
-<template>
-  <v-card
-    v-show="hoveredStrength === null || hoveredStrength === strength.name"
-    color="backgroundDarken"
-    class="pa-3 my-2 rounded-lg strengthCard"
-    :class="{
-      noShow: hoveredStrength !== strength.name && hoveredStrength !== null, // Default class when not hovered
-      expanded: hoveredStrength === strength.name, // Expanded class when hovered
-    }"
-    @mouseover="hoveredStrength = strength.name"
-    @mouseleave="hoveredStrength = null"
-  >
-    <v-row align="center">
-      <!-- Strength number in category -->
-      <v-card class="category" :style="{ backgroundColor: categoryColor }">
-        <h3>{{ props.strength.number }}</h3>
-      </v-card>
-      <h3>{{ props.strength.name }}</h3>
-      <p class="ml-auto domain">{{ props.strength.domain }}</p>
-    </v-row>
-
-    <!-- Conditionally show the description when hovered -->
-    <p
-      v-if="hoveredStrength === props.strength.name"
-      class="strength-description"
-    >
-      {{ strengthDescription }}
-    </p>
-  </v-card>
-</template>
-
 <script setup>
-import { computed, ref } from "vue";
+import { ref, computed } from "vue";
 import { strengthDescriptions } from "./strengthDescriptions";
 
 const props = defineProps({
@@ -61,22 +30,54 @@ const categoryColor = computed(() => {
 
   return domainColors[props.strength.domain] || "#0070CA"; // Default to blue if no match
 });
-
-// Handle mouse over event to set hovered strength
-const handleHover = () => {
-  hoveredStrength.value = props.strength.name;
-};
-
-// Handle mouse leave event to reset hovered strength
-const handleLeave = () => {
-  hoveredStrength.value = null;
-};
 </script>
-<style>
+
+<template>
+  <v-card
+    color="backgroundDarken"
+    class="pa-3 my-2 rounded-lg strengthCard"
+    v-show="hoveredStrength === null || hoveredStrength === strength.name"
+    :class="{
+      expanded: hoveredStrength === strength.name, // Expand hovered strength
+    }"
+    @mouseover="hoveredStrength = strength.name"
+    @mouseleave="hoveredStrength = null"
+  >
+    <v-row align="center">
+      <v-card class="category" :style="{ backgroundColor: categoryColor }">
+        <h3>{{ props.strength.number }}</h3>
+      </v-card>
+      <h3>{{ props.strength.name }}</h3>
+      <p class="ml-auto domain">{{ props.strength.domain }}</p>
+    </v-row>
+
+    <!-- Show the description only when hovered -->
+    <p v-if="hoveredStrength === strength.name" class="strength-description">
+      {{ strengthDescription }}
+    </p>
+  </v-card>
+</template>
+
+<style scoped>
 .strengthCard {
   height: 5vh;
-  display: inline-flex;
+
   align-items: center;
+  transition: height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hide other strengths when hovering */
+.hidden {
+  opacity: 0;
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden;
+  transition: height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Expand hovered strength */
+.expanded {
+  height: 20vh;
 }
 
 .category {
@@ -85,7 +86,6 @@ const handleLeave = () => {
   border-top-left-radius: 10px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
-
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -96,12 +96,7 @@ const handleLeave = () => {
   margin-right: 20px;
 }
 
-.noShow {
-  display: none;
-  height: 0%;
-}
-
-.expanded {
-  height: 100%;
+.strength-description {
+  margin: 40px 20px;
 }
 </style>
