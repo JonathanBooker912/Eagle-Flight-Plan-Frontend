@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import linkServices from "../services/linkServices";
 import strengthServices from "../services/strengthServices";
 import badgeServices from "../services/badgeServices";
+import userServices from "../services/userServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
@@ -13,6 +14,17 @@ const user = store.user;
 const links = ref([]);
 const strengths = ref([]);
 const badges = ref([]);
+const selectedUser = ref([]);
+
+const getUser = async () => {
+  try {
+    const res = await userServices.getOneUser(store.user.userId); // PASS IN THE ID
+    selectedUser.value = res.data; // Update links
+    console.log(selectedUser.value);
+  } catch (err) {
+    console.error("Error fetching user:", err); // Error handling
+  }
+};
 
 const getLinks = async () => {
   console.log(store.user.userId); // Check if userId is correctly populated
@@ -53,6 +65,7 @@ onMounted(() => {
   getLinks(); // Fetch links on component mount
   getStrengths();
   getBadges();
+  getUser();
 });
 </script>
 
@@ -78,17 +91,19 @@ onMounted(() => {
               "
             />
             <div style="margin-top: 90px">
-              <p class="text-h5 font-weight-bold">{{ user.fullName }}</p>
+              <p class="text-h5 font-weight-bold">
+                {{ selectedUser.fullName }}
+              </p>
               <p class="text-subtitle-1">{{ user.major }}</p>
             </div>
           </v-col>
           <v-col class="text-center">
             <p style="text-align: left">
-              {{ user.profileDescription }}
+              {{ selectedUser.profileDescription }}
             </p>
           </v-col>
           <v-col class="text-center">
-            <p>{{ user.email }}</p>
+            <p>{{ selectedUser.email }}</p>
             <p>{{ user.address }}</p>
           </v-col>
           <v-col class="text-center">
