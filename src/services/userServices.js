@@ -12,6 +12,9 @@ export default {
       },
     });
   },
+  getOneUser(id) {
+    return apiClient.get(`/user/${id}`);
+  },
   deleteUser(id) {
     return apiClient.delete(`/user/${id}`);
   },
