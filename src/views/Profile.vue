@@ -19,6 +19,17 @@ const user = store.user;
 const links = ref([]);
 const strengths = ref([]);
 const badges = ref([]);
+const selectedUser = ref([]);
+
+const getUser = async () => {
+  try {
+    const res = await userServices.getOneUser(store.user.userId); // PASS IN THE ID
+    selectedUser.value = res.data; // Update links
+    console.log(selectedUser.value);
+  } catch (err) {
+    console.error("Error fetching user:", err); // Error handling
+  }
+};
 
 const getLinks = async () => {
   console.log(store.user.userId); // Check if userId is correctly populated
