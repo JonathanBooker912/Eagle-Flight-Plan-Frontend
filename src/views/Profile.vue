@@ -33,7 +33,9 @@ const getLinks = async () => {
 
 const getStrengths = async () => {
   try {
-    const res = await strengthServices.getStrengthsForStudent(store.user.userId); // API call
+    const res = await strengthServices.getStrengthsForStudent(
+      store.user.userId,
+    ); // API call
     console.log(res);
     strengths.value = res.data; // Update strengths
     console.log(strengths.value); // Check if strengths are returned
