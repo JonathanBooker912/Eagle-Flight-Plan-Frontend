@@ -18,8 +18,8 @@ const color = computed(
 
 const points = computed(() => {
   return {
-    Task: props.flightPlanItem.task.points,
-    Experience: props.flightPlanItem.experience.points,
+    Task: props.flightPlanItem.task?.points,
+    Experience: props.flightPlanItem.experience?.points,
   }[props.flightPlanItem.flightPlanItemType];
 });
 </script>

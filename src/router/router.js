@@ -262,7 +262,8 @@ const router = createRouter({
         {
           path: "flightPlan",
           name: "student-flightPlan",
-          component: StudentFlightPlan,
+          component: FlightPlan,
+          props: { isAdmin: false },
         },
         {
           path: "notifications",
