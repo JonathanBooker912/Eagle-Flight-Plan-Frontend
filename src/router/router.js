@@ -25,7 +25,6 @@ import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
-import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentNotification from "../views/student/StudentNotification.vue";
 import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
