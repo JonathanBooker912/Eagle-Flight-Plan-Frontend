@@ -21,7 +21,7 @@ onMounted(() => {
 </script>
 
 <template>
-   <v-row>
+  <v-row>
     <v-col
       v-for="(item, index) in users"
       :key="index"
