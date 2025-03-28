@@ -8,6 +8,9 @@ import flightPlanServices from "../services/flightPlanServices";
 import flightPlanItemServices from "../services/flightPlanItemServices";
 import FlightPlanItemCard from "../components/cards/FlightPlanItemCard.vue";
 import { useDisplay } from "vuetify";
+import { userStore } from "../stores/userStore";
+import { storeToRefs } from "pinia";
+import studentServices from "../services/studentServices";
 
 const props = defineProps({
   isAdmin: {
@@ -22,14 +25,12 @@ const sortProperties = [
     value: "status",
   },
   {
-    title: "Type",
-    value: "flightPlanItemType",
-  },
-  {
     title: "Name",
     value: "name",
   },
 ];
+
+let student = null;
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +42,9 @@ const count = ref(0);
 const progress = ref(0);
 const flightPlanItemTypes = ref([]);
 const flightPlanItemStatuses = ref([]);
+
+const store = userStore();
+const { user } = storeToRefs(store);
 
 const showFilters = ref(false);
 const filters = ref({
@@ -65,10 +69,20 @@ const numCardColumns = computed(() => {
 });
 const pageSize = computed(() => numCardColumns.value * 2);
 
-const fetchFlightPlan = async () => {
-  const response = await flightPlanServices.getFlightPlanForStudent(
-    route.params.id,
+const fetchStudentForUserId = async () => {
+  if (props.isAdmin) {
+    student = route.params.id;
+    return;
+  }
+  const studentResponse = await studentServices.getStudentForUserId(
+    user.value.userId,
   );
+
+  student = studentResponse.data;
+};
+
+const fetchFlightPlan = async () => {
+  const response = await flightPlanServices.getFlightPlanForStudent(student.id);
   flightPlan.value = response.data[0];
 };
 
@@ -126,10 +140,13 @@ const handleClearFilters = () => {
 };
 
 onMounted(async () => {
+  await fetchStudentForUserId();
   await fetchFlightPlan();
-  await Promise.all([fetchFlightPlanAndItems(), fetchFlightPlanProgress()]);
-  fetchFlightPlanItemStatuses();
-  fetchFlightPlanItemTypes();
+  if (flightPlan.value) {
+    await Promise.all([fetchFlightPlanAndItems(), fetchFlightPlanProgress()]);
+    fetchFlightPlanItemStatuses();
+    fetchFlightPlanItemTypes();
+  }
 });
 
 watch([page, searchQuery], fetchFlightPlanAndItems);
@@ -137,7 +154,11 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
 <template>
   <v-container fluid>
     <h1 class="text-center mt-2">
-      {{ route.params.studentName || "No Name" }}
+      {{
+        props.isAdmin
+          ? route.params.studentName || "No Name"
+          : user.fullName || "No Name"
+      }}
     </h1>
     <v-container>
       <v-progress-linear
@@ -174,7 +195,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       </template>
       <template #filters>
         <v-select
-          v-model="filters.flightPlanpnItemType"
+          v-model="filters.flightPlanItemType"
           :items="flightPlanItemTypes"
           label="Type"
         ></v-select>
@@ -194,7 +215,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           v-model="page"
           :length="count"
           :total-visible="$vuetify.display.smAndDown ? 3 : 5"
-          class="m-2"
+          class="mt-2"
           @next="fetchFlightPlanAndItems"
           @prev="fetchFlightPlanAndItems"
           @update:model-value="fetchFlightPlanAndItems"
