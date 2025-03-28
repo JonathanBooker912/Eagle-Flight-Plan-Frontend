@@ -8,6 +8,7 @@ const initials = ref("");
 const isAdmin = ref(false);
 
 onMounted(() => {
+  console.log(props);
   initials.value =
     props.user.fName[0].toUpperCase() + props.user.lName[0].toUpperCase();
   isAdmin.value = props.user.roles?.some(

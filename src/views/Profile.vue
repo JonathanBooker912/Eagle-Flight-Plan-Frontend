@@ -16,25 +16,30 @@ const router = useRouter();
 
 const user = store.user;
 
+const noBadges = ref(false);
+const noStrengths = ref(false);
+
 const links = ref([]);
 const strengths = ref([]);
 const badges = ref([]);
 const selectedUser = ref([]);
+const isAdmin = ref(false);
 
-const getUser = async () => {
+const getUser = async (id) => {
   try {
-    const res = await userServices.getOneUser(store.user.userId); // PASS IN THE ID
+    const res = await userServices.getOneUser(id); // PASS IN THE ID
     selectedUser.value = res.data; // Update links
+    console.log("HEre");
     console.log(selectedUser.value);
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
 };
 
-const getLinks = async () => {
+const getLinks = async (id) => {
   console.log(store.user.userId); // Check if userId is correctly populated
   try {
-    const res = await linkServices.getAllLinksForUser(store.user.userId); // API call
+    const res = await linkServices.getAllLinksForUser(id); // API call
     links.value = res.data; // Update links
     console.log(links.value); // Check if links are returned
   } catch (err) {
@@ -42,25 +47,29 @@ const getLinks = async () => {
   }
 };
 
-const getStrengths = async () => {
+const getStrengths = async (id) => {
   try {
-    const res = await strengthServices.getStrengthsForStudent(
-      store.user.userId,
-    ); // API call
+    const res = await strengthServices.getStrengthsForStudent(id); // API call
     console.log(res);
     strengths.value = res.data; // Update strengths
     console.log(strengths.value); // Check if strengths are returned
+    if (strengths.value == null) {
+      noStrengths.value = true;
+    }
   } catch (err) {
     console.error("Error fetching strengths:", err); // Error handling
   }
 };
 
-const getBadges = async () => {
+const getBadges = async (id) => {
   try {
-    const res = await badgeServices.getBadgesForStudent(store.user.userId); // API call
+    const res = await badgeServices.getBadgesForStudent(id); // API call
     console.log(res);
     badges.value = res.data.badges; // Update badges
     console.log(badges.value); // Check if badges are returned
+    if (badges.value == null) {
+      noBadges.value = true;
+    }
   } catch (err) {
     console.error("Error fetching badges:", err); // Error handling
   }
