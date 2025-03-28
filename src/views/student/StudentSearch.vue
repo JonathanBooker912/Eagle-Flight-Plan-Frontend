@@ -25,7 +25,7 @@ onMounted(() => {
 
 <template>
   <v-row>
-    <v-btn vv-for="user in x" class="test" @onclick="sendToProfile">
+    <v-btn v-for="user in x" class="test" @onclick="sendToProfile">
       <router-link :to="`/student/profile/${user.id}`">
         {{ user.fName }}
       </router-link>
