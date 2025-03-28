@@ -1,2 +1,4 @@
 <script setup></script>
-<template></template>
+<template>
+  <h1>Faculty Profile!</h1>
+</template>

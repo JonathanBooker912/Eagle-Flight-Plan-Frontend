@@ -28,14 +28,12 @@ import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentNotification from "../views/student/StudentNotification.vue";
-import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyNotification from "../views/faculty/FacultyNotification.vue";
-import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
 import FlightPlan from "../views/FlightPlan.vue";
 import AddFlightPlanItem from "../views/admin/flightPlan/AddFlightPlanItem.vue";
@@ -271,7 +269,7 @@ const router = createRouter({
           component: StudentNotification,
         },
         {
-          path: "profile",
+          path: "profile/:userId",
           name: "student-profile",
           component: Profile,
         },

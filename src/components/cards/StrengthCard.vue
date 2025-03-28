@@ -101,6 +101,6 @@ const categoryColor = computed(() => {
 }
 
 .strength-description {
-  margin: 40px 20px;
+  margin: 20px 80px;
 }
 </style>

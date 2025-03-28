@@ -8,6 +8,7 @@ const initials = ref("");
 const isAdmin = ref(false);
 
 onMounted(() => {
+  console.log(props);
   initials.value =
     props.user.fName[0].toUpperCase() + props.user.lName[0].toUpperCase();
   isAdmin.value = props.user.roles?.some(
@@ -38,7 +39,7 @@ onMounted(() => {
             <p class="text-subtitle-1">
               {{ props.user.fName + " " + props.user.lName }}
             </p>
-            <p>{{ props.user.roles[0]?.name ?? "Student" }}</p>
+            <!---  <p>{{ props.user.roles[0]?.name ?? "Student" }}</p> -->
             <p
               v-if="
                 props.user.student &&

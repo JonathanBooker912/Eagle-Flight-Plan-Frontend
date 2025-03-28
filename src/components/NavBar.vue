@@ -32,6 +32,7 @@ const student = [
 
 const role = ref("");
 const route = useRoute();
+const userId = ref(null);
 
 onMounted(async () => {
   const store = userStore();
@@ -42,9 +43,10 @@ onMounted(async () => {
   // Set the initial role based on authentication and role checks
   role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
 
-  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
+  // Get the user ID from the store (assuming it's available)
+  userId.value = store.user.userId; // Replace with the actual method to get user ID from store
 
-  console.log(route);
+  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
   if (route.path.startsWith("/admin")) {
     role.value = "admin";
   } else if (route.path.startsWith("/faculty")) {
@@ -74,7 +76,11 @@ const getIcon = (linkText) => {
     <v-list v-if="role === 'admin'" class="pa-0">
       <v-list-item-group v-for="(item, index) in admin" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item.link - text === 'Profile'
+              ? { name: item['route-name'], params: { id: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
@@ -100,7 +106,11 @@ const getIcon = (linkText) => {
     <v-list v-if="role === 'faculty'" class="pa-0">
       <v-list-item-group v-for="(item, index) in faculty" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item.link - text === 'Profile'
+              ? { name: item['route-name'], params: { id: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
@@ -126,7 +136,11 @@ const getIcon = (linkText) => {
     <v-list v-if="role === 'student'" class="pa-0">
       <v-list-item-group v-for="(item, index) in student" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item.link - text === 'Profile'
+              ? { name: item['route-name'], params: { id: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
@@ -152,7 +166,7 @@ const getIcon = (linkText) => {
 </template>
 
 <style>
-/* Hide text when not hovering over the navbar */
+/* Styling for the navigation bar */
 .userNav .nav-item-content {
   display: flex;
   align-items: center;
@@ -162,7 +176,6 @@ const getIcon = (linkText) => {
   display: none;
 }
 
-/* Show text when navbar is hovered */
 .userNav:hover .nav-text {
   display: inline;
 }
