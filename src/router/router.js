@@ -15,24 +15,22 @@ import RewardPage from "../views/admin/reward/RewardPage.vue";
 import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
 import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
+import Notifications from "../views/Notification.vue";
 
 import AdminLanding from "../views/admin/AdminLanding.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminNotification from "../views/admin/AdminNotification.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
-import StudentNotification from "../views/student/StudentNotification.vue";
 import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
-import FacultyNotification from "../views/faculty/FacultyNotification.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
 import FlightPlan from "../views/FlightPlan.vue";
@@ -61,7 +59,7 @@ const router = createRouter({
         {
           path: "notifications",
           name: "admin-notifications",
-          component: AdminNotification,
+          component: Notifications,
         },
         {
           path: "profile",
@@ -234,7 +232,7 @@ const router = createRouter({
         {
           path: "notifications",
           name: "faculty-notifications",
-          component: FacultyNotification,
+          component: Notifications,
         },
         {
           path: "profile",
@@ -267,7 +265,7 @@ const router = createRouter({
         {
           path: "notifications",
           name: "student-notifications",
-          component: StudentNotification,
+          component: Notifications,
         },
         {
           path: "profile",
