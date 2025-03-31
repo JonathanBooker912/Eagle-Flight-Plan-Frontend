@@ -75,7 +75,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value },
+      { ...filters.value, ...sortOptions.value }
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -113,7 +113,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id,
+      (strength) => strength.id
     );
   }
   getEvents();
@@ -130,6 +130,14 @@ const handleClearFilters = () => {
 const handleShowInfo = (eventId) => {
   eventToShow.value = events.value.find((event) => event.id == eventId);
   showInfo.value = true;
+};
+
+const handleAttendance = (eventId, eventName) => {
+  console.log(eventName);
+  router.push({
+    name: "attendanceEvent",
+    params: { id: eventId, eventName: eventName },
+  });
 };
 
 // Initial fetch
@@ -195,6 +203,15 @@ onMounted(() => {
         <br />
         <h4>Attendance: {{ eventToShow.attendanceType }}</h4>
         <h4>Registration Type: {{ eventToShow.registration }}</h4>
+        <v-btn
+          class="mt-5 mb-0 full-width"
+          rounded="xl"
+          color="primary"
+          @click="handleAttendance(eventToShow.id, eventToShow.name)"
+          block
+        >
+          Record Attendance
+        </v-btn>
       </template>
       <template #pagination>
         <v-pagination

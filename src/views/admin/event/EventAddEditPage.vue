@@ -65,7 +65,7 @@ const handleSubmit = async () => {
     console.error(
       "Invalid time values:",
       formData.value.startTime,
-      formData.value.endTime,
+      formData.value.endTime
     );
     return;
   }
@@ -126,7 +126,7 @@ const filteredEndTimeOptions = computed(() => {
   if (!formData.value.startTime) return timeOptions.value;
   const start = parseTimeString(formData.value.startTime, "01/01/2000");
   return timeOptions.value.filter(
-    (time) => parseTimeString(time, "01/01/2000") > start,
+    (time) => parseTimeString(time, "01/01/2000") > start
   );
 });
 
