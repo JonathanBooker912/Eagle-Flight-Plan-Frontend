@@ -4,11 +4,16 @@ import NavBar from "./components/NavBar.vue";
 
 <template>
   <v-app>
-    <v-row no-gutters nowrap>
+    <v-row no-gutters class="flex-nowrap">
       <NavBar v-if="$route.path !== '/'" />
-      <v-main color="background">
-        <router-view />
-      </v-main>
+      <v-col>
+        <v-main
+          color="background"
+          class="main-content d-flex flex-column h-100"
+        >
+          <router-view />
+        </v-main>
+      </v-col>
     </v-row>
   </v-app>
 </template>

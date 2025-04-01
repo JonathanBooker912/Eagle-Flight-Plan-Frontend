@@ -4,5 +4,5 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 </script>
 <template>
-  <h1>Student {{ route.params.id }}</h1>
+  <h1>Add a flight plan item to flight plan: {{ route.params.id }}</h1>
 </template>
