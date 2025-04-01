@@ -19,6 +19,9 @@ export default {
   getEvent(eventId) {
     return apiClient.get(`/event/${eventId}`);
   },
+  getEventByToken(eventToken) {
+    return apiClient.get(`/event/token/${eventToken}`);
+  },
   deleteEvent(eventId) {
     return apiClient.delete(`/event/${eventId}`);
   },
