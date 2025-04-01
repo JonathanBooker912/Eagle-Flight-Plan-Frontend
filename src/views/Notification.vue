@@ -69,6 +69,7 @@ const editItem = async (item) => {
 </script>
 
 <template>
+  <h1>NOTIFS</h1>
   <div class="container">
     <div class="notifContainer">
       <h1>Notifications</h1>

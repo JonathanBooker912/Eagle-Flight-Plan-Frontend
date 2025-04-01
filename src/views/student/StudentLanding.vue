@@ -37,7 +37,6 @@ const getNotifications = async (page = 1) => {
 onMounted(() => {
   getNotifications();
 });
-
 </script>
 
 <template>
@@ -50,16 +49,17 @@ onMounted(() => {
     </v-card>
     <v-card color="backgroundDarken" class="adminItem">
       <strong style="font-size: 20px; padding-bottom: 5px"
-        >Notifications</strong>
-        <NotificationCard
-          v-for="(item, index) in notifications"
-          :key="index"
-          :to="{ name: 'student-notifications' }"
-          :notification="item"
-          :class="{ unread: !item.read, read: item.read }"
-          style="height: 10vh; border-color: white;"
-          @click="editItem(item)"
-        />
+        >Notifications</strong
+      >
+      <NotificationCard
+        v-for="(item, index) in notifications.splice(0, 5)"
+        :key="index"
+        :to="{ name: 'student-notifications' }"
+        :notification="item"
+        :class="{ unread: !item.read, read: item.read }"
+        style="height: 10vh; border-color: white"
+        @click="editItem(item)"
+      />
     </v-card>
     <v-card color="backgroundDarken" class="adminItem">
       <strong style="font-size: 20px; padding-bottom: 5px">Calendar</strong>
@@ -73,7 +73,7 @@ onMounted(() => {
   flex-direction: column;
   text-align: left;
   margin: 1%;
-  height: 80vh;
+  height: 60vh;
   padding: 15px 0px 5px 0px;
   width: 25vw;
   text-align: center;
