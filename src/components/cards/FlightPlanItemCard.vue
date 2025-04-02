@@ -47,7 +47,13 @@ const points = computed(() => {
             </v-tooltip>
             <p>{{ flightPlanItem.flightPlanItemType }}</p>
             <p>{{ flightPlanItem.status }}</p>
-            <p v-if="flightPlanItem.status == 'Complete'" class="mb-10">
+            <p
+              v-if="
+                flightPlanItem.status == 'Complete' ||
+                flightPlanItem.status == 'Registered'
+              "
+              class="mb-5"
+            >
               Points: {{ points }}
             </p>
             <p v-else>Points: {{ points }}</p></v-card-text
@@ -89,24 +95,6 @@ const points = computed(() => {
             </v-btn></v-row
           >
 
-          <!-- Sign in to Experience -->
-          <v-row
-            v-if="
-              flightPlanItem.status == 'Registered' &&
-              flightPlanItem.flightPlanItemType == 'Experience'
-            "
-            justify="end"
-            ><v-btn
-              class="mr-4 mb-3"
-              variant="outlined"
-              rounded="xl"
-              @click="emit('sign-in', props.flightPlanItem)"
-            >
-              Sign in
-              <v-icon right class="pl-1">mdi-login</v-icon>
-            </v-btn></v-row
-          >
-
           <!-- Pending Task -->
           <v-row v-else-if="flightPlanItem.status == 'Pending'" justify="end"
             ><v-btn
@@ -118,10 +106,6 @@ const points = computed(() => {
               View Submission<v-icon right class="pl-1">mdi-eye</v-icon>
             </v-btn></v-row
           >
-          <v-row
-            v-else-if="flightPlanItem.status == 'Complete'"
-            justify="end"
-          ></v-row>
         </v-col>
       </v-row>
     </v-container>
