@@ -25,4 +25,10 @@ export default {
   getFlightPlanItemStatuses() {
     return apiClient.get("/flightPlanItem/statuses");
   },
+  updateFlightPlanItem(flightPlanItem) {
+    return apiClient.put(
+      `/flightPlanItem/${flightPlanItem.id}`,
+      flightPlanItem,
+    );
+  },
 };

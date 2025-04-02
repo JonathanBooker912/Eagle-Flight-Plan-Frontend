@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import defaultImage from "../../assets/DefaultBadgeImage.png";
+import { loadImage, cleanupImage } from "../componentUtilities";
 
 // Define statements for vue
 const props = defineProps({
@@ -11,23 +12,11 @@ const emit = defineEmits(["edit", "delete"]);
 // Reactive states
 const imageSrc = ref("");
 
-// Functions
-const loadImage = (image) => {
-  if (!image || !image.data) return;
-
-  // Ensure image.data is a Uint8Array
-  const byteArray = new Uint8Array(image.data);
-
-  const blob = new Blob([byteArray], { type: image.type }); // Adjust type accordingly
-  imageSrc.value = URL.createObjectURL(blob);
-};
-
 // Vue functions
 onMounted(() => {
-  console.log(props.badge.image);
-  loadImage(props.badge.image);
+  imageSrc.value = loadImage(props.badge.image);
 });
-onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
+onUnmounted(() => cleanupImage(imageSrc.value));
 </script>
 <template>
   <v-card color="backgroundDarken" class="cardContainer">

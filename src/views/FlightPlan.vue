@@ -11,6 +11,10 @@ import { useDisplay } from "vuetify";
 import { userStore } from "../stores/userStore";
 import { storeToRefs } from "pinia";
 import studentServices from "../services/studentServices";
+import StudentApprovalDialog from "../components/dialogs/StudentApprovalDialog.vue";
+import { studentApprovalDialogStore } from "../stores/studentApprovalDialogStore";
+import ViewSubmissionDialog from "../components/dialogs/ViewSubmissionDialog.vue";
+import { studentViewSubmissionDialogStore } from "../stores/studentViewSubmissionDialogStore";
 
 const props = defineProps({
   isAdmin: {
@@ -43,8 +47,10 @@ const progress = ref(0);
 const flightPlanItemTypes = ref([]);
 const flightPlanItemStatuses = ref([]);
 
-const store = userStore();
-const { user } = storeToRefs(store);
+const useStudentApprovalDialogStore = studentApprovalDialogStore();
+const useStudentViewSubmissionDialogStore = studentViewSubmissionDialogStore();
+const useUserStore = userStore();
+const { user } = storeToRefs(useUserStore);
 
 const showFilters = ref(false);
 const filters = ref({
@@ -139,6 +145,16 @@ const handleClearFilters = () => {
   fetchFlightPlanAndItems();
 };
 
+const handleIncompleteButtonClick = (flightPlanItem) => {
+  useStudentApprovalDialogStore.toggleVisibility();
+  useStudentApprovalDialogStore.setFlightPlanItem(flightPlanItem);
+};
+
+const handlePendingButtonClick = (flightPlanItem) => {
+  useStudentViewSubmissionDialogStore.setFlightPlanItem(flightPlanItem);
+  useStudentViewSubmissionDialogStore.toggleVisibility();
+};
+
 onMounted(async () => {
   await fetchStudentForUserId();
   await fetchFlightPlan();
@@ -191,6 +207,8 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
         <FlightPlanItemCard
           :key="item.id"
           :flight-plan-item="item"
+          @incomplete="handleIncompleteButtonClick"
+          @view="handlePendingButtonClick"
         ></FlightPlanItemCard>
       </template>
       <template #filters>
@@ -224,4 +242,10 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       </template>
     </CardTable>
   </v-container>
+  <StudentApprovalDialog
+    @submit="fetchFlightPlanAndItems"
+  ></StudentApprovalDialog>
+  <ViewSubmissionDialog
+    @discard="fetchFlightPlanAndItems"
+  ></ViewSubmissionDialog>
 </template>
