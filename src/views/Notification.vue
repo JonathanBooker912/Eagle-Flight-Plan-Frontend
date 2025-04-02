@@ -5,6 +5,7 @@ import notificationServices from "../services/notificationServices";
 import apiClient from "../services/services";
 import moment from "moment";
 import { userStore } from "../stores/userStore";
+import { useNotificationStore } from "../stores/notificationStore";
 
 const notifications = ref([]);
 const selectedNotif = ref({});
@@ -14,6 +15,7 @@ const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
+const notifStore = useNotificationStore();
 
 const getNotifications = async (page = 1) => {
   try {
@@ -38,8 +40,42 @@ watch(currentPage, (newPage) => {
   getNotifications(newPage);
 });
 
-onMounted(() => {
-  getNotifications();
+onMounted(async () => {
+  await getNotifications();
+
+  // Check if a notification was set in the store
+  if (notifStore.activeNotification) {
+    console.log(
+      "notifStore.activeNotification:",
+      notifStore.activeNotification,
+    );
+    console.log("Current notifications:", notifications.value);
+
+    var chosenNotif = null;
+    for (const notif of notifications.value) {
+      console.log("Checking notification:", notif.id, "against:", notifStore.activeNotification);
+      if (notif.id === notifStore.activeNotification) {
+        chosenNotif = notif;
+        break;
+      }
+    }
+
+    console.log("Found notification:", chosenNotif);
+
+    if (chosenNotif) {
+      chosenNotif.read = true;
+      selectedNotif.value = chosenNotif;
+      showsidebar.value = true;
+      console.log("Selected Notification:", selectedNotif.value);
+    } else {
+      console.log(
+        "No notification found matching the id:",
+        notifStore.activeNotification,
+      );
+    }
+  } else {
+    console.log("No active notification ID in store.");
+  }
 });
 
 const formattedDateTime = (item) => {

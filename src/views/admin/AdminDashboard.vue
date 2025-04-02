@@ -5,6 +5,7 @@ import EventCard from "../../components/cards/EventCard.vue";
 
 import { userStore } from "../../stores/userStore";
 import { onMounted, ref } from "vue";
+import { useNotificationStore } from "../../stores/notificationStore";
 //import { useRoute } from "vue-router";
 // import { useModalStore } from "../../store/modal.store";
 // import { storeToRefs } from "pinia";
@@ -18,6 +19,8 @@ const isLoaded = ref(false);
 //const route = useRoute();
 
 const store = userStore();
+const notifStore = useNotificationStore();
+
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
@@ -52,6 +55,10 @@ const getNotifications = async (page = 1) => {
   }
 };
 
+const openNotification = (x) => {
+  notifStore.setActiveNotification(x);
+};
+
 onMounted(() => {
   getEvents();
   getNotifications();
@@ -60,9 +67,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-card color="backgroundDarken" class="main-back">
+  <v-card class="main-back" color="background">
     <v-row justify="center">
-      <v-card color="background" class="adminItem adminItemSmall">
+      <v-card color="backgroundDarken" class="adminItem adminItemSmall">
         <strong style="font-size: 20px; padding-bottom: 5px"
           >Upcoming Events</strong
         >
@@ -74,10 +81,10 @@ onMounted(() => {
           :to="{ name: 'admin-calendar' }"
         ></EventCard>
       </v-card>
-      <v-card color="background" class="adminItem adminItemBig">
+      <v-card color="backgroundDarken" class="adminItem adminItemBig">
         <p>Engagement Breakdown by Classification</p>
       </v-card>
-      <v-card color="background" class="adminItem adminItemSmall">
+      <v-card color="backgroundDarken" class="adminItem adminItemSmall">
         <strong style="font-size: 20px; padding-bottom: 5px"
           >Notifications</strong
         >
@@ -88,6 +95,7 @@ onMounted(() => {
             :to="{ name: 'admin-notifications' }"
             class="notification"
             color="background"
+            @click="openNotification(item.id)"
           >
             <div style="display: flex; align-items: center">
               <img
@@ -102,7 +110,7 @@ onMounted(() => {
           </v-card>
         </div>
       </v-card>
-      <v-card color="background" class="adminItem adminItemBig">
+      <v-card color="backgroundDarken" class="adminItem adminItemBig">
         <p>Percentage of students on track to complete their flight plan</p>
       </v-card>
     </v-row>
@@ -128,7 +136,7 @@ onMounted(() => {
   text-align: left;
   margin: 1%;
   height: 45vh;
-  padding: 15px 0px 5px 0px;
+  padding: 2vh 2vw;
 
   border-radius: 25px;
 }
