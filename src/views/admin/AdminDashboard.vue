@@ -3,6 +3,7 @@ import eventServices from "../../services/eventServices";
 import notificationServices from "../../services/notificationServices";
 import EventCard from "../../components/cards/EventCard.vue";
 
+import { userStore } from "../../stores/userStore";
 import { onMounted, ref } from "vue";
 //import { useRoute } from "vue-router";
 // import { useModalStore } from "../../store/modal.store";
@@ -16,6 +17,11 @@ const notifications = ref([]);
 const isLoaded = ref(false);
 //const route = useRoute();
 
+const store = userStore();
+const currentPage = ref(1);
+const pageSize = ref(14);
+const totalPages = ref(1);
+
 const getEvents = async () => {
   await eventServices
     .getAllEventsForUser()
@@ -28,15 +34,22 @@ const getEvents = async () => {
     .catch((err) => console.log(err));
 };
 
-const getNotifications = async () => {
-  await notificationServices
-    .getAllNotificationsForUser()
-    .then((res) => {
-      notifications.value = res.data;
-      isLoaded.value = true;
-      console.log(notifications);
-    })
-    .catch((err) => console.log(err));
+const getNotifications = async (page = 1) => {
+  try {
+    const res = await notificationServices.getAllNotificationsForUser(
+      store.user.userId,
+      page,
+      pageSize.value,
+    );
+
+    notifications.value = res.data.notifications; // Update the notifications array
+    totalPages.value = Math.ceil(res.data.total / pageSize.value);
+    currentPage.value = page; // Ensure currentPage updates correctly
+
+    console.log("Updated Notifications:", notifications.value); // Debugging: Check if notifications update
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+  }
 };
 
 onMounted(() => {

@@ -17,18 +17,18 @@ import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 import Notifications from "../views/Notification.vue";
 
-import AdminLanding from "../views/admin/AdminLanding.vue";
+import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
-import StudentLanding from "../views/student/StudentLanding.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentProfile from "../views/student/StudentProfile.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
-import FacultyLanding from "../views/faculty/FacultyLanding.vue";
+import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultyProfile from "../views/faculty/FacultyProfile.vue";
@@ -48,7 +48,6 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
-      component: AdminLanding,
       beforeEnter: isAdmin,
       children: [
         {
@@ -60,6 +59,11 @@ const router = createRouter({
           path: "notifications",
           name: "admin-notifications",
           component: Notifications,
+        },
+        {
+          path: "dashboard",
+          name: "admin-dashboard",
+          component: AdminDashboard,
         },
         {
           path: "profile",
@@ -216,7 +220,7 @@ const router = createRouter({
     {
       path: "/faculty",
       name: "faculty",
-      component: FacultyLanding,
+      component: FacultyDashboard,
       beforeEnter: isFaculty,
       children: [
         {
@@ -249,7 +253,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      component: StudentLanding,
+      component: StudentDashboard,
       children: [
         {
           path: "calendar",
