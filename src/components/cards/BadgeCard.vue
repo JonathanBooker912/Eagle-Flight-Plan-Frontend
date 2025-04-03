@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import defaultImage from "../../assets/DefaultBadgeImage.png";
+import { loadImage, cleanupImage } from "../componentUtilities";
 
 const props = defineProps({
   badge: { type: Object, required: true },

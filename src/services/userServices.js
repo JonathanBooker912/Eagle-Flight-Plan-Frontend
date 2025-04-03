@@ -14,6 +14,9 @@ export default {
   },
   getOneUser(id) {
     return apiClient.get(`/user/${id}`);
+
+  getAllAdmins() {
+    return apiClient.get("/user/admin/all");
   },
   deleteUser(id) {
     return apiClient.delete(`/user/${id}`);

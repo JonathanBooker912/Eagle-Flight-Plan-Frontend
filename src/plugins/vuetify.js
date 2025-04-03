@@ -2,6 +2,7 @@
  * Vuetify3 Plugin
  */
 import { createVuetify } from "vuetify";
+import { VFileUpload } from "vuetify/labs/components";
 
 // Misc
 import { loadFonts } from "./webfontloader";
@@ -49,6 +50,9 @@ const vuetify = createVuetify({
   },
   icons: {
     defaultSet: "mdi",
+  },
+  components: {
+    VFileUpload,
   },
 });
 
