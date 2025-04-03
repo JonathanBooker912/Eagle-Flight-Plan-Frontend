@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 
 const admin = [
-  { "route-name": "admin-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "admin", "link-text": "Dashboard" },
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
@@ -13,7 +13,7 @@ const admin = [
 ];
 
 const faculty = [
-  { "route-name": "faculty-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "faculty", "link-text": "Dashboard" },
   { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "faculty-calendar", "link-text": "Calendar" },
@@ -22,7 +22,7 @@ const faculty = [
 ];
 
 const student = [
-  { "route-name": "student-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "student", "link-text": "Dashboard" },
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
@@ -43,8 +43,9 @@ onMounted(async () => {
   // Set the initial role based on authentication and role checks
   role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
 
-  // Get the user ID from the store (assuming it's available)
-  userId.value = store.user.userId; // Replace with the actual method to get user ID from store
+  // Get the user ID from the store
+  userId.value = store.user.userId;
+  console.log(userId.value);
 
   // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
   if (route.path.startsWith("/admin")) {
@@ -77,8 +78,8 @@ const getIcon = (linkText) => {
       <v-list-item-group v-for="(item, index) in admin" :key="index">
         <v-list-item
           :to="
-            item.link - text === 'Profile'
-              ? { name: item['route-name'], params: { id: userId } }
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
               : { name: item['route-name'] }
           "
           class="bg-secondary"
@@ -86,14 +87,13 @@ const getIcon = (linkText) => {
         >
           <v-list-item-content>
             <v-list-item-title
-              class="text-body-1 font-weight-bold"
-              color="text"
+              class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" color="backgroundDarken">{{
+                <span class="nav-text text-backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
@@ -107,8 +107,8 @@ const getIcon = (linkText) => {
       <v-list-item-group v-for="(item, index) in faculty" :key="index">
         <v-list-item
           :to="
-            item.link - text === 'Profile'
-              ? { name: item['route-name'], params: { id: userId } }
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
               : { name: item['route-name'] }
           "
           class="bg-secondary"
@@ -116,14 +116,13 @@ const getIcon = (linkText) => {
         >
           <v-list-item-content>
             <v-list-item-title
-              class="text-body-1 font-weight-bold"
-              color="text"
+              class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
-                <v-icon :size="32" :color="text" class="mr-2">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" :color="text">{{
+                <span class="nav-text text-backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
@@ -137,8 +136,8 @@ const getIcon = (linkText) => {
       <v-list-item-group v-for="(item, index) in student" :key="index">
         <v-list-item
           :to="
-            item.link - text === 'Profile'
-              ? { name: item['route-name'], params: { id: userId } }
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
               : { name: item['route-name'] }
           "
           class="bg-secondary"
@@ -146,14 +145,13 @@ const getIcon = (linkText) => {
         >
           <v-list-item-content>
             <v-list-item-title
-              class="text-body-1 font-weight-bold"
-              color="text"
+              class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
-                <v-icon :size="32" :color="text" class="mr-2">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" :color="text">{{
+                <span class="nav-text text-backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
