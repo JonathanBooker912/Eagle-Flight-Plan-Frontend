@@ -99,7 +99,15 @@ onMounted(fetchOptionalReviewers);
         <span class="flex-grow-1 text-center">
           Submit Reflection
           <v-btn
+            v-if="type === 'text'"
             icon="mdi-upload"
+            variant="text"
+            class="ml-2 float-end"
+            @click="handleTypeToggle"
+          ></v-btn>
+          <v-btn
+            v-else
+            icon="mdi-file-document"
             variant="text"
             class="ml-2 float-end"
             @click="handleTypeToggle"
