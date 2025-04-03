@@ -34,7 +34,7 @@ const cardClass = computed(() => {
 </script>
 
 <template>
-  <v-card :class="['cardContainer', cardClass]">
+  <v-card :class="['rounded-xl', cardClass]">
     <v-card-text>
       <v-img
         v-if="imageSrc"
@@ -54,14 +54,14 @@ const cardClass = computed(() => {
       <v-row v-show="!props.isProfilePage" class="ma-2 justify-center">
         <v-btn
           color="warning"
-          class="mr-2 cardButton"
+          class="mr-2 rounded-lg"
           @click="emit('edit', props.badge.id)"
         >
           <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
         </v-btn>
         <v-btn
           color="danger"
-          class="cardButton"
+          class="rounded-lg"
           @click="emit('delete', props.badge.id, props.badge.imageName)"
         >
           <v-icon icon="mdi-delete" color="text" size="x-large"></v-icon>
@@ -72,23 +72,19 @@ const cardClass = computed(() => {
 </template>
 
 <style scoped>
-.cardContainer {
-  border-radius: 25px;
-  /* Original styling */
-}
-.cardButton {
-  border-radius: 13px;
-}
 .image {
   max-height: 150px;
 }
 
 .profile-card {
-  max-width: 200px; /* Smaller card for profile page */
-  font-size: 12px;
+  max-width: 200px;
 }
 
 .profile-card .image {
-  max-height: 100px; /* Smaller image for profile page */
+  max-height: 100px;
+}
+
+.profile-card :deep(.text-subtitle-1) {
+  font-size: 12px;
 }
 </style>
