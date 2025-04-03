@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import defaultImage from "../../assets/DefaultBadgeImage.png";
-import { loadImage, cleanupImage } from "../componentUtilities";
+import { loadImage } from "../componentUtilities";
 
 const props = defineProps({
   badge: { type: Object, required: true },
@@ -10,16 +10,6 @@ const props = defineProps({
 const emit = defineEmits(["edit", "delete"]);
 
 const imageSrc = ref("");
-
-const loadImage = (image) => {
-  if (!image || !image.data) return;
-
-  // Ensure image.data is a Uint8Array
-  const byteArray = new Uint8Array(image.data);
-
-  const blob = new Blob([byteArray], { type: image.type }); // Adjust type accordingly
-  imageSrc.value = URL.createObjectURL(blob);
-};
 
 // Vue functions
 onMounted(() => {
