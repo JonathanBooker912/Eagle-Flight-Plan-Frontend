@@ -166,7 +166,7 @@ const router = createRouter({
           component: AddFlightPlanItem,
         },
         {
-          path: "user/profile/:id",
+          path: "user/profile/:userId",
           name: "adminProfile",
           component: AdminProfile,
           props: { isAdmin: true },
@@ -236,7 +236,7 @@ const router = createRouter({
         },
         {
           path: "profile",
-          name: "faculty-profile",
+          name: "faculty-profile/:userId",
           component: Profile,
         },
         {

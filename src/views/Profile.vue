@@ -33,7 +33,6 @@ const getUser = async (id) => {
   try {
     const res = await userServices.getOneUser(id); // PASS IN THE ID
     selectedUser.value = res.data; // Update links
-    console.log(selectedUser.value);
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
@@ -99,15 +98,10 @@ onMounted(async () => {
             src="../../public/Birb.png"
             height="200"
             width="200"
-            class="profile-pic"
-            style="
-              position: absolute;
-              top: -20px;
-              z-index: 10000;
-              border-radius: 50%;
-            "
+            class="profile-pic rounded-xl"
+            style="position: absolute; top: -20px; z-index: 10000"
           />
-          <div style="margin-top: 160px">
+          <div class="mt-5">
             <p class="text-h6 font-weight-bold">
               {{ selectedUser.fullName }}
             </p>
@@ -215,8 +209,8 @@ onMounted(async () => {
             <v-col
               v-for="(item, index) in strengths.slice(0, 5)"
               :key="index"
+              class="py-2"
               cols="12"
-              style="padding: 0px 10px"
             >
               <StrengthCard :strength="item" />
             </v-col>
