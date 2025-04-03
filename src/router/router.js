@@ -26,6 +26,7 @@ import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
+import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
@@ -258,8 +259,7 @@ const router = createRouter({
         {
           path: "flightPlan",
           name: "student-flightPlan",
-          component: FlightPlan,
-          props: { isAdmin: false },
+          component: StudentFlightPlan,
         },
         {
           path: "notifications",
