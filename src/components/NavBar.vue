@@ -45,7 +45,6 @@ onMounted(async () => {
 
   // Get the user ID from the store
   userId.value = store.user.userId;
-  console.log(userId.value);
 
   // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
   if (route.path.startsWith("/admin")) {
@@ -75,7 +74,7 @@ const getIcon = (linkText) => {
 <template>
   <v-container class="d-flex flex-column pa-2 userNav bg-secondary">
     <v-list v-if="role === 'admin'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in admin" :key="index">
+      <div v-for="(item, index) in admin" :key="index">
         <v-list-item
           :to="
             item['link-text'] === 'Profile' && userId
@@ -85,7 +84,7 @@ const getIcon = (linkText) => {
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
+          <div>
             <v-list-item-title
               class="text-body-1 font-weight-bold text-backgroundDarken"
             >
@@ -98,13 +97,13 @@ const getIcon = (linkText) => {
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
+      </div>
     </v-list>
 
     <v-list v-if="role === 'faculty'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in faculty" :key="index">
+      <div v-for="(item, index) in faculty" :key="index">
         <v-list-item
           :to="
             item['link-text'] === 'Profile' && userId
@@ -114,7 +113,7 @@ const getIcon = (linkText) => {
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
+          <div>
             <v-list-item-title
               class="text-body-1 font-weight-bold text-backgroundDarken"
             >
@@ -127,13 +126,13 @@ const getIcon = (linkText) => {
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
+      </div>
     </v-list>
 
     <v-list v-if="role === 'student'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in student" :key="index">
+      <div v-for="(item, index) in student" :key="index">
         <v-list-item
           :to="
             item['link-text'] === 'Profile' && userId
@@ -143,7 +142,7 @@ const getIcon = (linkText) => {
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
+          <div>
             <v-list-item-title
               class="text-body-1 font-weight-bold text-backgroundDarken"
             >
@@ -156,9 +155,9 @@ const getIcon = (linkText) => {
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
+      </div>
     </v-list>
   </v-container>
 </template>
