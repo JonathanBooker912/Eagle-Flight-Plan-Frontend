@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import linkServices from "../services/linkServices";
 import strengthServices from "../services/strengthServices";
@@ -22,23 +22,24 @@ const badges = ref([]);
 const selectedUser = ref([]);
 const isAdmin = ref(false);
 
+// Add pagination variables
+const currentPage = ref(1);
+const pageSize = ref(6);
+const totalPages = ref(1);
+
 const getUser = async (id) => {
   try {
     const res = await userServices.getOneUser(id); // PASS IN THE ID
     selectedUser.value = res.data; // Update links
-    console.log("HEre");
-    console.log(selectedUser.value);
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
 };
 
 const getLinks = async (id) => {
-  console.log(store.user.userId); // Check if userId is correctly populated
   try {
     const res = await linkServices.getAllLinksForUser(id); // API call
     links.value = res.data; // Update links
-    console.log(links.value); // Check if links are returned
   } catch (err) {
     console.error("Error fetching links:", err); // Error handling
   }
@@ -47,9 +48,7 @@ const getLinks = async (id) => {
 const getStrengths = async (id) => {
   try {
     const res = await strengthServices.getStrengthsForStudent(id); // API call
-    console.log(res);
     strengths.value = res.data; // Update strengths
-    console.log(strengths.value); // Check if strengths are returned
     if (strengths.value == null) {
       noStrengths.value = true;
     }
@@ -58,19 +57,44 @@ const getStrengths = async (id) => {
   }
 };
 
-const getBadges = async (id) => {
+const getBadges = async (id, page = 1) => {
   try {
-    const res = await badgeServices.getBadgesForStudent(id); // API call
-    console.log(res);
-    badges.value = res.data.badges; // Update badges
-    console.log(badges.value); // Check if badges are returned
-    if (badges.value == null) {
+    console.log('Fetching badges for user:', id, 'page:', page);
+    const res = await badgeServices.getBadgesForStudent(
+      id,
+      page,
+      pageSize.value,
+    ); // API call
+    console.log('Badge response:', res.data);
+    
+    if (!res.data || !res.data.data) {
+      console.error('Invalid response structure:', res);
       noBadges.value = true;
+      return;
+    }
+
+    badges.value = res.data.data.badges; // Update badges
+    totalPages.value = Math.ceil(res.data.data.total / pageSize.value);
+    currentPage.value = page;
+    
+    console.log('Updated badges:', badges.value);
+    console.log('Total pages:', totalPages.value);
+    
+    if (!badges.value || badges.value.length === 0) {
+      noBadges.value = true;
+    } else {
+      noBadges.value = false;
     }
   } catch (err) {
     console.error("Error fetching badges:", err); // Error handling
+    noBadges.value = true;
   }
 };
+
+// Add watcher for pagination
+watch(currentPage, (newPage) => {
+  getBadges(route.params.userId, newPage);
+});
 
 onMounted(async () => {
   const passedId = route.params.userId;
@@ -161,26 +185,33 @@ onMounted(async () => {
           </v-card>
           <v-row v-if="!noBadges">
             <v-col
-              v-for="(item, index) in badges.slice(0, 6)"
+              v-for="(item, index) in badges"
               :key="index"
               cols="12"
               md="4"
             >
               <BadgeCard :badge="item" :isProfilePage="true" />
             </v-col>
-            <v-col v-if="noBadges">
-              <div class="adminItem" style="text-align: center">
-                No badges! <br />
-                Complete some flight plan items to be rewarded! <br />
-                <br />
-                <b
-                  >The LORD repay you for what you have done, and a full reward
-                  be given you by the LORD, the God of Israel, under whose wings
-                  you have come to take refuge!” <br />
-                  - Ruth 2:12</b
-                >
-              </div>
-            </v-col>
+          </v-row>
+          <v-row v-else>
+            <div class="adminItem" style="text-align: center">
+              No badges! <br />
+              Complete some flight plan items to be rewarded! <br />
+              <br />
+              <b
+                >The LORD repay you for what you have done, and a full reward
+                be given you by the LORD, the God of Israel, under whose wings
+                you have come to take refuge!" <br />
+                - Ruth 2:12</b
+              >
+            </div>
+          </v-row>
+          <v-row v-if="!noBadges" justify="center" align="center" class="pagination">
+            <v-pagination
+              v-model="currentPage"
+              :length="totalPages"
+              :total-visible="5"
+            ></v-pagination>
           </v-row>
         </div>
       </v-col>
@@ -206,9 +237,9 @@ onMounted(async () => {
                 No Clifton Strengths listed<br />
                 Contact Charlotte Hamil to change this! <br /><br />
                 <b
-                  >“Before I formed you in the womb I knew you, and before you
+                  >"Before I formed you in the womb I knew you, and before you
                   were born I consecrated you; I appointed you a prophet to the
-                  nations.” <br />
+                  nations." <br />
                   - Jeremiah 1:5</b
                 >
               </div>
@@ -239,5 +270,10 @@ onMounted(async () => {
   flex-direction: column;
   padding: 15px 0px 5px 0px;
   border-radius: 25px;
+}
+
+.pagination {
+  margin-top: 20px;
+  padding: 10px 0;
 }
 </style>

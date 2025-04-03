@@ -10,7 +10,6 @@ const getUsers = async () => {
     const res = await userServices.getAllUser(); // PASS IN THE ID
     users.value = res.data; // Update links
     x.value = users.value.rows;
-    console.log(users.value);
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }

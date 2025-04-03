@@ -22,17 +22,12 @@ const loadImage = (image) => {
 
 // Vue functions
 onMounted(() => {
-  console.log(props.badge.image);
   loadImage(props.badge.image);
 });
 onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 
 // Computed property to determine the card style
 const cardClass = computed(() => {
-  if (props.isProfilePage) {
-    console.log("I am in the prof page!");
-  }
-
   return props.isProfilePage ? "profile-card" : "";
 });
 </script>
