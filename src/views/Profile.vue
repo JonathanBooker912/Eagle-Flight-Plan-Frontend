@@ -50,7 +50,6 @@ const getLinks = async (id) => {
 
 const getStrengths = async (id) => {
   try {
-
     const res = await strengthServices.getStrengthsForStudent(id); // API call
     strengths.value = res.data; // Update strengths
 
@@ -76,6 +75,8 @@ const getBadges = async (id, page = 1) => {
       pageSize.value,
     ); // API call
     badges.value = res.data.badges; // Update badges
+
+    console.log(badges.value);
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page;
 
@@ -93,7 +94,6 @@ const getBadges = async (id, page = 1) => {
 const toFlightPlan = () => {
   router.push({ name: "student-flightPlan" });
 };
-
 
 // Add watcher for pagination
 watch(currentPage, (newPage) => {

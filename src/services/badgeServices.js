@@ -22,7 +22,12 @@ export default {
     return apiClient.put(`/badge/${badgeId}`, badgeData);
   },
 
-  getBadgesForStudent(studentId) {
-    return apiClient.get(`/badge/student/${studentId}`);
+  getBadgesForStudent(studentId, page = 1, pageSize = 10) {
+    return apiClient.get(`/badge/student/${studentId}`, {
+      params: {
+        page,
+        pageSize,
+      },
+    });
   },
 };
