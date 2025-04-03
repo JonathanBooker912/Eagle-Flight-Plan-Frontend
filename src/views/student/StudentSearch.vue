@@ -27,19 +27,16 @@ onMounted(() => {
     <v-btn
       :key="user.id"
       v-for="user in x"
-      class="test"
+      class="ma-2"
       @onclick="sendToProfile"
     >
-      <router-link :to="`/student/profile/${user.id}`">
+      <router-link :to="`/student/profile/${user.id}`" class="text-body-1">
         {{ user.fName }}
       </router-link>
     </v-btn>
   </v-row>
 </template>
 
-<style>
-.test {
-  margin: 10px;
-  height: 20px;
-}
+<style scoped>
+/* No custom styles needed as we're using Vuetify classes */
 </style>

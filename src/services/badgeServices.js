@@ -41,12 +41,7 @@ export default {
     return apiClient.put(`/badge/${badgeId}`, badgeData);
   },
 
-  getBadgesForStudent(studentId, page = 1, pageSize = 6) {
-    return apiClient.get(`/badge/student/${studentId}`, {
-      params: {
-        page,
-        pageSize,
-      },
-    });
+  getBadgesForStudent(studentId) {
+    return apiClient.get(`/badge/student/${studentId}`);
   },
 };

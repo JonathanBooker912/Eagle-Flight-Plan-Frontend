@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import linkServices from "../services/linkServices";
 import strengthServices from "../services/strengthServices";
@@ -8,9 +8,11 @@ import userServices from "../services/userServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
+import { useRouter } from "vue-router";
 
 const store = userStore();
 const route = useRoute();
+const router = useRouter();
 const user = store.user;
 
 const noBadges = ref(false);
@@ -22,7 +24,7 @@ const badges = ref([]);
 const selectedUser = ref([]);
 const isAdmin = ref(false);
 
-// Add pagination variables
+// Add pagination refs
 const currentPage = ref(1);
 const pageSize = ref(6);
 const totalPages = ref(1);
@@ -31,6 +33,7 @@ const getUser = async (id) => {
   try {
     const res = await userServices.getOneUser(id); // PASS IN THE ID
     selectedUser.value = res.data; // Update links
+    console.log(selectedUser.value);
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
@@ -57,44 +60,23 @@ const getStrengths = async (id) => {
   }
 };
 
-const getBadges = async (id, page = 1) => {
+const getBadges = async (id) => {
   try {
-    console.log('Fetching badges for user:', id, 'page:', page);
-    const res = await badgeServices.getBadgesForStudent(
-      id,
-      page,
-      pageSize.value,
-    ); // API call
-    console.log('Badge response:', res.data);
-    
-    if (!res.data || !res.data.data) {
-      console.error('Invalid response structure:', res);
+    const res = await badgeServices.getBadgesForStudent(id); // API call
+    badges.value = res.data.badges; // Update badges
+    if (badges.value == null) {
       noBadges.value = true;
-      return;
     }
-
-    badges.value = res.data.data.badges; // Update badges
-    totalPages.value = Math.ceil(res.data.data.total / pageSize.value);
-    currentPage.value = page;
-    
-    console.log('Updated badges:', badges.value);
-    console.log('Total pages:', totalPages.value);
-    
-    if (!badges.value || badges.value.length === 0) {
-      noBadges.value = true;
-    } else {
-      noBadges.value = false;
-    }
+    // Calculate total pages
+    totalPages.value = Math.ceil(badges.value.length / pageSize.value);
   } catch (err) {
     console.error("Error fetching badges:", err); // Error handling
-    noBadges.value = true;
   }
 };
 
-// Add watcher for pagination
-watch(currentPage, (newPage) => {
-  getBadges(route.params.userId, newPage);
-});
+const toFlightPlan = () => {
+  router.push({ name: "student-flightPlan" });
+};
 
 onMounted(async () => {
   const passedId = route.params.userId;
@@ -134,29 +116,29 @@ onMounted(async () => {
         </v-col>
 
         <v-col cols="4" class="d-flex flex-column justify-center">
-          <h3 style="text-align: left">About Me:</h3>
-          <p style="text-align: left; display: flex; font-size: 18px">
+          <h3 class="text-h6 text-left">About Me:</h3>
+          <p class="text-body-1 text-left">
             {{ selectedUser.profileDescription }}
           </p>
         </v-col>
         <v-col class="v-col-2 d-flex flex-column justify-center text-right">
-          <p style="font-size: 16px; text-align: right !important">Email</p>
+          <p class="text-body-2 text-right">Email</p>
           <p
             v-for="(link, index) in links.slice(0, 3)"
             :key="index"
-            style="text-align: right !important; font-size: 16px"
+            class="text-body-2 text-right"
           >
             {{ link.websiteName }}
           </p>
         </v-col>
         <v-col cols="3" class="d-flex flex-column justify-center text-left">
-          <a style="text-align: left !important">
+          <a class="text-body-2 text-left">
             {{ selectedUser.email }}
           </a>
           <a
             v-for="(link, index) in links.slice(0, 3)"
             :key="index"
-            style="text-align: left !important; font-size: 16px"
+            class="text-body-2 text-left"
             :href="link.link"
             target="_blank"
           >
@@ -167,10 +149,10 @@ onMounted(async () => {
         <v-col cols="1" class="d-flex align-right">
           <v-icon
             v-if="isAdmin"
+            @click="toFlightPlan"
             :size="32"
-            style="margin-left: 85%; margin-top: 5%"
+            class="d-flex align-right ml-auto mt-1"
             :color="text"
-            class="d-flex align-right"
             >mdi-airplane</v-icon
           >
         </v-col>
@@ -180,12 +162,15 @@ onMounted(async () => {
     <v-row>
       <v-col cols="12" md="6">
         <div class="adminItem">
-          <v-card color="backgroundDarken" style="margin-bottom: 25px">
-            <h2 style="margin: 10px 0px 5px 15px">Awards</h2>
+          <v-card color="backgroundDarken" class="mb-6">
+            <h2 class="text-h5 ma-2">Awards</h2>
           </v-card>
           <v-row v-if="!noBadges">
             <v-col
-              v-for="(item, index) in badges"
+              v-for="(item, index) in badges.slice(
+                (currentPage - 1) * pageSize,
+                currentPage * pageSize,
+              )"
               :key="index"
               cols="12"
               md="4"
@@ -193,26 +178,29 @@ onMounted(async () => {
               <BadgeCard :badge="item" :isProfilePage="true" />
             </v-col>
           </v-row>
-          <v-row v-else>
-            <div class="adminItem" style="text-align: center">
-              No badges! <br />
-              Complete some flight plan items to be rewarded! <br />
-              <br />
-              <b
-                >The LORD repay you for what you have done, and a full reward
-                be given you by the LORD, the God of Israel, under whose wings
-                you have come to take refuge!" <br />
-                - Ruth 2:12</b
-              >
-            </div>
-          </v-row>
-          <v-row v-if="!noBadges" justify="center" align="center" class="pagination">
+          <v-row justify="center" align="center" class="mt-4">
             <v-pagination
               v-model="currentPage"
               :length="totalPages"
               :total-visible="5"
             ></v-pagination>
           </v-row>
+          <v-col v-if="noBadges">
+            <div class="adminItem text-center">
+              <p class="text-body-1">No badges!</p>
+              <p class="text-body-1">
+                Complete some flight plan items to be rewarded!
+              </p>
+              <p class="text-body-1 mt-2">
+                <b
+                  >"The LORD repay you for what you have done, and a full reward
+                  be given you by the LORD, the God of Israel, under whose wings
+                  you have come to take refuge!" <br />
+                  - Ruth 2:12</b
+                >
+              </p>
+            </div>
+          </v-col>
         </div>
       </v-col>
 
@@ -220,7 +208,7 @@ onMounted(async () => {
       <v-col cols="12" md="6">
         <div class="adminItem" style="margin-right: 2vw">
           <v-card color="backgroundDarken" style="margin-bottom: 25px">
-            <h2 style="margin: 10px 0px 5px 15px">Clifton Strengths</h2>
+            <h2 class="text-h5 ma-2">Clifton Strengths</h2>
           </v-card>
           <!-- Stacked Strengths (Stretching Full Width) -->
           <v-row v-if="!noStrengths" class="strengths-list">
@@ -233,15 +221,17 @@ onMounted(async () => {
               <StrengthCard :strength="item" />
             </v-col>
             <v-col v-if="noStrengths">
-              <div class="adminItem" style="text-align: center">
-                No Clifton Strengths listed<br />
-                Contact Charlotte Hamil to change this! <br /><br />
-                <b
-                  >"Before I formed you in the womb I knew you, and before you
+              <div class="adminItem text-center">
+                <p class="text-body-1">No Clifton Strengths listed</p>
+                <p class="text-body-1">
+                  Contact Charlotte Hamil to change this!
+                </p>
+                <p class="text-body-1 mt-2">
+                  "Before I formed you in the womb I knew you, and before you
                   were born I consecrated you; I appointed you a prophet to the
-                  nations." <br />
-                  - Jeremiah 1:5</b
-                >
+                  nations.` <br />
+                  - Jeremiah 1:5"
+                </p>
               </div>
             </v-col>
           </v-row>
@@ -269,11 +259,10 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   padding: 15px 0px 5px 0px;
-  border-radius: 25px;
 }
 
-.pagination {
-  margin-top: 20px;
-  padding: 10px 0;
+.strengths-list {
+  display: flex;
+  flex-direction: column;
 }
 </style>

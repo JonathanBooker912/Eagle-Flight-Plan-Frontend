@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed } from "vue";
-import { strengthDescriptions } from "./strengthDescriptions";
 
 const props = defineProps({
   strength: {
@@ -12,11 +11,9 @@ const props = defineProps({
 // Reactive property to track the hovered strength name
 const hoveredStrength = ref(null);
 
-// Fetch the description based on the strength name
+// Use the description from the strength object
 const strengthDescription = computed(() => {
-  return (
-    strengthDescriptions[props.strength.name] || "Description not available."
-  );
+  return props.strength.description || "Description not available.";
 });
 
 // Map domain values to colors
