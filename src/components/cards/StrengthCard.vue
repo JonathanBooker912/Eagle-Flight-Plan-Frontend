@@ -35,16 +35,16 @@ const categoryColor = computed(() => {
     class="pa-3 my-2 rounded-lg strengthCard"
     v-show="hoveredStrength === null || hoveredStrength === strength.name"
     :class="{
-      expanded: hoveredStrength === strength.name, // Expand hovered strength
+      expanded: hoveredStrength === strength.name,
     }"
     @mouseover="hoveredStrength = strength.name"
     @mouseleave="hoveredStrength = null"
   >
-    <v-row align="center">
+    <v-row align="center" class="strength-header">
       <v-card class="category" :style="{ backgroundColor: categoryColor }">
         <h3>{{ props.strength.number }}</h3>
       </v-card>
-      <h3>{{ props.strength.name }}</h3>
+      <h3 class="strength-name">{{ props.strength.name }}</h3>
       <p class="ml-auto domain">{{ props.strength.domain }}</p>
     </v-row>
 
@@ -58,11 +58,23 @@ const categoryColor = computed(() => {
 <style scoped>
 .strengthCard {
   height: 5vh;
-
   align-items: center;
   transition:
     height 0.3s ease,
     opacity 0.3s ease;
+  width: 100%;
+}
+
+.strength-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.strength-name {
+  margin: 0 20px;
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 /* Hide other strengths when hovering */
@@ -95,9 +107,14 @@ const categoryColor = computed(() => {
 
 .domain {
   margin-right: 20px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .strength-description {
   margin: 20px 80px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
 }
 </style>
