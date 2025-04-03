@@ -1,6 +1,4 @@
 import apiClient from "./services.js";
-import axios from "axios";
-import { getAuthHeader, jsonToFormData, getBaseURL } from "./serviceUtils.js";
 export default {
   getAllBadges(page, pageSize, searchQuery) {
     return apiClient.get("/badge", {
@@ -19,23 +17,6 @@ export default {
   },
   createBadge(badgeData) {
     return apiClient.post("/badge", badgeData);
-  },
-  uploadBadgeImage(badgeData) {
-    const authHeader = getAuthHeader();
-    const formData = jsonToFormData(badgeData);
-    const baseURL = getBaseURL();
-    console.log(badgeData);
-    console.log(formData);
-
-    return axios.post(`${baseURL}/badge/upload`, formData, {
-      headers: { Authorization: authHeader },
-    });
-  },
-  deleteBadgeImage(fileName) {
-    return apiClient.delete(`/badge/image/${fileName}`);
-  },
-  getBadgeImage(fileName) {
-    return apiClient.get(`/badge/image/${fileName}`);
   },
   updateBadge(badgeId, badgeData) {
     return apiClient.put(`/badge/${badgeId}`, badgeData);
