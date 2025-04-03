@@ -8,9 +8,12 @@ import userServices from "../services/userServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
+import { useRouter } from "vue-router";
 
 const store = userStore();
 const route = useRoute();
+const router = useRouter();
+
 const user = store.user;
 
 const noBadges = ref(false);
@@ -47,11 +50,9 @@ const getLinks = async (id) => {
 
 const getStrengths = async (id) => {
   try {
-    console.log("Fetching strengths for user:", id);
 
     const res = await strengthServices.getStrengthsForStudent(id); // API call
     strengths.value = res.data; // Update strengths
-    console.log("Strengths response:", res.data);
 
     if (!res.data || res.data.length === 0) {
       console.error("Invalid response structure:", res);
@@ -69,26 +70,14 @@ const getStrengths = async (id) => {
 
 const getBadges = async (id, page = 1) => {
   try {
-    console.log("Fetching badges for user:", id, "page:", page);
     const res = await badgeServices.getBadgesForStudent(
       id,
       page,
       pageSize.value,
     ); // API call
-    console.log("Badge response:", res.data);
-
-    if (!res.data || !res.data.data) {
-      console.error("Invalid response structure:", res);
-      noBadges.value = true;
-      return;
-    }
-
     badges.value = res.data.data.badges; // Update badges
     totalPages.value = Math.ceil(res.data.data.total / pageSize.value);
     currentPage.value = page;
-
-    console.log("Updated badges:", badges.value);
-    console.log("Total pages:", totalPages.value);
 
     if (!badges.value || badges.value.length === 0) {
       noBadges.value = true;
@@ -100,6 +89,11 @@ const getBadges = async (id, page = 1) => {
     noBadges.value = true;
   }
 };
+
+const toFlightPlan = () => {
+  router.push({ name: "student-flightPlan" });
+};
+
 
 // Add watcher for pagination
 watch(currentPage, (newPage) => {
@@ -181,6 +175,7 @@ onMounted(async () => {
             style="margin-left: 85%; margin-top: 5%"
             :color="text"
             class="d-flex align-right"
+            @click="toFlightPlan"
             >mdi-airplane</v-icon
           >
         </v-col>
