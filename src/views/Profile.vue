@@ -8,6 +8,7 @@ import userServices from "../services/userServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
+import { useRouter } from "vue-router";
 
 const store = userStore();
 const route = useRoute();
