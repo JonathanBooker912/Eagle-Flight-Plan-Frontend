@@ -25,23 +25,24 @@ const badges = ref([]);
 const selectedUser = ref([]);
 const isAdmin = ref(false);
 
+// Add pagination variables
+const currentPage = ref(1);
+const pageSize = ref(6);
+const totalPages = ref(1);
+
 const getUser = async (id) => {
   try {
     const res = await userServices.getOneUser(id); // PASS IN THE ID
     selectedUser.value = res.data; // Update links
-    console.log("HEre");
-    console.log(selectedUser.value);
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
 };
 
 const getLinks = async (id) => {
-  console.log(store.user.userId); // Check if userId is correctly populated
   try {
     const res = await linkServices.getAllLinksForUser(id); // API call
     links.value = res.data; // Update links
-    console.log(links.value); // Check if links are returned
   } catch (err) {
     console.error("Error fetching links:", err); // Error handling
   }
@@ -50,9 +51,7 @@ const getLinks = async (id) => {
 const getStrengths = async (id) => {
   try {
     const res = await strengthServices.getStrengthsForStudent(id); // API call
-    console.log(res);
     strengths.value = res.data; // Update strengths
-    console.log(strengths.value); // Check if strengths are returned
     if (strengths.value == null) {
       noStrengths.value = true;
     }
@@ -61,17 +60,37 @@ const getStrengths = async (id) => {
   }
 };
 
-const getBadges = async (id) => {
+const getBadges = async (id, page = 1) => {
   try {
-    const res = await badgeServices.getBadgesForStudent(id); // API call
-    console.log(res);
-    badges.value = res.data.badges; // Update badges
-    console.log(badges.value); // Check if badges are returned
-    if (badges.value == null) {
+    console.log('Fetching badges for user:', id, 'page:', page);
+    const res = await badgeServices.getBadgesForStudent(
+      id,
+      page,
+      pageSize.value,
+    ); // API call
+    console.log('Badge response:', res.data);
+    
+    if (!res.data || !res.data.data) {
+      console.error('Invalid response structure:', res);
       noBadges.value = true;
+      return;
+    }
+
+    badges.value = res.data.data.badges; // Update badges
+    totalPages.value = Math.ceil(res.data.data.total / pageSize.value);
+    currentPage.value = page;
+    
+    console.log('Updated badges:', badges.value);
+    console.log('Total pages:', totalPages.value);
+    
+    if (!badges.value || badges.value.length === 0) {
+      noBadges.value = true;
+    } else {
+      noBadges.value = false;
     }
   } catch (err) {
     console.error("Error fetching badges:", err); // Error handling
+    noBadges.value = true;
   }
 };
 
