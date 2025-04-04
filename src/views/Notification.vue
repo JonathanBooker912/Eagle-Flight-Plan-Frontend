@@ -1,10 +1,10 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import NotificationCard from "../../components/cards/NotificationCard.vue";
-import notificationServices from "../../services/notificationServices";
-import apiClient from "../../services/services";
+import NotificationCard from "../components/cards/NotificationCard.vue";
+import notificationServices from "../services/notificationServices";
+import apiClient from "../services/services";
 import moment from "moment";
-import { userStore } from "../../stores/userStore";
+import { userStore } from "../stores/userStore";
 
 const notifications = ref([]);
 const selectedNotif = ref({});

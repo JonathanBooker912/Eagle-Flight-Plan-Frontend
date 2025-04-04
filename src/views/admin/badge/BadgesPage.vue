@@ -5,6 +5,7 @@ import CardTable from "../../../components/CardTable.vue";
 import CardHeader from "../../../components/CardHeader.vue";
 import BadgeCard from "../../../components/cards/BadgeCard.vue";
 import badgeServices from "../../../services/badgeServices";
+import fileServices from "../../../services/fileServices";
 
 // Constants
 const PAGE_SIZE = 8;
@@ -27,7 +28,7 @@ const handleEdit = (badgeId) =>
 const handleDelete = async (badgeId, badgeFileName) => {
   try {
     if (badgeFileName) {
-      await badgeServices.deleteBadgeImage(badgeFileName);
+      await fileServices.deleteFileForName(badgeFileName);
     }
     await badgeServices.deleteBadge(badgeId);
     await getBadges(); // Re-fetch badges after delete

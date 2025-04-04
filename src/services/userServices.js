@@ -12,6 +12,9 @@ export default {
       },
     });
   },
+  getAllAdmins() {
+    return apiClient.get("/user/admin/all");
+  },
   deleteUser(id) {
     return apiClient.delete(`/user/${id}`);
   },
