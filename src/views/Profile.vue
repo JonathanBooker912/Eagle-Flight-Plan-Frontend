@@ -76,7 +76,6 @@ const getBadges = async (id, page = 1) => {
     ); // API call
     badges.value = res.data.badges; // Update badges
 
-    console.log(badges.value);
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page;
 
@@ -186,7 +185,7 @@ onMounted(async () => {
       <v-col cols="12" md="6">
         <div class="adminItem">
           <v-card color="backgroundDarken" style="margin-bottom: 25px">
-            <h2 style="margin: 10px 0px 5px 15px">Awards</h2>
+            <h2 style="margin: 10px 0px 5px 15px">Badges</h2>
           </v-card>
           <v-row v-if="!noBadges">
             <v-col
