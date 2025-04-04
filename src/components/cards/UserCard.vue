@@ -38,7 +38,6 @@ onMounted(() => {
             <p class="text-subtitle-1">
               {{ props.user.fName + " " + props.user.lName }}
             </p>
-            <p>{{ props.user.roles[0]?.name ?? "Student" }}</p>
             <p
               v-if="
                 props.user.student &&
