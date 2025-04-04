@@ -1,6 +1,7 @@
 import apiClient from "./services.js";
+
 export default {
-  getAllStrengths() {
-    return apiClient.get("/strengths/");
+  getStrengthsForStudent(studentId) {
+    return apiClient.get(`/strengths/student/${studentId}`);
   },
 };

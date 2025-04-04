@@ -1,4 +1,4 @@
 <script setup></script>
 <template>
-  <h1>Student Profile Page</h1>
+  <h1>Student Profile!</h1>
 </template>

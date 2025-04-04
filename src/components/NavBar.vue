@@ -2,12 +2,9 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
-import authServices from "../services/authServices";
-import { useRouter } from "vue-router";
-import Utils from "../config/utils.js";
 
 const admin = [
-  { "route-name": "admin-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "admin", "link-text": "Dashboard" },
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
@@ -16,7 +13,7 @@ const admin = [
 ];
 
 const faculty = [
-  { "route-name": "faculty-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "faculty", "link-text": "Dashboard" },
   { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "faculty-calendar", "link-text": "Calendar" },
@@ -25,7 +22,7 @@ const faculty = [
 ];
 
 const student = [
-  { "route-name": "student-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "student", "link-text": "Dashboard" },
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
@@ -35,11 +32,10 @@ const student = [
 
 const role = ref("");
 const route = useRoute();
-const router = useRouter();
-const store = userStore();
-
+const userId = ref(null);
 
 onMounted(async () => {
+  const store = userStore();
 
   const isAdmin = await store.isAdmin();
   const isFaculty = await store.isFaculty();
@@ -47,9 +43,10 @@ onMounted(async () => {
   // Set the initial role based on authentication and role checks
   role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
 
-  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
+  // Get the user ID from the store
+  userId.value = store.user.userId;
 
-  console.log(route);
+  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
   if (route.path.startsWith("/admin")) {
     role.value = "admin";
   } else if (route.path.startsWith("/faculty")) {
@@ -68,47 +65,29 @@ const getIcon = (linkText) => {
     Notifications: "mdi-bell",
     Search: "mdi-magnify",
     Maintenance: "mdi-cog",
-    "Log Out": "mdi-logout",
   };
 
   return icons[linkText] || "mdi-circle"; // Default if not found
-};
-
-const logout = async () => {
-  try {
-    // First clear the user data from localStorage
-    Utils.removeItem("user");
-    
-    // Then try to notify the server (but don't wait for it)
-    try {
-      // Send a proper JSON object instead of just the userId
-      await authServices.logoutUser({ userId: store.user.userId });
-    } catch (error) {
-      // Log the error but continue with logout
-      console.error("Error notifying server about logout:", error);
-    }
-    
-    // Redirect to login page regardless of server response
-    router.push({ name: "login" });
-  } catch (error) {
-    console.error("Error during logout:", error);
-    // Still redirect to login page even if there's an error
-    router.push({ name: "login" });
-  }
 };
 </script>
 
 <template>
   <v-container class="d-flex flex-column pa-2 userNav bg-secondary">
     <v-list v-if="role === 'admin'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in admin" :key="index">
+      <div v-for="(item, index) in admin" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
-            <v-list-item-title class="text-body-1 font-weight-bold text-backgroundDarken">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
@@ -118,32 +97,26 @@ const logout = async () => {
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
-      <v-list-item @click="logout" class="bg-secondary" exact>
-        <v-list-item-content>
-          <v-list-item-title class="text-body-1 font-weight-bold text-backgroundDarken">
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                {{ getIcon("Log Out") }}
-              </v-icon>
-              <span class="nav-text text-backgroundDarken">Log Out</span>
-            </div>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      </div>
     </v-list>
 
     <v-list v-if="role === 'faculty'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in faculty" :key="index">
+      <div v-for="(item, index) in faculty" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
-            <v-list-item-title class="text-body-1 font-weight-bold text-backgroundDarken">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
@@ -153,32 +126,26 @@ const logout = async () => {
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
-      <v-list-item @click="logout" class="bg-secondary" exact>
-        <v-list-item-content>
-          <v-list-item-title class="text-body-1 font-weight-bold text-backgroundDarken">
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                {{ getIcon("Log Out") }}
-              </v-icon>
-              <span class="nav-text text-backgroundDarken">Log Out</span>
-            </div>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      </div>
     </v-list>
 
     <v-list v-if="role === 'student'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in student" :key="index">
+      <div v-for="(item, index) in student" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
-            <v-list-item-title class="text-body-1 font-weight-bold text-backgroundDarken">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
@@ -188,27 +155,15 @@ const logout = async () => {
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
-      <v-list-item @click="logout" class="bg-secondary" exact>
-        <v-list-item-content>
-          <v-list-item-title class="text-body-1 font-weight-bold text-backgroundDarken">
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                {{ getIcon("Log Out") }}
-              </v-icon>
-              <span class="nav-text text-backgroundDarken">Log Out</span>
-            </div>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      </div>
     </v-list>
   </v-container>
 </template>
 
 <style>
-/* Hide text when not hovering over the navbar */
+/* Styling for the navigation bar */
 .userNav .nav-item-content {
   display: flex;
   align-items: center;
@@ -218,7 +173,6 @@ const logout = async () => {
   display: none;
 }
 
-/* Show text when navbar is hovered */
 .userNav:hover .nav-text {
   display: inline;
 }
