@@ -1,8 +1,6 @@
 export const loadImage = (image) => {
   if (!image || !image.data) return;
 
-  console.log("Hello!!");
-
   // Ensure image.data is a Uint8Array
   const byteArray = new Uint8Array(image.data);
 

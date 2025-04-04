@@ -15,6 +15,7 @@ import RewardPage from "../views/admin/reward/RewardPage.vue";
 import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
 import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
+import Profile from "../views/Profile.vue";
 import Notifications from "../views/Notification.vue";
 
 import AdminLanding from "../views/admin/AdminLanding.vue";
@@ -25,13 +26,12 @@ import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
-import StudentProfile from "../views/student/StudentProfile.vue";
+import StudentFlightPlan from "../views/student/StudentFlightPlan.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
-import FacultyProfile from "../views/faculty/FacultyProfile.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
 import FlightPlan from "../views/FlightPlan.vue";
 import AddFlightPlanItem from "../views/admin/flightPlan/AddFlightPlanItem.vue";
@@ -64,7 +64,7 @@ const router = createRouter({
         {
           path: "profile",
           name: "admin-profile",
-          component: AdminProfile,
+          component: Profile,
         },
         {
           path: "search",
@@ -166,7 +166,7 @@ const router = createRouter({
           component: AddFlightPlanItem,
         },
         {
-          path: "user/profile/:id",
+          path: "user/profile/:userId",
           name: "adminProfile",
           component: AdminProfile,
           props: { isAdmin: true },
@@ -236,8 +236,8 @@ const router = createRouter({
         },
         {
           path: "profile",
-          name: "faculty-profile",
-          component: FacultyProfile,
+          name: "faculty-profile/:userId",
+          component: Profile,
         },
         {
           path: "search",
@@ -259,8 +259,7 @@ const router = createRouter({
         {
           path: "flightPlan",
           name: "student-flightPlan",
-          component: FlightPlan,
-          props: { isAdmin: false },
+          component: StudentFlightPlan,
         },
         {
           path: "notifications",
@@ -268,9 +267,9 @@ const router = createRouter({
           component: Notifications,
         },
         {
-          path: "profile",
+          path: "profile/:userId",
           name: "student-profile",
-          component: StudentProfile,
+          component: Profile,
         },
         {
           path: "search",
