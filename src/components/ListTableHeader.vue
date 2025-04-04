@@ -209,6 +209,13 @@ const handleCheckboxToggle = () => {
       >
         <v-icon icon="mdi-account-off" size="x-large" color="white" />
       </v-btn>
+
+      <div
+        v-if="selectedStudentsStore.selectedStudentIds.length > 0"
+        class="selected-count align-center px-2 py-1"
+      >
+        Selected: {{ selectedStudentsStore.selectedStudentIds.length }}
+      </div>
     </div>
   </v-row>
 
@@ -258,7 +265,7 @@ const handleCheckboxToggle = () => {
 .button-container {
   display: flex;
   margin-bottom: -47px;
-  gap: 5%;
+  gap: 4%;
 }
 .combined-button {
   height: 30px;
@@ -267,5 +274,9 @@ const handleCheckboxToggle = () => {
 .combined-button .v-checkbox {
   width: 24px;
   flex-shrink: 0;
+}
+
+.selected-count {
+  white-space: nowrap;
 }
 </style>

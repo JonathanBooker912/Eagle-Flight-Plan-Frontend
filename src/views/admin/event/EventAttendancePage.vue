@@ -101,7 +101,7 @@ const handleSearchChange = (input) => {
       <template #header>
         <ListTableHeader
           :headers="headers"
-          :students="pagedStudents.filter((s) => s !== null)"
+          :students="filteredStudents.filter((s) => s !== null)"
           @attendance-updated="getData"
         />
       </template>
