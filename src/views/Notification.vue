@@ -26,7 +26,6 @@ const getNotifications = async (page = 1) => {
     notifications.value = res.data.notifications; // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
-
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
