@@ -22,7 +22,7 @@ const props = defineProps({
 });
 
 const isSelected = computed(() =>
-  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId)
+  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId),
 );
 
 const toggleSelected = () => {

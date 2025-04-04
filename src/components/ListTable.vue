@@ -31,7 +31,7 @@ watch(
     } else if (oldShowFilters && newShowInfo) {
       emit("close-filter-menu");
     }
-  }
+  },
 );
 </script>
 

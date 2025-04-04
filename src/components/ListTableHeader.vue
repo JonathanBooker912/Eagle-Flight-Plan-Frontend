@@ -40,7 +40,7 @@ const hasAttendedSelected = computed(() => {
   return props.students.some(
     (student) =>
       selectedStudentsStore.selectedStudentIds.includes(student.studentId) &&
-      student.attendedStatus
+      student.attendedStatus,
   );
 });
 
@@ -48,7 +48,7 @@ const hasNotAttendedSelected = computed(() => {
   return props.students.some(
     (student) =>
       selectedStudentsStore.selectedStudentIds.includes(student.studentId) &&
-      !student.attendedStatus
+      !student.attendedStatus,
   );
 });
 
@@ -94,15 +94,15 @@ const handleBatchDelete = async () => {
   const attending = props.students.filter(
     (s) =>
       s.attendedStatus &&
-      selectedStudentsStore.selectedStudentIds.includes(s.studentId)
+      selectedStudentsStore.selectedStudentIds.includes(s.studentId),
   );
 
   await Promise.all(
     attending.map((s) =>
       eventServices
         .markAttendance(s.eventId, [s.studentId])
-        .catch((err) => console.error(`Error deleting ${s.studentId}:`, err))
-    )
+        .catch((err) => console.error(`Error deleting ${s.studentId}:`, err)),
+    ),
   );
 
   emit("attendance-updated");
@@ -114,15 +114,15 @@ const handleBatchCheckIn = async () => {
   const nonAttending = props.students.filter(
     (s) =>
       !s.attendedStatus &&
-      selectedStudentsStore.selectedStudentIds.includes(s.studentId)
+      selectedStudentsStore.selectedStudentIds.includes(s.studentId),
   );
 
   await Promise.all(
     nonAttending.map((s) =>
       eventServices
         .markAttendance(s.eventId, [s.studentId])
-        .catch((err) => console.error(`Error recording ${s.studentId}:`, err))
-    )
+        .catch((err) => console.error(`Error recording ${s.studentId}:`, err)),
+    ),
   );
 
   emit("attendance-updated");

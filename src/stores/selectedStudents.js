@@ -12,7 +12,7 @@ export const useSelectedStudentsStore = defineStore("selectedStudents", {
     },
     removeStudent(id) {
       this.selectedStudentIds = this.selectedStudentIds.filter(
-        (studentId) => studentId !== id
+        (studentId) => studentId !== id,
       ); // Remove student ID
     },
     toggleStudent(id) {

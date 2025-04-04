@@ -189,7 +189,7 @@ const router = createRouter({
           component: EventAddEditPage,
           props: { isAdd: true },
         },
-        { 
+        {
           path: "maintenance/event/attendance/:id/",
           name: "attendanceEvent",
           component: EventAttendancePage,
