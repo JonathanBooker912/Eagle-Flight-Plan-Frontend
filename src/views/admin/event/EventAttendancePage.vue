@@ -38,7 +38,7 @@ const pagedStudents = computed(() => {
   const start = (page.value - 1) * itemsPerPage;
   const currentPageStudents = filteredStudents.value.slice(
     start,
-    start + itemsPerPage
+    start + itemsPerPage,
   );
 
   const missingCount = itemsPerPage - currentPageStudents.length;
@@ -93,9 +93,9 @@ const handleSearchChange = (input) => {
   <v-container fluid>
     <CardHeader
       :label="label"
-      @toggle-filters="showFilters = !showFilters"
       @changed="handleSearchChange"
       :add-Button="false"
+      :filter-Button="false"
     />
     <ListTable :items="pagedStudents" :showFilters="showFilters">
       <template #header>
