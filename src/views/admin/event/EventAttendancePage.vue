@@ -5,9 +5,9 @@ import { useRoute } from "vue-router";
 import eventServices from "../../../services/eventServices";
 import CardHeader from "../../../components/CardHeader.vue";
 import ListTable from "../../../components/ListTable.vue";
-import ListTableRow from "../../../components/ListTableRow.vue";
 import ListTableHeader from "../../../components/ListTableHeader.vue";
 import { useSelectedStudentsStore } from "../../../stores/selectedStudents";
+import AttendanceStudentRow from "../../../components/AttendanceStudentRow.vue";
 
 const selectedStudentsStore = useSelectedStudentsStore();
 
@@ -51,7 +51,7 @@ const getData = async () => {
 
 const updateStudent = (updatedStudent) => {
   const index = students.value.findIndex(
-    (s) => s.studentId === updatedStudent.studentId,
+    (s) => s.studentId === updatedStudent.studentId
   );
   if (index !== -1) {
     students.value[index] = updatedStudent;
@@ -79,7 +79,7 @@ onMounted(async () => {
       </template>
 
       <template #default="{ item }">
-        <ListTableRow :student="item" @update-student="updateStudent" />
+        <AttendanceStudentRow :student="item" @update-student="getData" />
       </template>
 
       <template #pagination>

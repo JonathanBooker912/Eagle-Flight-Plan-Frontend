@@ -24,7 +24,7 @@ const props = defineProps({
 const emit = defineEmits(["update-student"]);
 
 const isSelected = computed(() =>
-  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId),
+  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId)
 );
 
 const toggleSelected = () => {
@@ -44,6 +44,8 @@ const confirmationDialog = (isDelete) => {
 
 const handleCardCrud = () => {
   const newAttendedStatus = !props.student.attendedStatus;
+
+  console.log(props.student.eventId);
 
   eventServices
     .markAttendance(props.student.eventId, [props.student.studentId])
@@ -69,7 +71,6 @@ const closeDialogs = () => {
 };
 </script>
 
-<!-- template stays the same except for @update-student -->
 <template>
   <v-card
     :class="{
@@ -137,7 +138,7 @@ const closeDialogs = () => {
               class="rounded-lg"
               size="small"
             >
-              <v-icon icon="mdi-check-circle" size="x-large" color="white" />
+              <v-icon icon="mdi-account-check" size="x-large" color="white" />
             </v-btn>
           </v-card-text>
 
@@ -148,7 +149,7 @@ const closeDialogs = () => {
               class="rounded-lg"
               size="small"
             >
-              <v-icon icon="mdi-delete" size="x-large" color="white" />
+              <v-icon icon="mdi-account-off" size="x-large" color="white" />
             </v-btn>
           </v-card-text>
         </v-col>
@@ -158,7 +159,7 @@ const closeDialogs = () => {
 
   <ConfirmDialog
     v-model="confirmDelete"
-    title="Are you sure you want to delete?"
+    title="Are you sure you want to mark student as absent?"
     confirmText="Delete"
     confirmColor="danger"
     @confirm="handleCardCrud"
@@ -166,7 +167,7 @@ const closeDialogs = () => {
 
   <ConfirmDialog
     v-model="confirmRecord"
-    title="Are you sure you want to record?"
+    title="Are you sure you want to mark student as present?"
     confirmText="Record"
     confirmColor="success"
     @confirm="handleCardCrud"

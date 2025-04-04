@@ -40,7 +40,7 @@ const hasAttendedSelected = computed(() => {
   return props.students.some(
     (student) =>
       selectedStudentsStore.selectedStudentIds.includes(student.studentId) &&
-      student.attendedStatus,
+      student.attendedStatus
   );
 });
 
@@ -48,7 +48,7 @@ const hasNotAttendedSelected = computed(() => {
   return props.students.some(
     (student) =>
       selectedStudentsStore.selectedStudentIds.includes(student.studentId) &&
-      !student.attendedStatus,
+      !student.attendedStatus
   );
 });
 
@@ -94,15 +94,15 @@ const handleBatchDelete = async () => {
   const attending = props.students.filter(
     (s) =>
       s.attendedStatus &&
-      selectedStudentsStore.selectedStudentIds.includes(s.studentId),
+      selectedStudentsStore.selectedStudentIds.includes(s.studentId)
   );
 
   await Promise.all(
     attending.map((s) =>
       eventServices
         .markAttendance(s.eventId, [s.studentId])
-        .catch((err) => console.error(`Error deleting ${s.studentId}:`, err)),
-    ),
+        .catch((err) => console.error(`Error deleting ${s.studentId}:`, err))
+    )
   );
 
   emit("attendance-updated");
@@ -114,15 +114,15 @@ const handleBatchCheckIn = async () => {
   const nonAttending = props.students.filter(
     (s) =>
       !s.attendedStatus &&
-      selectedStudentsStore.selectedStudentIds.includes(s.studentId),
+      selectedStudentsStore.selectedStudentIds.includes(s.studentId)
   );
 
   await Promise.all(
     nonAttending.map((s) =>
       eventServices
         .markAttendance(s.eventId, [s.studentId])
-        .catch((err) => console.error(`Error recording ${s.studentId}:`, err)),
-    ),
+        .catch((err) => console.error(`Error recording ${s.studentId}:`, err))
+    )
   );
 
   emit("attendance-updated");
@@ -197,7 +197,7 @@ const handleCheckboxToggle = () => {
         class="rounded-lg"
         size="small"
       >
-        <v-icon icon="mdi-check-circle" size="x-large" color="white" />
+        <v-icon icon="mdi-account-check" size="x-large" color="white" />
       </v-btn>
 
       <v-btn
@@ -207,7 +207,7 @@ const handleCheckboxToggle = () => {
         class="rounded-lg"
         size="small"
       >
-        <v-icon icon="mdi-delete" size="x-large" color="white" />
+        <v-icon icon="mdi-account-off" size="x-large" color="white" />
       </v-btn>
     </div>
   </v-row>
@@ -232,7 +232,7 @@ const handleCheckboxToggle = () => {
 
   <ConfirmDialog
     v-model="confirmDelete"
-    title="Are you sure you want to batch delete?"
+    title="Are you sure you want to mark selected students as absent?"
     confirmText="Delete"
     confirmColor="danger"
     @confirm="handleBatchDelete"
@@ -240,7 +240,7 @@ const handleCheckboxToggle = () => {
 
   <ConfirmDialog
     v-model="confirmRecord"
-    title="Are you sure you want to batch record?"
+    title="Are you sure you want to mark selected students as present?"
     confirmText="Record"
     confirmColor="success"
     @confirm="handleBatchCheckIn"
