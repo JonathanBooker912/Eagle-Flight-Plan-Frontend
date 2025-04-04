@@ -1,6 +1,5 @@
 <script setup>
     import { computed } from "vue";
-    import { userStore } from "../../stores/userStore";
 
     const props = defineProps({
         flightPlanItem: {
@@ -9,13 +8,12 @@
         }
     });
 
-    const emit = defineEmits(["incomplete", "view", "register", "sign-in"]);
+    const emit = defineEmits(["approve"]);
 
     const color = computed(
         () =>
             ({
                 Incomplete: "danger",
-                Rejected: "danger",
                 Pending: "warning",
                 Registered: "warning"
             })[props.flightPlanItem.status] || "primary"
@@ -66,74 +64,15 @@
                         </p>
                         <p v-else>Points: {{ points }}</p></v-card-text
                     >
-
-                    <!-- Incomplete Task -->
-                    <v-row
-                        v-if="
-                            flightPlanItem.status == 'Incomplete' &&
-                            flightPlanItem.flightPlanItemType == 'Task'
-                        "
-                        justify="end"
-                        ><v-btn
-                            class="mr-4 mb-3"
-                            variant="outlined"
-                            rounded="xl"
-                            @click="emit('incomplete', props.flightPlanItem)"
-                        >
-                            Incomplete
-                            <v-icon right class="pl-1">mdi-upload</v-icon>
-                        </v-btn></v-row
-                    >
-
-                    <!-- Rejected Task -->
-                    <v-row
-                        v-if="
-                            flightPlanItem.status == 'Rejected' &&
-                            flightPlanItem.flightPlanItemType == 'Task'
-                        "
-                        justify="end"
-                        ><v-btn
-                            class="mr-4 mb-3"
-                            variant="outlined"
-                            rounded="xl"
-                            @click="emit('incomplete', props.flightPlanItem)"
-                        >
-                            Rejected
-                            <v-icon right class="pl-1">mdi-upload</v-icon>
-                        </v-btn></v-row
-                    >
-
-                    <!-- Register for Experience -->
-                    <v-row
-                        v-if="
-                            flightPlanItem.status == 'Incomplete' &&
-                            flightPlanItem.flightPlanItemType == 'Experience'
-                        "
-                        justify="end"
-                        ><v-btn
-                            class="mr-4 mb-3"
-                            variant="outlined"
-                            rounded="xl"
-                            @click="emit('register', props.flightPlanItem)"
-                        >
-                            Register
-                            <v-icon right class="pl-1">mdi-account-plus</v-icon>
-                        </v-btn></v-row
-                    >
-
-                    <!-- Pending Task -->
-                    <v-row
-                        v-else-if="flightPlanItem.status == 'Pending'"
-                        justify="end"
+                    <v-row justify="end"
                         ><v-btn
                             class="mr-4 mb-3"
                             rounded="xl"
                             variant="outlined"
-                            @click="emit('view', props.flightPlanItem)"
+                            @click="emit('approve', props.flightPlanItem)"
                         >
-                            View Submission<v-icon right class="pl-1"
-                                >mdi-eye</v-icon
-                            >
+                            Approve
+                            <v-icon right class="pl-1">mdi-check</v-icon>
                         </v-btn></v-row
                     >
                 </v-col>
