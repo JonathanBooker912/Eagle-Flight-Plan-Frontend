@@ -3,10 +3,12 @@ import { computed, ref, onMounted } from "vue";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import eventServices from "../services/eventServices";
+import { useSelectedStudentsStore } from "../../src/stores/selectedStudents";
+import ConfirmDialog from "./dialogs/ConfirmDialog.vue";
+
+const selectedStudentsStore = useSelectedStudentsStore();
 
 dayjs.extend(advancedFormat);
-
-const emit = defineEmits(["attendance-updated"]);
 
 const isHovered = ref(false);
 const confirmDelete = ref(false);
@@ -19,15 +21,22 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {
-  console.log("Props received in ListTableRow:", props.student);
-});
+const isSelected = computed(() =>
+  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId)
+);
 
-const timeRecorded = computed(() => {
-  if (!props.student.timeRecorded) {
+const toggleSelected = () => {
+  isSelected.value = !isSelected.value;
+  selectedStudentsStore.toggleStudent(props.student.studentId);
+};
+
+const recordedTime = computed(() => {
+  console.log(props.student);
+
+  if (!props.student.recordedTime) {
     return null;
   }
-  return dayjs(props.student.timeRecorded).format("h:mm a [on] MM/DD/YYYY");
+  return dayjs(props.student.recordedTime).format("h:mm a [on] MM/DD/YYYY");
 });
 
 const confirmationDialog = (isDelete) => {
@@ -35,13 +44,12 @@ const confirmationDialog = (isDelete) => {
 
   if (isDelete) {
     confirmDelete.value = true;
-    console.log(confirmDelete);
   } else {
     confirmRecord.value = true;
   }
 };
 
-const handleCardClick = () => {
+const handleCardCrud = () => {
   const newAttendedStatus = !props.student.attendedStatus;
 
   eventServices
@@ -50,12 +58,10 @@ const handleCardClick = () => {
       props.student.attendedStatus = newAttendedStatus;
 
       if (newAttendedStatus) {
-        props.student.timeRecorded = dayjs().toISOString();
+        props.student.recordedTime = dayjs().toISOString();
       } else {
-        props.student.timeRecorded = null;
+        props.student.recordedTime = null;
       }
-
-      emit("attendance-updated", props.student.studentId);
     })
     .catch((err) => {
       console.error("Error marking attendance:", err);
@@ -72,48 +78,38 @@ const closeDialogs = () => {
 
 <template>
   <v-card
-    :class="{ hovered: isHovered, attended: props.student.attendedStatus }"
-    color="backgroundDarken"
+    :class="{
+      hovered: isHovered,
+      attended: props.student.attendedStatus,
+      selected: isSelected,
+    }"
+    :ripple="false"
+    :color="isSelected ? 'secondary' : 'backgroundDarken'"
     class="roundedCard"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
-    role="button"
+    @click="toggleSelected"
+    role="row"
     aria-label="Attendance card for {{ props.student.fName ?? 'Unknown' }} with ID {{ props.student.studentId ?? 'N/A' }}"
   >
-    <v-container class="row-container">
-      <v-row class="align-center">
-        <v-col :cols="1" class="accentChip-container">
+    <v-container class="row-container" fluid>
+      <v-row class="align-center pl-1">
+        <v-col :cols="1">
           <v-sheet
             :color="props.student.attendedStatus ? 'success' : 'info'"
             class="accentChip"
           ></v-sheet>
         </v-col>
-        <!-- <v-sheet
-          v-if="props.student.attendedStatus"
-          color="success"
-          class="half-circle"
-        ></v-sheet>
-        <v-sheet
-          v-if="!props.student.attendedStatus"
-          color="danger"
-          class="half-circle"
-        ></v-sheet> -->
 
-        <!-- <v-col>
-          <v-card-text class="pa-0 ml-8">
+        <v-col :cols="2">
+          <v-card-text class="pa-0">
             <p class="text-h6 font-weight-bold">
               {{ props.student.studentId ?? "N/A" }}
             </p>
           </v-card-text>
-        </v-col> -->
-
-        <v-col>
-          <v-card-text class="pa-0">
-            <p class="text-h6 font-weight-bold">1564998</p>
-          </v-card-text>
         </v-col>
 
-        <v-col>
+        <v-col :cols="2">
           <v-card-text class="pa-0">
             <p class="text-h6 font-weight-bold">
               {{
@@ -123,102 +119,83 @@ const closeDialogs = () => {
           </v-card-text>
         </v-col>
 
-        <v-col>
+        <v-col :cols="2">
           <v-card-text class="pa-0">
             <p class="text-h6 font-weight-bold">
-              {{ timeRecorded }}
+              {{ props.student.attendedStatus ? "Checked in" : "Registered" }}
             </p>
           </v-card-text>
         </v-col>
 
-        <v-col>
+        <v-col :cols="3">
           <v-card-text class="pa-0">
-            <v-icon
-              v-if="!props.student.attendedStatus"
-              icon="mdi-account-multiple-plus"
-              @click="confirmationDialog(false)"
-              color="success"
-              size="x-large"
-            ></v-icon>
+            <p class="text-h6 font-weight-bold">
+              {{ recordedTime }}
+            </p>
+          </v-card-text>
+        </v-col>
 
-            <v-icon
-              v-if="props.student.attendedStatus"
-              @click="confirmationDialog(true)"
-              icon="mdi-delete"
+        <v-col :cols="2" v-if="isHovered">
+          <v-card-text class="pa-0" v-if="!props.student.attendedStatus">
+            <v-btn
+              @click.stop="confirmationDialog(false)"
+              color="success"
+              class="rounded-lg"
+              size="small"
+            >
+              <v-icon
+                icon="mdi-check-circle"
+                size="x-large"
+                color="white"
+              ></v-icon>
+            </v-btn>
+          </v-card-text>
+          <v-card-text class="pa-0" v-if="props.student.attendedStatus">
+            <v-btn
+              @click.stop="confirmationDialog(true)"
               color="danger"
-              size="x-large"
-            ></v-icon>
+              class="rounded-lg"
+              size="small"
+            >
+              <v-icon icon="mdi-delete" size="x-large" color="white"></v-icon>
+            </v-btn>
           </v-card-text>
         </v-col>
       </v-row>
     </v-container>
   </v-card>
-  <v-dialog v-model="confirmDelete" width="300px"
-    ><v-card color="backgroundDarken rounded-lg">
-      <v-card-text>
-        <div style="text-align: center">
-          <h3>Are you sure?</h3>
-        </div>
-        <div class="mt-5" style="display: flex; justify-content: center">
-          <v-btn
-            class="mr-2"
-            variant="outlined"
-            rounded="xl"
-            @click="closeDialogs"
-            >Cancel</v-btn
-          >
-          <v-btn rounded="xl" color="danger" @click="handleCardClick"
-            >Delete</v-btn
-          >
-        </div>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <ConfirmDialog
+    v-model="confirmDelete"
+    title="Are you sure you want to delete?"
+    confirmText="Delete"
+    confirmColor="danger"
+    @confirm="handleCardCrud"
+  />
 
-  <v-dialog v-model="confirmRecord" width="300px"
-    ><v-card color="backgroundDarken rounded-lg">
-      <v-card-text>
-        <div style="text-align: center">
-          <h3>Are you sure?</h3>
-          <div class="mt-5" style="display: flex; justify-content: center">
-            <v-btn
-              class="mr-2"
-              variant="outlined"
-              rounded="xl"
-              @click="closeDialogs"
-              >Cancel</v-btn
-            >
-            <v-btn rounded="xl" color="success" @click="handleCardClick"
-              >Record</v-btn
-            >
-          </div>
-        </div>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <!-- Confirm Record Dialog -->
+  <ConfirmDialog
+    v-model="confirmRecord"
+    title="Are you sure you want to record?"
+    confirmText="Record"
+    confirmColor="success"
+    @confirm="handleCardCrud"
+  />
 </template>
 
 <style scoped>
-.hovered {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.status-indicator {
-  color: #28a745; /* Green color for attendance indication */
-  font-weight: bold;
-}
-
 .roundedCard {
   border-radius: 20px;
   margin: 5px 0;
-  transition:
-    box-shadow 0.3s,
-    background-color 0.3s;
+
   overflow: hidden;
 }
 
+.roundedCard.hovered {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 .row-container {
-  text-align: left;
+  text-align: center;
   height: 44px;
   padding: 0;
 }
@@ -228,11 +205,11 @@ const closeDialogs = () => {
   height: 25px;
   border-radius: 25px 0px 0px 25px;
 }
-
-.accentChip-container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding-left: 15px;
+.hover-icon {
+  transition: all 0.1s ease;
+  border-radius: 50%; /* Ensure the hover effect is circular */
+}
+.hover-icon:hover {
+  transform: scale(1.1);
 }
 </style>
