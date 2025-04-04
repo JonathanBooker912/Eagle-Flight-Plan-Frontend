@@ -1,14 +1,14 @@
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref } from "vue";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import eventServices from "../services/eventServices";
 import { useSelectedStudentsStore } from "../../src/stores/selectedStudents";
 import ConfirmDialog from "./dialogs/ConfirmDialog.vue";
 
-const selectedStudentsStore = useSelectedStudentsStore();
-
 dayjs.extend(advancedFormat);
+
+const selectedStudentsStore = useSelectedStudentsStore();
 
 const isHovered = ref(false);
 const confirmDelete = ref(false);
@@ -31,22 +31,13 @@ const toggleSelected = () => {
 };
 
 const recordedTime = computed(() => {
-  console.log(props.student);
-
-  if (!props.student.recordedTime) {
-    return null;
-  }
+  if (!props.student.recordedTime) return null;
   return dayjs(props.student.recordedTime).format("h:mm a [on] MM/DD/YYYY");
 });
 
 const confirmationDialog = (isDelete) => {
-  console.log(isDelete);
-
-  if (isDelete) {
-    confirmDelete.value = true;
-  } else {
-    confirmRecord.value = true;
-  }
+  if (isDelete) confirmDelete.value = true;
+  else confirmRecord.value = true;
 };
 
 const handleCardCrud = () => {
@@ -56,12 +47,9 @@ const handleCardCrud = () => {
     .markAttendance(props.student.eventId, [props.student.studentId])
     .then(() => {
       props.student.attendedStatus = newAttendedStatus;
-
-      if (newAttendedStatus) {
-        props.student.recordedTime = dayjs().toISOString();
-      } else {
-        props.student.recordedTime = null;
-      }
+      props.student.recordedTime = newAttendedStatus
+        ? dayjs().toISOString()
+        : null;
     })
     .catch((err) => {
       console.error("Error marking attendance:", err);
@@ -90,7 +78,7 @@ const closeDialogs = () => {
     @mouseleave="isHovered = false"
     @click="toggleSelected"
     role="row"
-    aria-label="Attendance card for {{ props.student.fName ?? 'Unknown' }} with ID {{ props.student.studentId ?? 'N/A' }}"
+    :aria-label="`Attendance card for ${props.student.fName ?? 'Unknown'} with ID ${props.student.studentId ?? 'N/A'}`"
   >
     <v-container class="row-container" fluid>
       <v-row class="align-center pl-1">
@@ -143,13 +131,10 @@ const closeDialogs = () => {
               class="rounded-lg"
               size="small"
             >
-              <v-icon
-                icon="mdi-check-circle"
-                size="x-large"
-                color="white"
-              ></v-icon>
+              <v-icon icon="mdi-check-circle" size="x-large" color="white" />
             </v-btn>
           </v-card-text>
+
           <v-card-text class="pa-0" v-if="props.student.attendedStatus">
             <v-btn
               @click.stop="confirmationDialog(true)"
@@ -157,13 +142,14 @@ const closeDialogs = () => {
               class="rounded-lg"
               size="small"
             >
-              <v-icon icon="mdi-delete" size="x-large" color="white"></v-icon>
+              <v-icon icon="mdi-delete" size="x-large" color="white" />
             </v-btn>
           </v-card-text>
         </v-col>
       </v-row>
     </v-container>
   </v-card>
+
   <ConfirmDialog
     v-model="confirmDelete"
     title="Are you sure you want to delete?"
@@ -172,7 +158,6 @@ const closeDialogs = () => {
     @confirm="handleCardCrud"
   />
 
-  <!-- Confirm Record Dialog -->
   <ConfirmDialog
     v-model="confirmRecord"
     title="Are you sure you want to record?"
@@ -185,31 +170,19 @@ const closeDialogs = () => {
 <style scoped>
 .roundedCard {
   border-radius: 20px;
-  margin: 5px 0;
-
   overflow: hidden;
 }
-
 .roundedCard.hovered {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-
 .row-container {
   text-align: center;
   height: 44px;
   padding: 0;
 }
-
 .accentChip {
   width: 15px;
   height: 25px;
-  border-radius: 25px 0px 0px 25px;
-}
-.hover-icon {
-  transition: all 0.1s ease;
-  border-radius: 50%; /* Ensure the hover effect is circular */
-}
-.hover-icon:hover {
-  transform: scale(1.1);
+  border-radius: 25px 0 0 25px;
 }
 </style>

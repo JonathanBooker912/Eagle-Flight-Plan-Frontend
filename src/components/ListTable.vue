@@ -1,6 +1,5 @@
 <script setup>
 import { watch } from "vue";
-import { VRow, VCol, VCard } from "vuetify/components";
 
 const emit = defineEmits([
   "update-filters",
@@ -9,7 +8,6 @@ const emit = defineEmits([
   "close-info",
 ]);
 
-// Props for number of items per row and items array
 const props = defineProps({
   items: { type: Array, required: true },
   showFilters: Boolean,
@@ -35,34 +33,37 @@ watch(
     }
   }
 );
-
-const handleClearFilters = () => {
-  emit("clear-filters");
-};
-const handleUpdateFilters = () => {
-  emit("update-filters");
-};
-const handleCloseFilters = () => {
-  emit("close-filter-menu");
-};
-const handleCloseInfo = () => {
-  emit("close-info");
-};
 </script>
+
+<template>
+  <div class="scrollable-container">
+    <slot name="header"></slot>
+
+    <v-row class="ma-0 pa-0" no-gutters>
+      <v-col
+        cols="12"
+        v-for="(item, index) in props.items"
+        :key="index"
+        class="ma-0 pa-0 cardRow"
+      >
+        <slot :item="item"></slot>
+      </v-col>
+    </v-row>
+
+    <slot name="pagination"></slot>
+  </div>
+</template>
 
 <style scoped>
 .scrollable-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding-right: 4px; /* Prevent content from hiding under scrollbar */
+  padding-right: 4px;
   margin-top: 10px;
 }
-
-.filter-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.cardRow {
+  max-height: 15px;
 }
 
 .card-radius {

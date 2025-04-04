@@ -1,8 +1,9 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { useSelectedStudentsStore } from "../../src/stores/selectedStudents";
 import eventServices from "../services/eventServices";
 import ConfirmDialog from "./dialogs/ConfirmDialog.vue";
+
 const selectedStudentsStore = useSelectedStudentsStore();
 
 const emit = defineEmits(["attendance-updated"]);
@@ -27,17 +28,11 @@ const closeDialogs = () => {
 };
 
 const confirmationDialog = (isDelete) => {
-  console.log(isDelete);
-
-  if (isDelete) {
-    confirmDelete.value = true;
-  } else {
-    confirmRecord.value = true;
-  }
+  if (isDelete) confirmDelete.value = true;
+  else confirmRecord.value = true;
 };
 
 const menuVisible = ref(false);
-
 const checkedIn = ref(false);
 const notCheckedIn = ref(false);
 
@@ -60,79 +55,55 @@ const hasNotAttendedSelected = computed(() => {
 const selectAllAttending = () => {
   checkedIn.value = true;
   notCheckedIn.value = false;
-  const attendingStudentIds = props.students
-    .filter((student) => student.attendedStatus)
-    .map((student) => student.studentId);
+  const ids = props.students
+    .filter((s) => s.attendedStatus)
+    .map((s) => s.studentId);
   selectedStudentsStore.clearSelection();
-  attendingStudentIds.forEach((id) => selectedStudentsStore.addStudent(id));
-
-  if (attendingStudentIds.length == 0) {
-    checkedIn.value = false;
-  }
+  ids.forEach((id) => selectedStudentsStore.addStudent(id));
+  if (ids.length === 0) checkedIn.value = false;
 };
 
-// Select all non-attending students
 const selectAllNonAttending = () => {
   notCheckedIn.value = true;
   checkedIn.value = false;
-  const nonAttendingStudentIds = props.students
-    .filter((student) => !student.attendedStatus)
-    .map((student) => student.studentId);
+  const ids = props.students
+    .filter((s) => !s.attendedStatus)
+    .map((s) => s.studentId);
   selectedStudentsStore.clearSelection();
-  nonAttendingStudentIds.forEach((id) => selectedStudentsStore.addStudent(id));
-
-  if (nonAttendingStudentIds.length == 0) {
-    notCheckedIn.value = false;
-  }
+  ids.forEach((id) => selectedStudentsStore.addStudent(id));
+  if (ids.length === 0) notCheckedIn.value = false;
 };
 
 const selectAll = () => {
   checkedIn.value = true;
   notCheckedIn.value = true;
-
-  // Select all students
-  const allStudentIds = props.students.map((student) => student.studentId);
+  const ids = props.students.map((s) => s.studentId);
   selectedStudentsStore.clearSelection();
-  allStudentIds.forEach((id) => selectedStudentsStore.addStudent(id));
+  ids.forEach((id) => selectedStudentsStore.addStudent(id));
 };
 
 const resetSelection = () => {
   selectedStudentsStore.clearSelection();
   checkedIn.value = false;
   notCheckedIn.value = false;
+  console.log("Reset");
+  console.log(selectedStudentsStore.selectedStudentIds);
 };
 
 const handleBatchDelete = async () => {
-  const attendingStudentIds = props.students
-    .filter(
-      (student) =>
-        student.attendedStatus &&
-        selectedStudentsStore.selectedStudentIds.includes(student.studentId)
-    )
-    .map((student) => student.studentId);
-
-  const attendingStudents = props.students.filter((student) =>
-    attendingStudentIds.includes(student.studentId)
+  const attending = props.students.filter(
+    (s) =>
+      s.attendedStatus &&
+      selectedStudentsStore.selectedStudentIds.includes(s.studentId)
   );
 
-  const deletePromises = attendingStudents.map((student) => {
-    console.log(`Deleting attendance for student: ${student.studentId}`);
-    return eventServices
-      .markAttendance(student.eventId, [student.studentId])
-      .then(() => {
-        console.log(
-          `Successfully deleted attendance for ${student.studentId} on event ${student.eventId}`
-        );
-      })
-      .catch((err) => {
-        console.error(
-          `Error deleting attendance for ${student.studentId}:`,
-          err
-        );
-      });
-  });
-
-  await Promise.all(deletePromises);
+  await Promise.all(
+    attending.map((s) =>
+      eventServices
+        .markAttendance(s.eventId, [s.studentId])
+        .catch((err) => console.error(`Error deleting ${s.studentId}:`, err))
+    )
+  );
 
   emit("attendance-updated");
   resetSelection();
@@ -140,55 +111,30 @@ const handleBatchDelete = async () => {
 };
 
 const handleBatchCheckIn = async () => {
-  const nonAttendingStudentIds = props.students
-    .filter(
-      (student) =>
-        !student.attendedStatus &&
-        selectedStudentsStore.selectedStudentIds.includes(student.studentId)
-    )
-    .map((student) => student.studentId);
-
-  const nonAttendingStudents = props.students.filter((student) =>
-    nonAttendingStudentIds.includes(student.studentId)
+  const nonAttending = props.students.filter(
+    (s) =>
+      !s.attendedStatus &&
+      selectedStudentsStore.selectedStudentIds.includes(s.studentId)
   );
 
-  console.log("Students to mark attendance:", nonAttendingStudents);
-
-  const attendancePromises = nonAttendingStudents.map((student) => {
-    console.log(`Marking attendance for student: ${student.studentId}`);
-    return eventServices
-      .markAttendance(student.eventId, [student.studentId])
-      .then(() => {
-        console.log(
-          `Successfully added attendance for ${student.studentId} on event ${student.eventId}`
-        );
-      })
-      .catch((err) => {
-        console.error(`Error adding attendance for ${student.studentId}:`, err);
-      });
-  });
-
-  await Promise.all(attendancePromises);
+  await Promise.all(
+    nonAttending.map((s) =>
+      eventServices
+        .markAttendance(s.eventId, [s.studentId])
+        .catch((err) => console.error(`Error recording ${s.studentId}:`, err))
+    )
+  );
 
   emit("attendance-updated");
   resetSelection();
   closeDialogs();
 };
 
-onMounted(() => {
-  console.log(props.students);
-});
-
 const handleCheckboxToggle = () => {
   if (selectedStudentsStore.selectedStudentIds.length > 0) {
-    checkedIn.value = false;
-    notCheckedIn.value = false;
-    selectedStudentsStore.clearSelection();
+    resetSelection();
   } else if (checkedIn.value || notCheckedIn.value) {
-    checkedIn.value = false;
-    notCheckedIn.value = false;
-
-    selectedStudentsStore.clearSelection();
+    resetSelection();
   } else {
     selectAll();
   }
@@ -196,15 +142,13 @@ const handleCheckboxToggle = () => {
 </script>
 
 <template>
-  <v-row class="pb-5 pl-4">
+  <v-row class="pt-2">
     <div class="button-container">
-      <!-- Unified Styled Button Container -->
       <v-card
         color="primary"
-        class="combined-button d-flex align-center rounded-lg px-2 py-1"
+        class="combined-button d-flex align-center rounded-lg px-2 py-1 ml-3"
         @click.stop
       >
-        <!-- Checkbox -->
         <v-checkbox
           hide-details
           density="compact"
@@ -212,9 +156,8 @@ const handleCheckboxToggle = () => {
           @click="handleCheckboxToggle"
           :model-value="hasAttendedSelected || hasNotAttendedSelected"
           color="white"
-        ></v-checkbox>
+        />
 
-        <!-- Dropdown Arrow -->
         <v-menu v-model="menuVisible" offset-y>
           <template #activator="{ props }">
             <v-btn
@@ -247,7 +190,6 @@ const handleCheckboxToggle = () => {
         </v-menu>
       </v-card>
 
-      <!-- Action Buttons -->
       <v-btn
         v-if="hasNotAttendedSelected"
         @click.stop="confirmationDialog(false)"
@@ -255,7 +197,7 @@ const handleCheckboxToggle = () => {
         class="rounded-lg"
         size="small"
       >
-        <v-icon icon="mdi-check-circle" size="x-large" color="white"></v-icon>
+        <v-icon icon="mdi-check-circle" size="x-large" color="white" />
       </v-btn>
 
       <v-btn
@@ -265,17 +207,12 @@ const handleCheckboxToggle = () => {
         class="rounded-lg"
         size="small"
       >
-        <v-icon icon="mdi-delete" size="x-large" color="white"></v-icon>
+        <v-icon icon="mdi-delete" size="x-large" color="white" />
       </v-btn>
     </div>
   </v-row>
 
-  <v-card
-    color="backgroundDarken"
-    class="headerCard"
-    role="row"
-    aria-label="Table Header"
-  >
+  <v-card color="backgroundDarken" class="headerCard" role="row">
     <v-container class="pa-0" fluid>
       <v-row>
         <v-col
@@ -292,6 +229,7 @@ const handleCheckboxToggle = () => {
       </v-row>
     </v-container>
   </v-card>
+
   <ConfirmDialog
     v-model="confirmDelete"
     title="Are you sure you want to batch delete?"
@@ -300,7 +238,6 @@ const handleCheckboxToggle = () => {
     @confirm="handleBatchDelete"
   />
 
-  <!-- Confirm Record Dialog -->
   <ConfirmDialog
     v-model="confirmRecord"
     title="Are you sure you want to batch record?"
@@ -318,17 +255,15 @@ const handleCheckboxToggle = () => {
   background-color: #333;
   color: #fff;
 }
-
 .button-container {
   display: flex;
+  margin-bottom: -47px;
   gap: 5%;
 }
-
 .combined-button {
   height: 30px;
   min-width: 50px;
 }
-
 .combined-button .v-checkbox {
   width: 24px;
   flex-shrink: 0;

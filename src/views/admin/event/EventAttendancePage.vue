@@ -1,18 +1,25 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import dayjs from "dayjs";
 
 import eventServices from "../../../services/eventServices";
 import CardHeader from "../../../components/CardHeader.vue";
+import ListTable from "../../../components/ListTable.vue";
 import ListTableRow from "../../../components/ListTableRow.vue";
 import ListTableHeader from "../../../components/ListTableHeader.vue";
+import { useSelectedStudentsStore } from "../../../stores/selectedStudents";
+
+const selectedStudentsStore = useSelectedStudentsStore();
 
 const route = useRoute();
-
 const event = ref();
 const eventId = ref();
 const label = ref("");
+const showFilters = ref(false);
+const students = ref([]);
+const page = ref(1);
+const count = ref(1); // Placeholder if pagination is needed later
+
 const headers = [
   { name: "", cols: 1 },
   { name: "Student ID", cols: 2 },
@@ -21,8 +28,6 @@ const headers = [
   { name: "Recorded Time", cols: 3 },
   { name: "Actions", cols: 2 },
 ];
-const students = ref([]);
-const showFilters = ref(false);
 
 const getRegisteredStudents = async () => {
   const response = await eventServices.getRegisteredStudents(eventId.value);
@@ -44,16 +49,9 @@ const getData = async () => {
   }));
 };
 
-const handleSearchChange = (input) => {
-  searchQuery.value = input;
-  page.value = 1;
-  getEvents(page.value);
-};
-
 onMounted(async () => {
+  selectedStudentsStore.clearSelection();
   await getData();
-
-  console.log(students.value);
   label.value = `${event.value.name}'s Attendance`;
 });
 </script>
@@ -62,36 +60,27 @@ onMounted(async () => {
   <v-container fluid>
     <CardHeader :label="label" @toggle-filters="showFilters = !showFilters" />
 
-    <!-- Header -->
-    <ListTableHeader
-      :headers="headers"
-      :students="students"
-      @attendance-updated="getData()"
-    />
+    <ListTable :items="students" :showFilters="showFilters">
+      <template #header>
+        <ListTableHeader
+          :headers="headers"
+          :students="students"
+          @attendance-updated="getData"
+        />
+      </template>
 
-    <!-- Rows -->
-    <v-row class="ma-0 pa-0">
-      <v-col
-        cols="12"
-        v-for="(student, index) in students"
-        :key="student.studentId"
-        class="pa-0"
-      >
-        <ListTableRow :student="student" :headers="headers" />
-      </v-col>
-    </v-row>
+      <template #default="{ item }">
+        <ListTableRow :student="item" />
+      </template>
 
-    <template #pagination>
-      <v-pagination
-        v-model="page"
-        :length="count"
-        :total-visible="$vuetify.display.smAndDown ? 3 : 5"
-        class="mt-4"
-        @next="getEvents"
-        @prev="getEvents"
-        @update:model-value="getEvents"
-      >
-      </v-pagination>
-    </template>
+      <template #pagination>
+        <v-pagination
+          v-model="page"
+          :length="count"
+          :total-visible="$vuetify.display.smAndDown ? 3 : 5"
+          class="mt-4"
+        />
+      </template>
+    </ListTable>
   </v-container>
 </template>
