@@ -24,7 +24,7 @@ const props = defineProps({
 const emit = defineEmits(["update-student"]);
 
 const isSelected = computed(() =>
-  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId)
+  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId),
 );
 
 const toggleSelected = () => {

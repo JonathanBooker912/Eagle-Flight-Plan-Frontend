@@ -38,7 +38,7 @@ const pagedStudents = computed(() => {
   const start = (page.value - 1) * itemsPerPage;
   const currentPageStudents = filteredStudents.value.slice(
     start,
-    start + itemsPerPage
+    start + itemsPerPage,
   );
 
   const missingCount = itemsPerPage - currentPageStudents.length;
