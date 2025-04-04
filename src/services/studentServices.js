@@ -4,7 +4,7 @@ export default {
     return apiClient.get(`/students/user/${userId}`);
   },
   getAllStudents() {
-    return apiClient.get("/student");
+    return apiClient.get("/students");
   },
   // getAllStudentsForAdmin(page, pageSize, searchQuery) {
   //   return apiClient.get("/student/admin", {
@@ -16,15 +16,15 @@ export default {
   //   });
   // },
   getStudentById(id) {
-    return apiClient.get(`/student/${id}`);
+    return apiClient.get(`/students/${id}`);
   },
   deleteStudent(id) {
-    return apiClient.delete(`/student/${id}`);
+    return apiClient.delete(`/students/${id}`);
   },
   createStudent(item) {
     return apiClient.post(`/student`, item);
   },
   updateStudent(item) {
-    return apiClient.put(`/student/${item.id}`, item);
+    return apiClient.put(`/students/${item.id}`, item);
   },
 };
