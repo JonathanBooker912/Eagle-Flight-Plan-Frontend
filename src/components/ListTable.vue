@@ -31,7 +31,7 @@ watch(
     } else if (oldShowFilters && newShowInfo) {
       emit("close-filter-menu");
     }
-  },
+  }
 );
 </script>
 
@@ -61,9 +61,6 @@ watch(
   height: 100%;
   padding-right: 4px;
   margin-top: 10px;
-}
-.cardRow {
-  max-height: 15px;
 }
 
 .card-radius {

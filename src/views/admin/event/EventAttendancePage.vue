@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 
 import eventServices from "../../../services/eventServices";
@@ -16,9 +16,36 @@ const event = ref();
 const eventId = ref();
 const label = ref("");
 const showFilters = ref(false);
+const searchQuery = ref("");
 const students = ref([]);
 const page = ref(1);
-const count = ref(1); // Placeholder if pagination is needed later
+const itemsPerPage = 5;
+
+const count = computed(() => Math.ceil(students.value.length / itemsPerPage));
+
+const filteredStudents = computed(() => {
+  if (!searchQuery.value) return students.value;
+
+  const query = searchQuery.value.toLowerCase();
+
+  return students.value.filter((student) => {
+    const fullName = `${student.fName} ${student.lName}`.toLowerCase();
+    return fullName.includes(query);
+  });
+});
+
+const pagedStudents = computed(() => {
+  const start = (page.value - 1) * itemsPerPage;
+  const currentPageStudents = filteredStudents.value.slice(
+    start,
+    start + itemsPerPage
+  );
+
+  const missingCount = itemsPerPage - currentPageStudents.length;
+  const placeholders = Array(missingCount).fill(null);
+
+  return [...currentPageStudents, ...placeholders];
+});
 
 const headers = [
   { name: "", cols: 1 },
@@ -49,37 +76,42 @@ const getData = async () => {
   }));
 };
 
-const updateStudent = (updatedStudent) => {
-  const index = students.value.findIndex(
-    (s) => s.studentId === updatedStudent.studentId
-  );
-  if (index !== -1) {
-    students.value[index] = updatedStudent;
-  }
-};
-
 onMounted(async () => {
   selectedStudentsStore.clearSelection();
   await getData();
   label.value = `${event.value.name}'s Attendance`;
 });
+
+const handleSearchChange = (input) => {
+  searchQuery.value = input;
+  page.value = 1;
+  getRegisteredStudents(page.value);
+};
 </script>
 
 <template>
   <v-container fluid>
-    <CardHeader :label="label" @toggle-filters="showFilters = !showFilters" />
-
-    <ListTable :items="students" :showFilters="showFilters">
+    <CardHeader
+      :label="label"
+      @toggle-filters="showFilters = !showFilters"
+      @changed="handleSearchChange"
+    />
+    <ListTable :items="pagedStudents" :showFilters="showFilters">
       <template #header>
         <ListTableHeader
           :headers="headers"
-          :students="students"
+          :students="pagedStudents.filter((s) => s !== null)"
           @attendance-updated="getData"
         />
       </template>
 
       <template #default="{ item }">
-        <AttendanceStudentRow :student="item" @update-student="getData" />
+        <AttendanceStudentRow
+          v-if="item"
+          :student="item"
+          @update-student="getData"
+        />
+        <div v-else class="empty-card" />
       </template>
 
       <template #pagination>

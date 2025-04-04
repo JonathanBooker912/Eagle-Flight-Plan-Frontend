@@ -177,15 +177,10 @@ const closeDialogs = () => {
 <style scoped>
 .roundedCard {
   border-radius: 20px;
-  overflow: hidden;
 }
-.roundedCard.hovered {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
+
 .row-container {
   text-align: center;
-  height: 44px;
-  padding: 0;
 }
 .accentChip {
   width: 15px;
