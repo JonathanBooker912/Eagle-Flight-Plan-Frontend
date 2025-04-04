@@ -25,8 +25,8 @@ onMounted(() => {
 <template>
   <v-row>
     <v-btn
-      :key="user.id"
       v-for="user in x"
+      :key="user.id"
       class="ma-2"
       @onclick="sendToProfile"
     >
