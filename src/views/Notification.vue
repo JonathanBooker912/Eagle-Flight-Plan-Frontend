@@ -27,7 +27,6 @@ const getNotifications = async (page = 1) => {
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
 
-    console.log("Updated Notifications:", notifications.value); // Debugging: Check if notifications update
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
@@ -55,7 +54,6 @@ const editItem = async (item) => {
 
     if (response.status === 200) {
       item.read = true; // Update the notification locally after successful API call
-      console.log("Notification marked as read:", item);
     } else {
       console.error("Failed to update notification:", response);
     }
