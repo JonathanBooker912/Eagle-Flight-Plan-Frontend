@@ -21,6 +21,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["update-student"]);
+
 const isSelected = computed(() =>
   selectedStudentsStore.selectedStudentIds.includes(props.student.studentId),
 );
@@ -46,10 +48,13 @@ const handleCardCrud = () => {
   eventServices
     .markAttendance(props.student.eventId, [props.student.studentId])
     .then(() => {
-      props.student.attendedStatus = newAttendedStatus;
-      props.student.recordedTime = newAttendedStatus
-        ? dayjs().toISOString()
-        : null;
+      const updatedStudent = {
+        ...props.student,
+        attendedStatus: newAttendedStatus,
+        recordedTime: newAttendedStatus ? dayjs().toISOString() : null,
+      };
+
+      emit("update-student", updatedStudent);
     })
     .catch((err) => {
       console.error("Error marking attendance:", err);
@@ -64,6 +69,7 @@ const closeDialogs = () => {
 };
 </script>
 
+<!-- template stays the same except for @update-student -->
 <template>
   <v-card
     :class="{

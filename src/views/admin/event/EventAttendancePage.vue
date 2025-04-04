@@ -49,6 +49,15 @@ const getData = async () => {
   }));
 };
 
+const updateStudent = (updatedStudent) => {
+  const index = students.value.findIndex(
+    (s) => s.studentId === updatedStudent.studentId,
+  );
+  if (index !== -1) {
+    students.value[index] = updatedStudent;
+  }
+};
+
 onMounted(async () => {
   selectedStudentsStore.clearSelection();
   await getData();
@@ -70,7 +79,7 @@ onMounted(async () => {
       </template>
 
       <template #default="{ item }">
-        <ListTableRow :student="item" />
+        <ListTableRow :student="item" @update-student="updateStudent" />
       </template>
 
       <template #pagination>
