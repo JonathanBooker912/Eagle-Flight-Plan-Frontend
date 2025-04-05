@@ -65,4 +65,20 @@ export default {
   getAttendingStudents(eventId) {
     return apiClient.get(`/event/${eventId}/attending-students`);
   },
+
+  getFulfillableFlightPlanItems(eventId, studentId) {
+    return apiClient.get(
+      `/event/${eventId}/fulfillableFlightPlanItems/${studentId}`
+    );
+  },
+
+  generateCheckInToken(eventId, expirationTimestamp) {
+    return apiClient.post(`/event/${eventId}/check-in-token`, {
+      expirationTimestamp,
+    });
+  },
+
+  getCheckInToken(eventId) {
+    return apiClient.get(`/event/${eventId}/check-in-token`);
+  },
 };

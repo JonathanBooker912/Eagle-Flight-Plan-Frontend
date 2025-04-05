@@ -9,6 +9,9 @@ import CardTable from "../../components/CardTable.vue";
 import CardHeader from "../../components/CardHeader.vue";
 import DatePickerField from "../../components/DatePickerField.vue";
 import SortSelect from "../../components/SortSelect.vue";
+import QRCodeVue from "qrcode.vue";
+import { generateEventQRCodePDF } from "../../utils/pdfGenerator.js";
+import QRCodeGenerationModal from "../../components/modals/QRCodeGenerationModal.vue";
 
 // Constants
 const label = "Events";
@@ -48,6 +51,13 @@ const filters = ref({
 const showInfo = ref(false);
 const eventToShow = ref({});
 
+// Token generation states
+const generatingToken = ref(false);
+const generatingPDF = ref(false);
+const generatedToken = ref(null);
+const showQRCodeModal = ref(false);
+const checkingToken = ref(false);
+
 const sortOptions = ref({
   sortAttribute: sortProperties[0].value,
   sortDirection: "asc",
@@ -75,7 +85,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value },
+      { ...filters.value, ...sortOptions.value }
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -113,7 +123,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id,
+      (strength) => strength.id
     );
   }
   getEvents();
@@ -127,9 +137,53 @@ const handleClearFilters = () => {
   getEvents();
 };
 
-const handleShowInfo = (eventId) => {
+const getCurrentToken = async () => {
+  if (!eventToShow.value?.id) return;
+
+  checkingToken.value = true;
+  try {
+    const response = await EventServices.getCheckInToken(eventToShow.value.id);
+    generatedToken.value = response.data;
+  } catch (error) {
+    console.error("Error getting check-in token:", error);
+    generatedToken.value = null;
+  } finally {
+    checkingToken.value = false;
+  }
+};
+
+const handleShowInfo = async (eventId) => {
   eventToShow.value = events.value.find((event) => event.id == eventId);
   showInfo.value = true;
+  await getCurrentToken();
+};
+
+const handleGenerateQRCode = async (expirationTimestamp) => {
+  generatingToken.value = true;
+  try {
+    const response = await EventServices.generateCheckInToken(
+      eventToShow.value.id,
+      expirationTimestamp
+    );
+    generatedToken.value = response.data;
+  } catch (error) {
+    console.error("Error generating check-in token:", error);
+  } finally {
+    generatingToken.value = false;
+  }
+};
+
+const downloadQRCode = async () => {
+  if (!generatedToken.value) return;
+
+  generatingPDF.value = true;
+  try {
+    await generateEventQRCodePDF(eventToShow.value, generatedToken.value);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  } finally {
+    generatingPDF.value = false;
+  }
 };
 
 const handleAttendance = (eventId, eventName) => {
@@ -212,6 +266,42 @@ onMounted(() => {
         >
           Record Attendance
         </v-btn>
+        <br />
+
+        <div class="d-flex justify-center">
+          <v-progress-circular
+            v-if="checkingToken"
+            indeterminate
+            color="primary"
+            size="32"
+            width="3"
+          ></v-progress-circular>
+          <template v-else>
+            <v-btn
+              v-if="generatedToken?.token"
+              color="primary"
+              class="mt-4"
+              @click="downloadQRCode"
+              :loading="generatingPDF"
+            >
+              Download QR Code PDF
+            </v-btn>
+            <v-btn
+              v-else
+              color="primary"
+              @click="showQRCodeModal = true"
+              :loading="generatingToken"
+            >
+              Generate Check-In Code
+            </v-btn>
+          </template>
+        </div>
+
+        <QRCodeGenerationModal
+          v-model:show="showQRCodeModal"
+          :event="eventToShow"
+          @generate="handleGenerateQRCode"
+        />
       </template>
       <template #pagination>
         <v-pagination
