@@ -60,7 +60,7 @@ const adminRoutes = [
   },
   {
     path: "approvals",
-    name: "approvals",
+    name: "admin-approvals",
     component: Approvals,
   },
 ];
