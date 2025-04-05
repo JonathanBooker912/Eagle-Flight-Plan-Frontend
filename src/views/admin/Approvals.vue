@@ -4,25 +4,47 @@
     import flightPlanItemServices from "../../services/flightPlanItemServices";
     import FlightPlanItemApprovalCard from "../../components/cards/FlightPlanItemApprovalCard.vue";
     import ViewApprovalDialog from "../../components/dialogs/ViewApprovalDialog.vue";
-    import { ref, onMounted } from "vue";
+    import { ref, onMounted, computed, watch } from "vue";
     import { adminApprovalDialogStore } from "../../stores/adminApprovalDialogStore";
+    import { useDisplay } from "vuetify";
 
     const dialogStore = adminApprovalDialogStore();
 
     const pendingApprovals = ref([]);
     const page = ref(1);
     const count = ref(1);
+    const searchQuery = ref("");
+
+    const display = useDisplay();
+
+    const numCardColumns = computed(() => {
+        if (display.xxl.value) return 4;
+        if (display.xl.value) return 3;
+        if (display.lg.value) return 3;
+        if (display.md.value) return 2;
+        if (display.sm.value) return 1;
+        return 1; // Default for xs
+    });
+    const pageSize = computed(() => numCardColumns.value * 2);
 
     const fetchPendingApprovals = async () => {
         try {
-            const response = await flightPlanItemServices.getPendingApprovals();
+            const response = await flightPlanItemServices.getPendingApprovals(
+                page.value,
+                pageSize.value,
+                searchQuery.value
+            );
             pendingApprovals.value = response.data.flightPlanItems;
             count.value = response.data.count;
             page.value = 1;
         } catch (error) {
             console.error("Error fetching pending approvals:", error);
-            // You could add error handling here, like showing a notification
         }
+    };
+
+    const handleSearchChange = (input) => {
+        searchQuery.value = input;
+        page.value = 1; // Reset to first page on search change
     };
 
     const handleApprove = (flightPlanItem) => {
@@ -30,13 +52,20 @@
         dialogStore.toggleVisibility();
     };
 
+    watch([page, searchQuery], fetchPendingApprovals);
+
     onMounted(() => {
         fetchPendingApprovals();
     });
 </script>
 <template>
     <v-container>
-        <CardHeader label="Approvals" :add-button="false" />
+        <CardHeader
+            label="Approvals"
+            :add-button="false"
+            :filter-button="false"
+            @changed="handleSearchChange"
+        />
         <CardTable
             :items="pendingApprovals"
             :per-row-lg="3"

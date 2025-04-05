@@ -2,10 +2,7 @@ import apiClient from "./services";
 export default {
     getAllFlightPlanItemsForFlightPlan(
         flightPlanId,
-        page,
-        pageSize,
-        searchQuery,
-        filters
+        { page, pageSize, searchQuery, filters }
     ) {
         return apiClient.get(`/flightPlanItem/flightPlan/${flightPlanId}`, {
             params: {
@@ -13,9 +10,7 @@ export default {
                 pageSize,
                 searchQuery,
                 status: filters?.status,
-                flightPlanItemType: filters?.flightPlanItemType,
-                sortAttribute: filters?.sortAttribute,
-                sortDirection: filters?.sortDirection
+                flightPlanItemType: filters?.flightPlanItemType
             }
         });
     },

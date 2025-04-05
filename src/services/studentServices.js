@@ -6,8 +6,15 @@ export default {
     getStudentForFlightPlanId(flightPlanId) {
         return apiClient.get(`/students/flightPlan/${flightPlanId}`);
     },
-    addPoints(studentId, points) {
+    getStudent(studentId) {
+        return apiClient.get(`/students/${studentId}`);
+    },
+    updatePoints(studentId, points) {
+        console.log("points", points);
         return apiClient.put(`/students/${studentId}/points`, { points });
+    },
+    getPoints(studentId) {
+        return apiClient.get(`/students/${studentId}/points`);
     },
     getAllStudents() {
         return apiClient.get("/students");

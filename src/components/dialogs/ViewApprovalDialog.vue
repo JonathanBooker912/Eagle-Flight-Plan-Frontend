@@ -97,9 +97,9 @@
                     read: false,
                     userId: student.user.id
                 });
-                await studentServices.addPoints(
+                await studentServices.updatePoints(
                     student.id,
-                    flightPlanItem.value.points
+                    flightPlanItem.value.task.points
                 );
             }
 
