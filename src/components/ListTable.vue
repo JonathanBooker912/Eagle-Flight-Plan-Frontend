@@ -41,9 +41,9 @@ watch(
 
     <v-row class="ma-0 pa-0" no-gutters>
       <v-col
-        cols="12"
         v-for="(item, index) in props.items"
         :key="index"
+        ßcols="12"
         class="ma-0 pa-0 cardRow"
       >
         <slot :item="item"></slot>

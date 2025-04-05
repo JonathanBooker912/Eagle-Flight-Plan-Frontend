@@ -153,24 +153,25 @@ const handleCheckboxToggle = () => {
           hide-details
           density="compact"
           class="ma-0 pa-0"
-          @click="handleCheckboxToggle"
           :model-value="hasAttendedSelected || hasNotAttendedSelected"
           color="white"
+          @click="handleCheckboxToggle"
         />
 
         <v-menu v-model="menuVisible" offset-y>
+          <!-- eslint-disable-next-line -->
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
               size="small"
               class="dropdown-btn ma-0 pa-0"
-              @click.stop
               variant="plain"
               style="
                 min-width: 0;
                 background-color: transparent;
                 box-shadow: none;
               "
+              @click.stop
             >
               <v-icon color="white">mdi-menu-down</v-icon>
             </v-btn>
@@ -192,20 +193,20 @@ const handleCheckboxToggle = () => {
 
       <v-btn
         v-if="hasNotAttendedSelected"
-        @click.stop="confirmationDialog(false)"
         color="success"
         class="rounded-lg"
         size="small"
+        @click.stop="confirmationDialog(false)"
       >
         <v-icon icon="mdi-account-check" size="x-large" color="white" />
       </v-btn>
 
       <v-btn
         v-if="hasAttendedSelected"
-        @click.stop="confirmationDialog(true)"
         color="danger"
         class="rounded-lg"
         size="small"
+        @click.stop="confirmationDialog(true)"
       >
         <v-icon icon="mdi-account-off" size="x-large" color="white" />
       </v-btn>
@@ -227,7 +228,7 @@ const handleCheckboxToggle = () => {
           :key="index"
           :cols="header.cols"
         >
-          <v-card-text class="pa-0 text-center" v-if="index !== 0">
+          <v-card-text v-if="index !== 0" class="pa-0 text-center">
             <p class="text-h6 font-weight-bold">
               {{ header.name }}
             </p>
@@ -240,16 +241,16 @@ const handleCheckboxToggle = () => {
   <ConfirmDialog
     v-model="confirmDelete"
     title="Are you sure you want to mark selected students as absent?"
-    confirmText="Delete"
-    confirmColor="danger"
+    confirm-text="Delete"
+    confirm-color="danger"
     @confirm="handleBatchDelete"
   />
 
   <ConfirmDialog
     v-model="confirmRecord"
     title="Are you sure you want to mark selected students as present?"
-    confirmText="Record"
-    confirmColor="success"
+    confirm-text="Record"
+    confirm-color="success"
     @confirm="handleBatchCheckIn"
   />
 </template>

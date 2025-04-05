@@ -23,9 +23,10 @@ const props = defineProps({
 
 const emit = defineEmits(["update-student"]);
 
-const isSelected = computed(() =>
-  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId),
-);
+// eslint-disable-next-line
+const isSelected = computed(() => {
+  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId);
+});
 
 const toggleSelected = () => {
   isSelected.value = !isSelected.value;
@@ -81,11 +82,11 @@ const closeDialogs = () => {
     :ripple="false"
     :color="isSelected ? 'secondary' : 'backgroundDarken'"
     class="roundedCard"
+    role="row"
+    :aria-label="`Attendance card for ${props.student.fName ?? 'Unknown'} with ID ${props.student.studentId ?? 'N/A'}`"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @click="toggleSelected"
-    role="row"
-    :aria-label="`Attendance card for ${props.student.fName ?? 'Unknown'} with ID ${props.student.studentId ?? 'N/A'}`"
   >
     <v-container class="row-container" fluid>
       <v-row class="align-center pl-1">
@@ -130,24 +131,24 @@ const closeDialogs = () => {
           </v-card-text>
         </v-col>
 
-        <v-col :cols="2" v-if="isHovered">
-          <v-card-text class="pa-0" v-if="!props.student.attendedStatus">
+        <v-col v-if="isHovered" :cols="2">
+          <v-card-text v-if="!props.student.attendedStatus" class="pa-0">
             <v-btn
-              @click.stop="confirmationDialog(false)"
               color="success"
               class="rounded-lg"
               size="small"
+              @click.stop="confirmationDialog(false)"
             >
               <v-icon icon="mdi-account-check" size="x-large" color="white" />
             </v-btn>
           </v-card-text>
 
-          <v-card-text class="pa-0" v-if="props.student.attendedStatus">
+          <v-card-text v-if="props.student.attendedStatus" class="pa-0">
             <v-btn
-              @click.stop="confirmationDialog(true)"
               color="danger"
               class="rounded-lg"
               size="small"
+              @click.stop="confirmationDialog(true)"
             >
               <v-icon icon="mdi-account-off" size="x-large" color="white" />
             </v-btn>
@@ -160,16 +161,16 @@ const closeDialogs = () => {
   <ConfirmDialog
     v-model="confirmDelete"
     title="Are you sure you want to mark student as absent?"
-    confirmText="Delete"
-    confirmColor="danger"
+    confirm-text="Delete"
+    confirm-color="danger"
     @confirm="handleCardCrud"
   />
 
   <ConfirmDialog
     v-model="confirmRecord"
     title="Are you sure you want to mark student as present?"
-    confirmText="Record"
-    confirmColor="success"
+    confirm-text="Record"
+    confirm-color="success"
     @confirm="handleCardCrud"
   />
 </template>

@@ -93,11 +93,11 @@ const handleSearchChange = (input) => {
   <v-container fluid>
     <CardHeader
       :label="label"
+      :add-button="false"
+      :filter-button="false"
       @changed="handleSearchChange"
-      :add-Button="false"
-      :filter-Button="false"
     />
-    <ListTable :items="pagedStudents" :showFilters="showFilters">
+    <ListTable :items="pagedStudents" :show-filters="showFilters">
       <template #header>
         <ListTableHeader
           :headers="headers"

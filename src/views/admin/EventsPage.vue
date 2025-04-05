@@ -207,8 +207,8 @@ onMounted(() => {
           class="mt-5 mb-0 full-width"
           rounded="xl"
           color="primary"
-          @click="handleAttendance(eventToShow.id, eventToShow.name)"
           block
+          @click="handleAttendance(eventToShow.id, eventToShow.name)"
         >
           Record Attendance
         </v-btn>
