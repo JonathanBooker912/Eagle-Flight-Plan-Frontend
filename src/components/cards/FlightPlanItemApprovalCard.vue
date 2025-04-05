@@ -74,8 +74,8 @@ const showPoints = computed(
               variant="outlined"
               @click="emit('approve', props.flightPlanItem)"
             >
-              Approve
-              <v-icon right class="pl-1">mdi-check</v-icon>
+              View Submission
+              <v-icon right class="pl-1">mdi-eye</v-icon>
             </v-btn>
           </v-row>
         </v-col>
