@@ -43,7 +43,7 @@ watch(
       <v-col
         v-for="(item, index) in props.items"
         :key="index"
-        ßcols="12"
+        cols="12"
         class="ma-0 pa-0 cardRow"
       >
         <slot :item="item"></slot>
