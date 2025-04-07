@@ -18,18 +18,18 @@ import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 import Profile from "../views/Profile.vue";
 import Notifications from "../views/Notification.vue";
 
-import AdminLanding from "../views/admin/AdminLanding.vue";
+import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
 
-import StudentLanding from "../views/student/StudentLanding.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
-import FacultyLanding from "../views/faculty/FacultyLanding.vue";
+import FacultyDashboard from "../views/faculty/FacultyDashboard.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
@@ -47,6 +47,11 @@ const adminRoutes = [
     path: "notifications",
     name: "admin-notifications",
     component: Notifications,
+  },
+  {
+    path: "dashboard",
+    name: "admin-dashboard",
+    component: AdminDashboard,
   },
   {
     path: "profile",
@@ -287,8 +292,8 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
-      component: AdminLanding,
       beforeEnter: isAdmin,
+      redirect: { name: "admin-dashboard" },
       children: [...adminRoutes, ...adminMaintenanceRoutes],
     },
 
@@ -296,7 +301,7 @@ const router = createRouter({
     {
       path: "/faculty",
       name: "faculty",
-      component: FacultyLanding,
+      component: FacultyDashboard,
       beforeEnter: isFaculty,
       children: [...facultyRoutes],
     },
@@ -305,7 +310,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      component: StudentLanding,
+      component: StudentDashboard,
       children: [...studentRoutes],
     },
 
