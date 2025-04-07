@@ -1,6 +1,9 @@
 <script setup>
 const props = defineProps({
-  task: Object,
+  task: {
+    type: Object,
+    required: true,
+  },
 });
 const emit = defineEmits(["edit", "delete"]);
 </script>

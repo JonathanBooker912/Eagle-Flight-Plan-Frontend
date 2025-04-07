@@ -93,7 +93,7 @@ onMounted(fetchOptionalReviewers);
 </script>
 
 <template>
-  <v-dialog transition="dialog-bottom-transition" v-model="visible">
+  <v-dialog v-model="visible" transition="dialog-bottom-transition">
     <v-card rounded="xl" color="backgroundDarken">
       <v-card-title class="text-h4 d-flex justify-center align-center">
         <span class="flex-grow-1 text-center">

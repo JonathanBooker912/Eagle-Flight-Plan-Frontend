@@ -66,11 +66,11 @@ watch(visible, async () => {
 </script>
 
 <template>
-  <v-dialog transition="dialog-bottom-transition" v-model="visible">
+  <v-dialog v-model="visible" transition="dialog-bottom-transition">
     <v-card rounded="xl" color="backgroundDarken">
       <v-card-title class="d-flex justify-space-between align-center ma-2">
         <span>Submissions for {{ flightPlanItem.name }}</span>
-        <v-icon @click="visible = false" class="cursor-pointer"
+        <v-icon class="cursor-pointer" @click="visible = false"
           >mdi-close</v-icon
         >
       </v-card-title>
@@ -94,17 +94,17 @@ watch(visible, async () => {
             </v-container>
 
             <v-row
-              v-else-if="submissions.length > 0"
               v-for="(submission, index) in submissions"
+              v-else-if="submissions.length > 0"
               :key="index"
               class="bg-background rounded-lg mb-1"
             >
               <v-col class="d-flex justify-space-between align-center">
                 <span>File {{ index + 1 }}</span>
                 <v-btn
-                  @click="handleDownload(index)"
                   variant="solo"
                   density="comfortable"
+                  @click="handleDownload(index)"
                 >
                   <v-icon icon="mdi-download"></v-icon>
                 </v-btn>

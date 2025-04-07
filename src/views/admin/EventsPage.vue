@@ -132,6 +132,14 @@ const handleShowInfo = (eventId) => {
   showInfo.value = true;
 };
 
+const handleAttendance = (eventId, eventName) => {
+  console.log(eventName);
+  router.push({
+    name: "attendanceEvent",
+    params: { id: eventId, eventName: eventName },
+  });
+};
+
 // Initial fetch
 onMounted(() => {
   getEvents();
@@ -195,6 +203,15 @@ onMounted(() => {
         <br />
         <h4>Attendance: {{ eventToShow.attendanceType }}</h4>
         <h4>Registration Type: {{ eventToShow.registration }}</h4>
+        <v-btn
+          class="mt-5 mb-0 full-width"
+          rounded="xl"
+          color="primary"
+          block
+          @click="handleAttendance(eventToShow.id, eventToShow.name)"
+        >
+          Record Attendance
+        </v-btn>
       </template>
       <template #pagination>
         <v-pagination

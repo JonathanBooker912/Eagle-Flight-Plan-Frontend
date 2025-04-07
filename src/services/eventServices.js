@@ -44,4 +44,22 @@ export default {
   getRegistrationTypes() {
     return apiClient.get("/event/types/registrationTypes");
   },
+  registerStudents(eventId, studentIds) {
+    return apiClient.post(`/event/${eventId}/register`, { studentIds });
+  },
+
+  markAttendance(eventId, studentIds) {
+    console.log("Event ID:", eventId);
+    console.log("Student IDs:", studentIds);
+
+    return apiClient.post(`/event/${eventId}/attend`, { studentIds });
+  },
+
+  getRegisteredStudents(eventId) {
+    return apiClient.get(`/event/${eventId}/registered-students`);
+  },
+
+  getAttendingStudents(eventId) {
+    return apiClient.get(`/event/${eventId}/attending-students`);
+  },
 };

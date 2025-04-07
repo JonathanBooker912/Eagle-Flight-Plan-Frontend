@@ -51,6 +51,7 @@ const clearDate = () => {
     offset-y
     :close-on-content-click="false"
   >
+    <!-- eslint-disable-next-line -->
     <template #activator="{ props }">
       <v-text-field
         v-model="formattedDate"

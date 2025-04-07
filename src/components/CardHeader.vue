@@ -3,6 +3,7 @@
 const props = defineProps({
   label: { type: String, default: null },
   addButton: { type: Boolean, default: true },
+  filterButton: { type: Boolean, default: true },
 });
 
 // Emit event functions
@@ -70,16 +71,23 @@ const handleToggleFilters = () => emit("toggle-filters");
       </div>
 
       <!-- Filter & Sort button (desktop) -->
-      <v-btn
-        v-if="$vuetify.display.smAndUp"
-        color="backgroundDarken"
-        rounded="xl"
-        @click="handleToggleFilters"
-      >
-        Filter & Sort
-      </v-btn>
-      <!-- Filter icon button (mobile) -->
-      <v-btn v-else icon="mdi-filter-variant" color="backgroundDarken"></v-btn>
+      <div v-if="props.filterButton">
+        <v-btn
+          v-if="$vuetify.display.smAndUp"
+          color="backgroundDarken"
+          rounded="xl"
+          @click="handleToggleFilters"
+        >
+          Filter & Sort
+        </v-btn>
+        <!-- Filter icon button (mobile) -->
+
+        <v-btn
+          v-else
+          icon="mdi-filter-variant"
+          color="backgroundDarken"
+        ></v-btn>
+      </div>
     </v-col>
   </v-row>
 </template>

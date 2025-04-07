@@ -35,6 +35,7 @@ import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
 import FacultySearch from "../views/faculty/FacultySearch.vue";
 import FlightPlan from "../views/FlightPlan.vue";
 import AddFlightPlanItem from "../views/admin/flightPlan/AddFlightPlanItem.vue";
+import EventAttendancePage from "../views/admin/event/EventAttendancePage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -187,6 +188,11 @@ const router = createRouter({
           name: "addEvent",
           component: EventAddEditPage,
           props: { isAdd: true },
+        },
+        {
+          path: "maintenance/event/attendance/:id/",
+          name: "attendanceEvent",
+          component: EventAttendancePage,
         },
         {
           path: "maintenance/user",
