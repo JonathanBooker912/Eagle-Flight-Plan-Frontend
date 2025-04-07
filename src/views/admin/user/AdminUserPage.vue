@@ -51,7 +51,7 @@ const handleDialogClick = (optionNumber) => {
       })
     : router.push({
         name: "adminStudentFlightPlan",
-        params: { id: popUpId.value, studentName: popUpName.value },
+        params: { id: popUpId.value },
       });
 };
 watch([page, searchQuery], fetchUsers, { immediate: true });
