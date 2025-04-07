@@ -6,4 +6,7 @@ export default {
       params: { page, pageSize },
     });
   },
+  createNotification(notificationData) {
+    return apiClient.post("/notification", notificationData);
+  },
 };

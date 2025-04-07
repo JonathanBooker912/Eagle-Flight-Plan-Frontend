@@ -10,6 +10,7 @@ const admin = [
   { "route-name": "admin-notifications", "link-text": "Notifications" },
   { "route-name": "maintenance", "link-text": "Maintenance" },
   { "route-name": "admin-search", "link-text": "Search" },
+  { "route-name": "admin-approvals", "link-text": "Approvals" },
 ];
 
 const faculty = [
@@ -65,6 +66,7 @@ const getIcon = (linkText) => {
     Notifications: "mdi-bell",
     Search: "mdi-magnify",
     Maintenance: "mdi-cog",
+    Approvals: "mdi-check",
   };
 
   return icons[linkText] || "mdi-circle"; // Default if not found
@@ -78,7 +80,10 @@ const getIcon = (linkText) => {
         <v-list-item
           :to="
             item['link-text'] === 'Profile' && userId
-              ? { name: item['route-name'], params: { userId: userId } }
+              ? {
+                  name: item['route-name'],
+                  params: { userId: userId },
+                }
               : { name: item['route-name'] }
           "
           class="bg-secondary"
@@ -107,7 +112,10 @@ const getIcon = (linkText) => {
         <v-list-item
           :to="
             item['link-text'] === 'Profile' && userId
-              ? { name: item['route-name'], params: { userId: userId } }
+              ? {
+                  name: item['route-name'],
+                  params: { userId: userId },
+                }
               : { name: item['route-name'] }
           "
           class="bg-secondary"
@@ -136,7 +144,10 @@ const getIcon = (linkText) => {
         <v-list-item
           :to="
             item['link-text'] === 'Profile' && userId
-              ? { name: item['route-name'], params: { userId: userId } }
+              ? {
+                  name: item['route-name'],
+                  params: { userId: userId },
+                }
               : { name: item['route-name'] }
           "
           class="bg-secondary"
