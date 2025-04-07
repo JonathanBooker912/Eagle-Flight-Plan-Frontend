@@ -1,6 +1,6 @@
 import apiClient from "./services.js";
 export default {
-  getAllEvents(page, pageSize, searchQuery, filters) {
+  getAllEvents(page = 1, pageSize = 10, searchQuery, filters) {
     return apiClient.get("/event", {
       params: {
         page: page,
@@ -15,7 +15,11 @@ export default {
       },
     });
   },
-
+  getAllEventsForUser(id, page = 1, pageSize = 10) {
+    return apiClient.get(`/event/user/${id}`, {
+      params: { page, pageSize },
+    });
+  },
   getEvent(eventId) {
     return apiClient.get(`/event/${eventId}`);
   },

@@ -50,6 +50,7 @@ const router = createRouter({
       path: "/admin",
       name: "admin",
       beforeEnter: isAdmin,
+      redirect: { name: "admin-dashboard" },
       children: [
         {
           path: "calendar",

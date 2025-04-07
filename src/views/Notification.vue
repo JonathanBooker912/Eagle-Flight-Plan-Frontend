@@ -51,7 +51,12 @@ onMounted(async () => {
 
     var chosenNotif = null;
     for (const notif of notifications.value) {
-      console.log("Checking notification:", notif.id, "against:", notifStore.activeNotification);
+      console.log(
+        "Checking notification:",
+        notif.id,
+        "against:",
+        notifStore.activeNotification,
+      );
       if (notif.id === notifStore.activeNotification) {
         chosenNotif = notif;
         break;

@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { userStore } from "../../stores/userStore";
+import { computed } from "vue";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -8,12 +7,13 @@ dayjs.extend(advancedFormat);
 
 const emit = defineEmits(["edit", "delete", "show-info"]);
 
-const store = userStore();
-const isAdmin = ref(false);
-
 const props = defineProps({
   event: {
     type: Object,
+    required: true,
+  },
+  isEventViewing: {
+    type: Boolean,
     required: true,
   },
 });
@@ -39,13 +39,10 @@ const editEvent = () => {
 const showEventInfo = () => {
   emit("show-info", props.event.id);
 };
-
-onMounted(async () => {
-  isAdmin.value = await store.isAdmin();
-});
 </script>
+
 <template>
-  <v-card v-if="isAdmin" color="backgroundDarken" class="cardContainer">
+  <v-card v-if="isEventViewing" color="backgroundDarken" class="cardContainer">
     <v-row no-gutters>
       <v-col>
         <v-card-text>
@@ -91,24 +88,24 @@ onMounted(async () => {
   </v-card>
   <v-card
     v-else
-    color="backgroundDarken"
-    class="cardContainer"
+    color="background"
+    class="cardContainer mb-4"
     @click="viewCard"
   >
     <v-row no-gutters>
       <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>
         <v-card-text>
-          <p class="text-h5 text-truncate w-100">
+          <p class="text-h6 text-truncate w-100">
             {{ props.event.name }}
           </p>
-          <p class="text-subtitle-1 font-weight-regular">
+          <p class="text-subtitle-2 font-weight-regular">
             {{ props.event.location }}
           </p>
-          <p class="text-subtitle-1 font-weight-regular">
+          <p class="text-subtitle-2 font-weight-regular">
             {{ eventDate }}
           </p>
-          <p class="text-subtitle-1 font-weight-regular">
+          <p class="text-subtitle-2 font-weight-regular">
             {{ eventTime }}
           </p>
         </v-card-text>

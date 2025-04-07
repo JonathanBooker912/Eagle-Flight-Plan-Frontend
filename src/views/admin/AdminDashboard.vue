@@ -27,14 +27,13 @@ const totalPages = ref(1);
 
 const getEvents = async () => {
   await eventServices
-    .getAllEventsForUser()
+    .getAllEvents()
     .then((res) => {
-      console.log(res);
-      events.value = res.data;
+      events.value = res.data.events;
       isLoaded.value = true;
-      console.log(events);
+      console.log("Events data:", events.value);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 };
 
 const getNotifications = async (page = 1) => {
@@ -67,69 +66,55 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-card class="main-back" color="background">
-    <v-row justify="center">
-      <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-        <strong style="font-size: 20px; padding-bottom: 5px"
-          >Upcoming Events</strong
-        >
-        <EventCard
-          v-for="(item, index) in events.slice(0, 2)"
+  <v-row justify="center">
+    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
+      <strong style="font-size: 20px; padding-bottom: 5px"
+        >Upcoming Events</strong
+      >
+      <EventCard
+        v-for="(item, index) in events.splice(0, 2)"
+        :key="index"
+        :event="item"
+        :isEventViewing="false"
+        :to="{ name: 'admin-calendar' }"
+      ></EventCard>
+    </v-card>
+    <v-card color="backgroundDarken" class="adminItem adminItemBig">
+      <p>Engagement Breakdown by Classification</p>
+    </v-card>
+    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
+      <strong style="font-size: 20px; padding-bottom: 5px"
+        >Notifications</strong
+      >
+      <div id="notifList">
+        <v-card
+          v-for="(item, index) in notifications.slice(0, 4)"
           :key="index"
-          :event="item"
-          :isEdit="false"
-          :to="{ name: 'admin-calendar' }"
-        ></EventCard>
-      </v-card>
-      <v-card color="backgroundDarken" class="adminItem adminItemBig">
-        <p>Engagement Breakdown by Classification</p>
-      </v-card>
-      <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-        <strong style="font-size: 20px; padding-bottom: 5px"
-          >Notifications</strong
+          :to="{ name: 'admin-notifications' }"
+          class="notification"
+          color="background"
+          @click="openNotification(item.id)"
         >
-        <div id="notifList">
-          <v-card
-            v-for="(item, index) in notifications.slice(0, 4)"
-            :key="index"
-            :to="{ name: 'admin-notifications' }"
-            class="notification"
-            color="background"
-            @click="openNotification(item.id)"
-          >
-            <div style="display: flex; align-items: center">
-              <img
-                style="height: 30px; margin-right: 5px"
-                src="../../../public/Birb.png"
-              />
-              <div>
-                <strong style="font-size: 18px">{{ item.header }}</strong>
-                <p style="font-size: 14px">{{ item.description }}</p>
-              </div>
+          <div style="display: flex; align-items: center">
+            <img
+              style="height: 30px; margin-right: 5px"
+              src="../../../public/Birb.png"
+            />
+            <div>
+              <strong style="font-size: 18px">{{ item.header }}</strong>
+              <p style="font-size: 14px">{{ item.description }}</p>
             </div>
-          </v-card>
-        </div>
-      </v-card>
-      <v-card color="backgroundDarken" class="adminItem adminItemBig">
-        <p>Percentage of students on track to complete their flight plan</p>
-      </v-card>
-    </v-row>
-  </v-card>
+          </div>
+        </v-card>
+      </div>
+    </v-card>
+    <v-card color="backgroundDarken" class="adminItem adminItemBig">
+      <p>Percentage of students on track to complete their flight plan</p>
+    </v-card>
+  </v-row>
 </template>
 
 <style>
-.main-back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0.5%;
-  padding: 0.5%;
-  flex-wrap: wrap;
-  align-self: flex-end;
-  border-radius: 25px;
-  width: 90vw;
-}
-
 .adminItem {
   display: flex;
   flex-direction: column;
