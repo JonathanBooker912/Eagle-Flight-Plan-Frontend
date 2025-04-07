@@ -8,11 +8,14 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["incomplete", "view", "register", "sign-in"]);
+
 const color = computed(
   () =>
     ({
       Incomplete: "danger",
       Pending: "warning",
+      Registered: "warning",
     })[props.flightPlanItem.status] || "primary",
 );
 
@@ -35,7 +38,7 @@ const points = computed(() => {
           <v-card-text class="text-no-wrap">
             <v-tooltip bottom>
               <!-- eslint-disable-next-line vue/no-template-shadow -->
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <p v-bind="props" class="text-h6 mb-2 truncate-text">
                   {{ flightPlanItem.name }}
                 </p>
@@ -44,7 +47,64 @@ const points = computed(() => {
             </v-tooltip>
             <p>{{ flightPlanItem.flightPlanItemType }}</p>
             <p>{{ flightPlanItem.status }}</p>
-            <p>Points: {{ points }}</p></v-card-text
+            <p
+              v-if="
+                flightPlanItem.status == 'Complete' ||
+                flightPlanItem.status == 'Registered'
+              "
+              class="mb-5"
+            >
+              Points: {{ points }}
+            </p>
+            <p v-else>Points: {{ points }}</p></v-card-text
+          >
+
+          <!-- Incomplete Task -->
+          <v-row
+            v-if="
+              flightPlanItem.status == 'Incomplete' &&
+              flightPlanItem.flightPlanItemType == 'Task'
+            "
+            justify="end"
+            ><v-btn
+              class="mr-4 mb-3"
+              variant="outlined"
+              rounded="xl"
+              @click="emit('incomplete', props.flightPlanItem)"
+            >
+              Incomplete
+              <v-icon right class="pl-1">mdi-upload</v-icon>
+            </v-btn></v-row
+          >
+
+          <!-- Register for Experience -->
+          <v-row
+            v-if="
+              flightPlanItem.status == 'Incomplete' &&
+              flightPlanItem.flightPlanItemType == 'Experience'
+            "
+            justify="end"
+            ><v-btn
+              class="mr-4 mb-3"
+              variant="outlined"
+              rounded="xl"
+              @click="emit('register', props.flightPlanItem)"
+            >
+              Register
+              <v-icon right class="pl-1">mdi-account-plus</v-icon>
+            </v-btn></v-row
+          >
+
+          <!-- Pending Task -->
+          <v-row v-else-if="flightPlanItem.status == 'Pending'" justify="end"
+            ><v-btn
+              class="mr-4 mb-3"
+              rounded="xl"
+              variant="outlined"
+              @click="emit('view', props.flightPlanItem)"
+            >
+              View Submission<v-icon right class="pl-1">mdi-eye</v-icon>
+            </v-btn></v-row
           >
         </v-col>
       </v-row>

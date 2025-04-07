@@ -4,8 +4,8 @@ import { useRoute } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 
 const admin = [
-  { "route-name": "admin-profile", "link-text": "Profile" },
-  { "route-name": "admin-dashboard", "link-text": "Dashboard" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
+  { "route-name": "admin", "link-text": "Dashboard" },
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
   { "route-name": "maintenance", "link-text": "Maintenance" },
@@ -13,7 +13,7 @@ const admin = [
 ];
 
 const faculty = [
-  { "route-name": "faculty-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "faculty", "link-text": "Dashboard" },
   { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "faculty-calendar", "link-text": "Calendar" },
@@ -22,7 +22,7 @@ const faculty = [
 ];
 
 const student = [
-  { "route-name": "student-profile", "link-text": "Profile" },
+  { "route-name": "adminProfile", "link-text": "Profile" },
   { "route-name": "student", "link-text": "Dashboard" },
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
@@ -32,6 +32,7 @@ const student = [
 
 const role = ref("");
 const route = useRoute();
+const userId = ref(null);
 
 onMounted(async () => {
   const store = userStore();
@@ -42,9 +43,10 @@ onMounted(async () => {
   // Set the initial role based on authentication and role checks
   role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
 
-  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
+  // Get the user ID from the store
+  userId.value = store.user.userId;
 
-  console.log(route);
+  // Override role if the path explicitly starts with '/admin', '/faculty', or '/student'
   if (route.path.startsWith("/admin")) {
     role.value = "admin";
   } else if (route.path.startsWith("/faculty")) {
@@ -72,87 +74,96 @@ const getIcon = (linkText) => {
 <template>
   <v-container class="d-flex flex-column pa-2 userNav bg-secondary">
     <v-list v-if="role === 'admin'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in admin" :key="index">
+      <div v-for="(item, index) in admin" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
+          <div>
             <v-list-item-title
-              class="text-body-1 font-weight-bold"
-              color="text"
+              class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" color="backgroundDarken">{{
+                <span class="nav-text text-backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
+      </div>
     </v-list>
 
     <v-list v-if="role === 'faculty'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in faculty" :key="index">
+      <div v-for="(item, index) in faculty" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
+          <div>
             <v-list-item-title
-              class="text-body-1 font-weight-bold"
-              color="text"
+              class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
-                <v-icon :size="32" :color="text" class="mr-2">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" :color="text">{{
+                <span class="nav-text text-backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
+      </div>
     </v-list>
 
     <v-list v-if="role === 'student'" class="pa-0">
-      <v-list-item-group v-for="(item, index) in student" :key="index">
+      <div v-for="(item, index) in student" :key="index">
         <v-list-item
-          :to="{ name: item['route-name'] }"
+          :to="
+            item['link-text'] === 'Profile' && userId
+              ? { name: item['route-name'], params: { userId: userId } }
+              : { name: item['route-name'] }
+          "
           class="bg-secondary"
           exact
         >
-          <v-list-item-content>
+          <div>
             <v-list-item-title
-              class="text-body-1 font-weight-bold"
-              color="text"
+              class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
-                <v-icon :size="32" :color="text" class="mr-2">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
                   {{ getIcon(item["link-text"]) }}
                 </v-icon>
-                <span class="nav-text" :color="text">{{
+                <span class="nav-text text-backgroundDarken">{{
                   item["link-text"]
                 }}</span>
               </div>
             </v-list-item-title>
-          </v-list-item-content>
+          </div>
         </v-list-item>
-      </v-list-item-group>
+      </div>
     </v-list>
   </v-container>
 </template>
 
 <style>
-/* Hide text when not hovering over the navbar */
+/* Styling for the navigation bar */
 .userNav .nav-item-content {
   display: flex;
   align-items: center;
@@ -162,7 +173,6 @@ const getIcon = (linkText) => {
   display: none;
 }
 
-/* Show text when navbar is hovered */
 .userNav:hover .nav-text {
   display: inline;
 }
