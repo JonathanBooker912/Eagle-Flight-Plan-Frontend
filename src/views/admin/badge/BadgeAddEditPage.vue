@@ -7,6 +7,7 @@ import {
   fileTypeRule,
 } from "../../../utils/formValidators";
 import badgeServices from "../../../services/badgeServices";
+import fileServices from "../../../services/fileServices";
 
 // Define statements for vue
 const props = defineProps({
@@ -33,7 +34,6 @@ const handleSubmit = async () => {
   if (!isValid) return;
   try {
     if (props.isAdd) {
-      console.log(props);
       await uploadImage();
       await badgeServices.createBadge(formData.value);
     } else {
@@ -49,8 +49,9 @@ const handleSubmit = async () => {
 
 const uploadImage = async () => {
   if (!image.value) return;
-  const response = await badgeServices.uploadBadgeImage({
-    image: image.value,
+  const response = await fileServices.uploadFile({
+    file: image.value,
+    folder: "photos",
   });
   formData.value.imageName = response.data.fileName;
 };
@@ -61,12 +62,12 @@ const handleImageUpdate = async () => {
   }
   // Case where image is changed
   else if (image.value && formData.value.imageName !== image.value.name) {
-    await badgeServices.deleteBadgeImage(formData.value.imageName);
+    await fileServices.deleteFileForName(formData.value.imageName);
     await uploadImage();
   }
   // Case where image is deleted
   else if (!image.value && formData.value.imageName) {
-    await badgeServices.deleteBadgeImage(formData.value.imageName);
+    await fileServices.deleteFileForName(formData.value.imageName);
     formData.value.imageName = null;
   }
   formData.value.image = undefined;
@@ -79,7 +80,7 @@ onMounted(async () => {
       let response = await badgeServices.getBadge(route.params.id);
       formData.value = response.data;
       if (formData.value.imageName) {
-        response = await badgeServices.getBadgeImage(formData.value.imageName);
+        response = await fileServices.getFileForName(formData.value.imageName);
         image.value = new File([response.data.image], formData.value.imageName);
       }
     } catch (err) {

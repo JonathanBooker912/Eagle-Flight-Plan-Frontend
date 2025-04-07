@@ -1,6 +1,9 @@
 <script setup>
 const props = defineProps({
-  experience: Object,
+  experience: {
+    type: Object,
+    required: true,
+  },
 });
 const emit = defineEmits(["edit", "delete"]);
 </script>

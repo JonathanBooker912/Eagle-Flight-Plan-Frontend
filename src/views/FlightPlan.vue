@@ -3,7 +3,6 @@ import { onMounted, ref, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CardHeader from "../components/CardHeader.vue";
 import CardTable from "../components/CardTable.vue";
-import SortSelect from "../components/SortSelect.vue";
 import flightPlanServices from "../services/flightPlanServices";
 import flightPlanItemServices from "../services/flightPlanItemServices";
 import FlightPlanItemCard from "../components/cards/FlightPlanItemCard.vue";
@@ -11,7 +10,11 @@ import { useDisplay } from "vuetify";
 import { userStore } from "../stores/userStore";
 import { storeToRefs } from "pinia";
 import studentServices from "../services/studentServices";
-
+import StudentApprovalDialog from "../components/dialogs/StudentApprovalDialog.vue";
+import { studentApprovalDialogStore } from "../stores/studentApprovalDialogStore";
+import ViewSubmissionDialog from "../components/dialogs/ViewSubmissionDialog.vue";
+import { studentViewSubmissionDialogStore } from "../stores/studentViewSubmissionDialogStore";
+import userServices from "../services/userServices";
 const props = defineProps({
   isAdmin: {
     type: Boolean,
@@ -19,22 +22,13 @@ const props = defineProps({
   },
 });
 
-const sortProperties = [
-  {
-    title: "Status",
-    value: "status",
-  },
-  {
-    title: "Name",
-    value: "name",
-  },
-];
-
 let student = null;
 
 const route = useRoute();
 const router = useRouter();
 const flightPlan = ref(null);
+const selectedFlightPlan = ref(null);
+const flightPlans = ref([]);
 const flightPlanItems = ref([]);
 const page = ref(1);
 const searchQuery = ref("");
@@ -42,19 +36,18 @@ const count = ref(0);
 const progress = ref(0);
 const flightPlanItemTypes = ref([]);
 const flightPlanItemStatuses = ref([]);
+const points = ref(0);
+const userName = ref(null);
 
-const store = userStore();
-const { user } = storeToRefs(store);
+const useStudentApprovalDialogStore = studentApprovalDialogStore();
+const useStudentViewSubmissionDialogStore = studentViewSubmissionDialogStore();
+const useUserStore = userStore();
+const { user } = storeToRefs(useUserStore);
 
 const showFilters = ref(false);
 const filters = ref({
   status: null,
   flightPlanItemType: null,
-});
-
-const sortOptions = ref({
-  sortAttribute: sortProperties[0].value,
-  sortDirection: "asc",
 });
 
 const display = useDisplay();
@@ -69,53 +62,78 @@ const numCardColumns = computed(() => {
 });
 const pageSize = computed(() => numCardColumns.value * 2);
 
-const fetchStudentForUserId = async () => {
+const fetchStudent = async () => {
+  let studentResponse;
+
   if (props.isAdmin) {
-    student = route.params.id;
-    return;
+    studentResponse = await studentServices.getStudent(route.params.id);
+    const userResponse = await userServices.getOneUser(
+      studentResponse.data.userId,
+    );
+    userName.value = userResponse.data.fullName;
+  } else {
+    studentResponse = await studentServices.getStudentForUserId(
+      user.value.userId,
+    );
   }
-  const studentResponse = await studentServices.getStudentForUserId(
-    user.value.userId,
-  );
 
   student = studentResponse.data;
+  const pointsResponse = await studentServices.getPoints(student.id);
+  points.value = pointsResponse.data.points;
 };
 
 const fetchFlightPlan = async () => {
+  const formatFlightPlanLabel = (flightPlan) => {
+    const term =
+      flightPlan.semester.term.charAt(0).toUpperCase() +
+      flightPlan.semester.term.slice(1);
+    return `${term} ${flightPlan.semester.year}`;
+  };
+
   const response = await flightPlanServices.getFlightPlanForStudent(student.id);
+
+  flightPlans.value = response.data.map((flightPlan) => ({
+    label: formatFlightPlanLabel(flightPlan),
+    value: flightPlan.id,
+  }));
+
+  selectedFlightPlan.value = flightPlans.value[0];
   flightPlan.value = response.data[0];
 };
 
 const fetchFlightPlanAndItems = async () => {
+  const params = {
+    page: page.value,
+    pageSize: pageSize.value,
+    searchQuery: searchQuery.value,
+    filters: filters.value,
+  };
+
   const response =
     await flightPlanItemServices.getAllFlightPlanItemsForFlightPlan(
-      flightPlan.value.id,
-      page.value,
-      pageSize.value,
-      searchQuery.value,
-      { ...filters.value, ...sortOptions.value },
+      selectedFlightPlan.value.value,
+      params,
     );
+
   flightPlanItems.value = response.data.flightPlanItems;
   count.value = response.data.count;
 };
 
 const fetchFlightPlanProgress = async () => {
   const response = await flightPlanServices.getFlightPlanProgressForFlightPlan(
-    flightPlan.value.id,
+    selectedFlightPlan.value.value,
   );
   progress.value = response.data.progress;
 };
 
-const fetchFlightPlanItemTypes = () => {
-  flightPlanItemServices.getFlightPlanItemTypes().then((response) => {
-    flightPlanItemTypes.value = response.data;
-  });
+const fetchFlightPlanItemTypes = async () => {
+  const response = await flightPlanItemServices.getFlightPlanItemTypes();
+  flightPlanItemTypes.value = response.data;
 };
 
-const fetchFlightPlanItemStatuses = () => {
-  flightPlanItemServices.getFlightPlanItemStatuses().then((response) => {
-    flightPlanItemStatuses.value = response.data;
-  });
+const fetchFlightPlanItemStatuses = async () => {
+  const response = await flightPlanItemServices.getFlightPlanItemStatuses();
+  flightPlanItemStatuses.value = response.data;
 };
 
 const handleSearchChange = (input) => {
@@ -139,27 +157,84 @@ const handleClearFilters = () => {
   fetchFlightPlanAndItems();
 };
 
+const handleIncompleteButtonClick = (flightPlanItem) => {
+  useStudentApprovalDialogStore.toggleVisibility();
+  useStudentApprovalDialogStore.setFlightPlanItem(flightPlanItem);
+};
+
+const handlePendingButtonClick = (flightPlanItem) => {
+  useStudentViewSubmissionDialogStore.setFlightPlanItem(flightPlanItem);
+  useStudentViewSubmissionDialogStore.toggleVisibility();
+};
+
 onMounted(async () => {
-  await fetchStudentForUserId();
+  await fetchStudent();
   await fetchFlightPlan();
   if (flightPlan.value) {
-    await Promise.all([fetchFlightPlanAndItems(), fetchFlightPlanProgress()]);
-    fetchFlightPlanItemStatuses();
-    fetchFlightPlanItemTypes();
+    await Promise.all([
+      fetchFlightPlanAndItems(),
+      fetchFlightPlanProgress(),
+      fetchFlightPlanItemStatuses(),
+      fetchFlightPlanItemTypes(),
+    ]);
   }
+});
+
+watch(selectedFlightPlan, () => {
+  fetchFlightPlanAndItems();
+  fetchFlightPlanProgress();
 });
 
 watch([page, searchQuery], fetchFlightPlanAndItems);
 </script>
 <template>
   <v-container fluid>
-    <h1 class="text-center mt-2">
-      {{
-        props.isAdmin
-          ? route.params.studentName || "No Name"
-          : user.fullName || "No Name"
-      }}
-    </h1>
+    <div v-if="props.isAdmin">
+      <div class="mt-2 d-flex justify-center">
+        <div class="mr-4 mb-5 text-h5">{{ userName }}</div>
+      </div>
+      <v-row>
+        <v-col :cols="6" class="d-flex justify-end">
+          <v-select
+            v-model="selectedFlightPlan"
+            :items="flightPlans"
+            :item-title="(item) => item.label"
+            :item-value="(item) => item.value"
+            variant="solo"
+            bg-color="background"
+            return-object
+            flat
+            class="flex-grow-0"
+            density="comfortable"
+          ></v-select
+        ></v-col>
+        <v-col :cols="6" class="d-flex justify-start align-center mb-6">
+          <span class="text-subtitle-1"> Available Points: {{ points }} </span>
+        </v-col>
+      </v-row>
+    </div>
+    <div v-else>
+      <div class="mt-2 d-flex justify-center">
+        <v-select
+          v-model="selectedFlightPlan"
+          :items="flightPlans"
+          :item-title="(item) => item.label"
+          :item-value="(item) => item.value"
+          variant="solo"
+          bg-color="background"
+          return-object
+          class="flex-grow-0"
+          density="comfortable"
+          flat
+        ></v-select>
+      </div>
+      <div class="mt-2 d-flex align-center">
+        <span class="flex-grow-1 text-center text-subtitle-1">
+          Available Points: {{ points }}
+        </span>
+      </div>
+    </div>
+
     <v-container>
       <v-progress-linear
         v-model="progress"
@@ -191,6 +266,9 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
         <FlightPlanItemCard
           :key="item.id"
           :flight-plan-item="item"
+          :is-admin="props.isAdmin"
+          @incomplete="handleIncompleteButtonClick"
+          @view="handlePendingButtonClick"
         ></FlightPlanItemCard>
       </template>
       <template #filters>
@@ -204,10 +282,6 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           :items="flightPlanItemStatuses"
           label="Status"
         ></v-select>
-        <SortSelect
-          v-model="sortOptions"
-          :sort-options="sortProperties"
-        ></SortSelect>
       </template>
 
       <template #pagination>
@@ -224,4 +298,10 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       </template>
     </CardTable>
   </v-container>
+  <StudentApprovalDialog
+    @submit="fetchFlightPlanAndItems"
+  ></StudentApprovalDialog>
+  <ViewSubmissionDialog
+    @discard="fetchFlightPlanAndItems"
+  ></ViewSubmissionDialog>
 </template>
