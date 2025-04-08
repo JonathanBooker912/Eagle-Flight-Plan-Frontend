@@ -1,6 +1,5 @@
 <script setup>
 import { useRouter } from "vue-router";
-import QRCodeVue3 from "qrcode-vue3";
 
 const routes = [
   {

@@ -9,7 +9,6 @@ import CardTable from "../../components/CardTable.vue";
 import CardHeader from "../../components/CardHeader.vue";
 import DatePickerField from "../../components/DatePickerField.vue";
 import SortSelect from "../../components/SortSelect.vue";
-import QRCodeVue from "qrcode.vue";
 import { generateEventQRCodePDF } from "../../utils/pdfGenerator.js";
 import QRCodeGenerationModal from "../../components/modals/QRCodeGenerationModal.vue";
 
@@ -85,7 +84,7 @@ const getEvents = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value }
+      { ...filters.value, ...sortOptions.value },
     );
     events.value = result.data.events;
     count.value = result.data.count;
@@ -123,7 +122,7 @@ const handleSearchChange = (input) => {
 const handleChangeFilters = () => {
   if (filters.value.strengths && filters.value.strengths.length > 0) {
     filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id
+      (strength) => strength.id,
     );
   }
   getEvents();
@@ -163,7 +162,7 @@ const handleGenerateQRCode = async (expirationTimestamp) => {
   try {
     const response = await EventServices.generateCheckInToken(
       eventToShow.value.id,
-      expirationTimestamp
+      expirationTimestamp,
     );
     generatedToken.value = response.data;
   } catch (error) {
@@ -281,16 +280,16 @@ onMounted(() => {
               v-if="generatedToken?.token"
               color="primary"
               class="mt-4"
-              @click="downloadQRCode"
               :loading="generatingPDF"
+              @click="downloadQRCode"
             >
               Download QR Code PDF
             </v-btn>
             <v-btn
               v-else
               color="primary"
-              @click="showQRCodeModal = true"
               :loading="generatingToken"
+              @click="showQRCodeModal = true"
             >
               Generate Check-In Code
             </v-btn>

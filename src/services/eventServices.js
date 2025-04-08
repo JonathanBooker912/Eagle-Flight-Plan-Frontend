@@ -68,7 +68,7 @@ export default {
 
   getFulfillableFlightPlanItems(eventId, studentId) {
     return apiClient.get(
-      `/event/${eventId}/fulfillableFlightPlanItems/${studentId}`
+      `/event/${eventId}/fulfillableFlightPlanItems/${studentId}`,
     );
   },
 

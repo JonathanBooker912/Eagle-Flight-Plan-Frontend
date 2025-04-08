@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { userStore } from "../../stores/userStore";
 import { storeToRefs } from "pinia";
 import EventServices from "../../services/eventServices.js";
@@ -8,7 +8,6 @@ import EventCard from "../../components/cards/EventCard.vue";
 import FlightPlanItemCard from "../../components/cards/FlightPlanItemCard.vue";
 import studentServices from "../../services/studentServices.js";
 
-const route = useRoute();
 const router = useRouter();
 const store = userStore();
 const { user } = storeToRefs(store);
@@ -34,15 +33,14 @@ const userInitials = computed(() => {
 const getEvent = async () => {
   try {
     const response = await EventServices.getEventByToken(props.eventToken);
-
     event.value = response.data;
 
     EventServices.getFulfillableFlightPlanItems(event.value.id, 3).then(
       (response) => {
         flightPlanItem.value = response.data.fulfillableFlightPlanItems[0];
-      }
+      },
     );
-  } catch (error) {
+  } catch {
     errorMessage.value =
       "There was an issue retrieving the event data! Check-in for this event may have expired";
   }
@@ -55,10 +53,10 @@ const getStudent = async () => {
 
 const checkIn = async () => {
   try {
-    const response = await EventServices.checkInWithToken(
+    await EventServices.checkInWithToken(
       event.value.id,
       student.value.id,
-      props.eventToken
+      props.eventToken,
     );
     // Handle successful check-in
     errorMessage.value = ""; // Clear any previous error message
@@ -107,7 +105,7 @@ onMounted(() => {
           <div class="dashed-outline sub-card">
             <FlightPlanItemCard
               v-if="flightPlanItem"
-              :flightPlanItem="flightPlanItem"
+              :flight-plan-item="flightPlanItem"
             />
             <div v-else class="text-center text-h6 pa-4">
               No Associated Flight Plan Item Found

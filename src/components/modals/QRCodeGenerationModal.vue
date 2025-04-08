@@ -24,11 +24,11 @@
         <v-btn
           class="mr-4"
           color="secondary"
-          @click="closeModal"
           variant="outlined"
+          @click="closeModal"
           >Cancel</v-btn
         >
-        <v-btn color="primary" @click="generateQRCode" :loading="generating">
+        <v-btn color="primary" :loading="generating" @click="generateQRCode">
           Generate QR Code
         </v-btn>
       </v-row>
@@ -41,7 +41,10 @@ import { ref, computed } from "vue";
 
 const props = defineProps({
   show: Boolean,
-  event: Object,
+  event: {
+    type: Object,
+    required: true,
+  },
 });
 
 const emit = defineEmits(["update:show", "generate"]);
@@ -76,7 +79,7 @@ const generateQRCode = async () => {
     } else {
       const startTime = new Date(props.event.startTime);
       expirationTimestamp = new Date(
-        startTime.getTime() + durationMinutes.value * 60000
+        startTime.getTime() + durationMinutes.value * 60000,
       );
     }
 

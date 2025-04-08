@@ -21,7 +21,7 @@ const color = computed(
       Rejected: "danger",
       Pending: "warning",
       Registered: "warning",
-    })[props.flightPlanItem.status] || "primary"
+    })[props.flightPlanItem.status] || "primary",
 );
 
 const points = computed(() => {
