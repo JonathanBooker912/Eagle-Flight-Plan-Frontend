@@ -3,18 +3,22 @@ export default {
   getStudentForUserId(userId) {
     return apiClient.get(`/students/user/${userId}`);
   },
+  getStudentForFlightPlanId(flightPlanId) {
+    return apiClient.get(`/students/flightPlan/${flightPlanId}`);
+  },
+  getStudent(studentId) {
+    return apiClient.get(`/students/${studentId}`);
+  },
+  updatePoints(studentId, points) {
+    console.log("points", points);
+    return apiClient.put(`/students/${studentId}/points`, { points });
+  },
+  getPoints(studentId) {
+    return apiClient.get(`/students/${studentId}/points`);
+  },
   getAllStudents() {
     return apiClient.get("/students");
   },
-  // getAllStudentsForAdmin(page, pageSize, searchQuery) {
-  //   return apiClient.get("/student/admin", {
-  //     params: {
-  //       page: page,
-  //       pageSize: pageSize,
-  //       searchQuery: searchQuery,
-  //     },
-  //   });
-  // },
   getStudentById(id) {
     return apiClient.get(`/students/${id}`);
   },

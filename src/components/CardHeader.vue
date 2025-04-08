@@ -81,7 +81,6 @@ const handleToggleFilters = () => emit("toggle-filters");
           Filter & Sort
         </v-btn>
         <!-- Filter icon button (mobile) -->
-
         <v-btn
           v-else
           icon="mdi-filter-variant"
