@@ -47,19 +47,31 @@ onMounted(() => {
     <v-card color="backgroundDarken" class="adminItem">
       <strong style="font-size: 20px; padding-bottom: 5px">Flight Plan</strong>
     </v-card>
-    <v-card color="backgroundDarken" class="adminItem">
+    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
       <strong style="font-size: 20px; padding-bottom: 5px"
         >Notifications</strong
       >
-      <NotificationCard
-        v-for="(item, index) in notifications.splice(0, 5)"
-        :key="index"
-        :to="{ name: 'student-notifications' }"
-        :notification="item"
-        :class="{ unread: !item.read, read: item.read }"
-        style="height: 10vh; border-color: white"
-        @click="editItem(item)"
-      />
+      <div id="notifList">
+        <v-card
+          v-for="(item, index) in notifications.slice(0, 4)"
+          :key="index"
+          :to="{ name: 'student-notifications' }"
+          class="notification"
+          color="background"
+          @click="openNotification(item.id)"
+        >
+          <div style="display: flex; align-items: center">
+            <img
+              style="height: 30px; margin-right: 5px"
+              src="../../../public/Birb.png"
+            />
+            <div>
+              <strong style="font-size: 18px">{{ item.header }}</strong>
+              <p style="font-size: 14px">{{ item.description }}</p>
+            </div>
+          </div>
+        </v-card>
+      </div>
     </v-card>
     <v-card color="backgroundDarken" class="adminItem">
       <strong style="font-size: 20px; padding-bottom: 5px">Calendar</strong>

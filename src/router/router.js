@@ -25,7 +25,7 @@ import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
 
-import StudentLanding from "../views/student/StudentLanding.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 
@@ -305,7 +305,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      component: StudentLanding,
+      component: StudentDashboard,
       children: [...studentRoutes],
     },
 
