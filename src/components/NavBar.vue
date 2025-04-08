@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
+import apiClient from "../services/services";
 
 const admin = [
   { "route-name": "adminProfile", "link-text": "Profile" },
@@ -34,6 +35,7 @@ const student = [
 const role = ref("");
 const route = useRoute();
 const userId = ref(null);
+const router = useRouter();
 
 onMounted(async () => {
   const store = userStore();
@@ -71,6 +73,35 @@ const getIcon = (linkText) => {
 
   return icons[linkText] || "mdi-circle"; // Default if not found
 };
+
+const handleLogout = async () => {
+  try {
+    // Clear user data from store
+    const store = userStore();
+    store.$reset();
+
+    // Clear localStorage first
+    localStorage.clear();
+
+    try {
+      // Try to notify backend of logout, but don't wait for response
+      await apiClient.post("/auth/logout", { userId: userId.value });
+    } catch (error) {
+      // Ignore any errors from the logout API call
+      console.log(
+        "Logout API call failed, continuing with client-side logout",
+        error,
+      );
+    }
+
+    // Redirect to login page
+    router.push({ name: "login" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    // Even if there's an error, try to redirect to login
+    router.push({ name: "login" });
+  }
+};
 </script>
 
 <template>
@@ -105,6 +136,20 @@ const getIcon = (linkText) => {
           </div>
         </v-list-item>
       </div>
+      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+        <div>
+          <v-list-item-title
+            class="text-body-1 font-weight-bold text-backgroundDarken"
+          >
+            <div class="nav-item-content">
+              <v-icon :size="32" color="backgroundDarken" class="mr-2"
+                >mdi-logout</v-icon
+              >
+              <span class="nav-text text-backgroundDarken">Logout</span>
+            </div>
+          </v-list-item-title>
+        </div>
+      </v-list-item>
     </v-list>
 
     <v-list v-if="role === 'faculty'" class="pa-0">
@@ -137,6 +182,20 @@ const getIcon = (linkText) => {
           </div>
         </v-list-item>
       </div>
+      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+        <div>
+          <v-list-item-title
+            class="text-body-1 font-weight-bold text-backgroundDarken"
+          >
+            <div class="nav-item-content">
+              <v-icon :size="32" color="backgroundDarken" class="mr-2"
+                >mdi-logout</v-icon
+              >
+              <span class="nav-text text-backgroundDarken">Logout</span>
+            </div>
+          </v-list-item-title>
+        </div>
+      </v-list-item>
     </v-list>
 
     <v-list v-if="role === 'student'" class="pa-0">
@@ -169,6 +228,20 @@ const getIcon = (linkText) => {
           </div>
         </v-list-item>
       </div>
+      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+        <div>
+          <v-list-item-title
+            class="text-body-1 font-weight-bold text-backgroundDarken"
+          >
+            <div class="nav-item-content">
+              <v-icon :size="32" color="backgroundDarken" class="mr-2"
+                >mdi-logout</v-icon
+              >
+              <span class="nav-text text-backgroundDarken">Logout</span>
+            </div>
+          </v-list-item-title>
+        </div>
+      </v-list-item>
     </v-list>
   </v-container>
 </template>
@@ -233,5 +306,9 @@ const getIcon = (linkText) => {
     height: 60px;
     flex-direction: row;
   }
+}
+
+.userNav .mt-auto {
+  margin-top: auto;
 }
 </style>
