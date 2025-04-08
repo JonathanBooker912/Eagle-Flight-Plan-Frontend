@@ -16,6 +16,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  viewOnly: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const eventDate = computed(() => {
@@ -45,7 +49,11 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <v-card v-if="isAdmin" color="backgroundDarken" class="cardContainer">
+  <v-card
+    v-if="isAdmin && !props.viewOnly"
+    color="backgroundDarken"
+    class="cardContainer"
+  >
     <v-row no-gutters>
       <v-col>
         <v-card-text>

@@ -28,6 +28,7 @@ import Approvals from "../views/admin/Approvals.vue";
 import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
+import StudentEventCheckIn from "../views/student/StudentEventCheckIn.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
@@ -269,6 +270,12 @@ const studentRoutes = [
     path: "search",
     name: "student-search",
     component: StudentSearch,
+  },
+  {
+    path: "event/checkIn/:eventToken",
+    name: "studentEventCheckin",
+    component: StudentEventCheckIn,
+    props: true,
   },
 ];
 
