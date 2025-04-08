@@ -2,6 +2,7 @@
 import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
+import dayjs from "dayjs";
 import EventServices from "../../services/eventServices.js";
 import StrengthServices from "../../services/strengthServices.js";
 import EventCard from "../../components/cards/EventCard.vue";
@@ -9,6 +10,8 @@ import CardTable from "../../components/CardTable.vue";
 import CardHeader from "../../components/CardHeader.vue";
 import DatePickerField from "../../components/DatePickerField.vue";
 import SortSelect from "../../components/SortSelect.vue";
+import { generateEventQRCodePDF } from "../../utils/pdfGenerator.js";
+import QRCodeGenerationModal from "../../components/modals/QRCodeGenerationModal.vue";
 
 // Constants
 const label = "Events";
@@ -48,6 +51,13 @@ const filters = ref({
 const showInfo = ref(false);
 const eventToShow = ref({});
 
+// Token generation states
+const generatingToken = ref(false);
+const generatingPDF = ref(false);
+const generatedToken = ref(null);
+const showQRCodeModal = ref(false);
+const checkingToken = ref(false);
+
 const sortOptions = ref({
   sortAttribute: sortProperties[0].value,
   sortDirection: "asc",
@@ -67,6 +77,12 @@ const pageSize = computed(() => numCardColumns.value * 2);
 
 watch(showFilters, () => getEvents());
 watch(showInfo, () => getEvents());
+
+// Add this computed property after the other computed properties
+const isEventInFuture = computed(() => {
+  if (!eventToShow.value?.date) return false;
+  return dayjs(eventToShow.value.date).isAfter(dayjs());
+});
 
 // Fetch events
 const getEvents = async (pageNumber = page.value) => {
@@ -127,9 +143,53 @@ const handleClearFilters = () => {
   getEvents();
 };
 
-const handleShowInfo = (eventId) => {
+const getCurrentToken = async () => {
+  if (!eventToShow.value?.id) return;
+
+  checkingToken.value = true;
+  try {
+    const response = await EventServices.getCheckInToken(eventToShow.value.id);
+    generatedToken.value = response.data;
+  } catch (error) {
+    console.error("Error getting check-in token:", error);
+    generatedToken.value = null;
+  } finally {
+    checkingToken.value = false;
+  }
+};
+
+const handleShowInfo = async (eventId) => {
   eventToShow.value = events.value.find((event) => event.id == eventId);
   showInfo.value = true;
+  await getCurrentToken();
+};
+
+const handleGenerateQRCode = async (expirationTimestamp) => {
+  generatingToken.value = true;
+  try {
+    const response = await EventServices.generateCheckInToken(
+      eventToShow.value.id,
+      expirationTimestamp,
+    );
+    generatedToken.value = response.data;
+  } catch (error) {
+    console.error("Error generating check-in token:", error);
+  } finally {
+    generatingToken.value = false;
+  }
+};
+
+const downloadQRCode = async () => {
+  if (!generatedToken.value) return;
+
+  generatingPDF.value = true;
+  try {
+    await generateEventQRCodePDF(eventToShow.value, generatedToken.value);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  } finally {
+    generatingPDF.value = false;
+  }
 };
 
 const handleAttendance = (eventId, eventName) => {
@@ -212,6 +272,37 @@ onMounted(() => {
         >
           Record Attendance
         </v-btn>
+        <br />
+
+        <v-btn
+          v-if="generatedToken?.token"
+          color="primary"
+          class="full-width"
+          rounded="xl"
+          block
+          :loading="generatingPDF"
+          @click="downloadQRCode"
+        >
+          Download QR Code PDF
+        </v-btn>
+        <v-btn
+          v-else-if="isEventInFuture"
+          color="primary"
+          rounded="xl"
+          class="full-width"
+          :loading="generatingToken"
+          :disabled="checkingToken"
+          block
+          @click="showQRCodeModal = true"
+        >
+          Generate Check-In Code
+        </v-btn>
+
+        <QRCodeGenerationModal
+          v-model:show="showQRCodeModal"
+          :event="eventToShow"
+          @generate="handleGenerateQRCode"
+        />
       </template>
       <template #pagination>
         <v-pagination
