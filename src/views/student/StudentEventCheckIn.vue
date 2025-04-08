@@ -6,14 +6,18 @@ import { storeToRefs } from "pinia";
 import EventServices from "../../services/eventServices.js";
 import EventCard from "../../components/cards/EventCard.vue";
 import FlightPlanItemCard from "../../components/cards/FlightPlanItemCard.vue";
-import flightPlanItemServices from "../../services/flightPlanItemServices";
+import studentServices from "../../services/studentServices.js";
 
 const route = useRoute();
 const router = useRouter();
 const store = userStore();
 const { user } = storeToRefs(store);
+const student = ref(null);
 const event = ref(null);
 const flightPlanItem = ref(null);
+const errorMessage = ref("");
+const showDialog = ref(false);
+const isSuccess = ref(false);
 
 const props = defineProps({
   eventToken: {
@@ -28,18 +32,59 @@ const userInitials = computed(() => {
 });
 
 const getEvent = async () => {
-  const response = await EventServices.getEventByToken(props.eventToken);
-  event.value = response.data;
+  try {
+    const response = await EventServices.getEventByToken(props.eventToken);
 
-  EventServices.getFulfillableFlightPlanItems(event.value.id, 3).then(
-    (response) => {
-      flightPlanItem.value = response.data.fulfillableFlightPlanItems[0];
+    event.value = response.data;
+
+    EventServices.getFulfillableFlightPlanItems(event.value.id, 3).then(
+      (response) => {
+        flightPlanItem.value = response.data.fulfillableFlightPlanItems[0];
+      }
+    );
+  } catch (error) {
+    errorMessage.value =
+      "There was an issue retrieving the event data! Check-in for this event may have expired";
+  }
+};
+
+const getStudent = async () => {
+  const response = await studentServices.getStudentForUserId(user.value.userId);
+  student.value = response.data;
+};
+
+const checkIn = async () => {
+  try {
+    const response = await EventServices.checkInWithToken(
+      event.value.id,
+      student.value.id,
+      props.eventToken
+    );
+    // Handle successful check-in
+    errorMessage.value = ""; // Clear any previous error message
+    isSuccess.value = true;
+    showDialog.value = true;
+  } catch (error) {
+    if (error.response && error.response.status === 500) {
+      // Handle case where student is already checked in
+      errorMessage.value = "You have already checked in for this event.";
+    } else {
+      // Handle other errors
+      errorMessage.value =
+        "An error occurred while checking in. Please try again.";
     }
-  );
+    isSuccess.value = false;
+    showDialog.value = true;
+  }
+};
+
+const goToFlightPlan = () => {
+  router.push({ name: "student-flightPlan" });
 };
 
 onMounted(() => {
   getEvent();
+  getStudent();
 });
 </script>
 <template>
@@ -89,10 +134,54 @@ onMounted(() => {
       </v-row>
       <v-row class="mt-10" justify="center" align="center" no-gutters>
         <v-btn class="rounded-lg mr-6" variant="outlined">Cancel</v-btn>
-        <v-btn class="rounded-lg" color="primary">Check-In</v-btn>
+        <v-btn class="rounded-lg" color="primary" @click="checkIn"
+          >Check-In</v-btn
+        >
       </v-row>
     </v-card-text>
   </v-card>
+
+  <v-card v-else class="w-50 mx-auto mt-8" color="backgroundDarken">
+    <v-col class="d-flex flex-column justify-center">
+      <v-card-text class="text-center text-h5">
+        {{ errorMessage }}
+      </v-card-text>
+      <v-btn
+        color="danger"
+        class="rounded-lg w-25 mx-auto"
+        @click="goToFlightPlan"
+      >
+        Back to Flight Plan
+      </v-btn>
+    </v-col>
+  </v-card>
+
+  <v-dialog v-model="showDialog" max-width="500">
+    <v-card class="rounded-lg" color="backgroundDarken">
+      <v-card-title
+        class="text-center text-h4"
+        :class="{ 'text-danger': !isSuccess }"
+      >
+        {{ isSuccess ? "Success!" : "Oops!" }}
+      </v-card-title>
+      <v-card-text class="text-center text-h6">
+        {{
+          isSuccess
+            ? "You have been successfully checked in for this event."
+            : errorMessage
+        }}
+      </v-card-text>
+      <v-card-actions class="justify-center pb-6">
+        <v-btn
+          :color="isSuccess ? 'primary' : 'danger'"
+          class="rounded-lg"
+          @click="goToFlightPlan"
+        >
+          Back to Flight Plan
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped>

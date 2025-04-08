@@ -81,4 +81,8 @@ export default {
   getCheckInToken(eventId) {
     return apiClient.get(`/event/${eventId}/check-in-token`);
   },
+
+  checkInWithToken(eventId, studentId, token) {
+    return apiClient.post(`/event/${eventId}/check-in/${studentId}`, { token });
+  },
 };
