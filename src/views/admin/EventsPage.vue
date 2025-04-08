@@ -2,6 +2,7 @@
 import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
+import dayjs from "dayjs";
 import EventServices from "../../services/eventServices.js";
 import StrengthServices from "../../services/strengthServices.js";
 import EventCard from "../../components/cards/EventCard.vue";
@@ -76,6 +77,12 @@ const pageSize = computed(() => numCardColumns.value * 2);
 
 watch(showFilters, () => getEvents());
 watch(showInfo, () => getEvents());
+
+// Add this computed property after the other computed properties
+const isEventInFuture = computed(() => {
+  if (!eventToShow.value?.date) return false;
+  return dayjs(eventToShow.value.date).isAfter(dayjs());
+});
 
 // Fetch events
 const getEvents = async (pageNumber = page.value) => {
@@ -267,34 +274,29 @@ onMounted(() => {
         </v-btn>
         <br />
 
-        <div class="d-flex justify-center">
-          <v-progress-circular
-            v-if="checkingToken"
-            indeterminate
-            color="primary"
-            size="32"
-            width="3"
-          ></v-progress-circular>
-          <template v-else>
-            <v-btn
-              v-if="generatedToken?.token"
-              color="primary"
-              class="mt-4"
-              :loading="generatingPDF"
-              @click="downloadQRCode"
-            >
-              Download QR Code PDF
-            </v-btn>
-            <v-btn
-              v-else
-              color="primary"
-              :loading="generatingToken"
-              @click="showQRCodeModal = true"
-            >
-              Generate Check-In Code
-            </v-btn>
-          </template>
-        </div>
+        <v-btn
+          v-if="generatedToken?.token"
+          color="primary"
+          class="full-width"
+          rounded="xl"
+          block
+          :loading="generatingPDF"
+          @click="downloadQRCode"
+        >
+          Download QR Code PDF
+        </v-btn>
+        <v-btn
+          v-else-if="isEventInFuture"
+          color="primary"
+          rounded="xl"
+          class="full-width"
+          :loading="generatingToken"
+          :disabled="checkingToken"
+          block
+          @click="showQRCodeModal = true"
+        >
+          Generate Check-In Code
+        </v-btn>
 
         <QRCodeGenerationModal
           v-model:show="showQRCodeModal"
