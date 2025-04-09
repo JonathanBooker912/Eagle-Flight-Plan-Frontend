@@ -62,6 +62,6 @@ export const generateEventQRCodePDF = async (event, token) => {
   const imgData = canvas.toDataURL("image/png");
   pdf.addImage(imgData, "PNG", 0, 0, 800, 1000);
   pdf.save(
-    `${event.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_qr_code.pdf`,
+    `${event.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_qr_code.pdf`
   );
 };
