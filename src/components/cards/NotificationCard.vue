@@ -40,7 +40,6 @@ const isAdmin = ref(false);
 
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
-  console.log(props.notification);
 });
 
 const props = defineProps({
