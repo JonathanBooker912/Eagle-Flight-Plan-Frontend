@@ -68,12 +68,12 @@ const fetchStudent = async () => {
   if (props.isAdmin) {
     studentResponse = await studentServices.getStudent(route.params.id);
     const userResponse = await userServices.getOneUser(
-      studentResponse.data.userId
+      studentResponse.data.userId,
     );
     userName.value = userResponse.data.fullName;
   } else {
     studentResponse = await studentServices.getStudentForUserId(
-      user.value.userId
+      user.value.userId,
     );
   }
 
@@ -112,7 +112,7 @@ const fetchFlightPlanAndItems = async () => {
   const response =
     await flightPlanItemServices.getAllFlightPlanItemsForFlightPlan(
       selectedFlightPlan.value.value,
-      params
+      params,
     );
 
   flightPlanItems.value = response.data.flightPlanItems;
@@ -121,7 +121,7 @@ const fetchFlightPlanAndItems = async () => {
 
 const fetchFlightPlanProgress = async () => {
   const response = await flightPlanServices.getFlightPlanProgressForFlightPlan(
-    selectedFlightPlan.value.value
+    selectedFlightPlan.value.value,
   );
   progress.value = response.data.progress;
 };
