@@ -19,6 +19,7 @@ const getNotifications = async (page = 1) => {
     );
 
     notifications.value = res.data.notifications;
+    console.log(notifications.value);
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page;
   } catch (err) {

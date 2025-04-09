@@ -1,3 +1,23 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { userStore } from "../../stores/userStore";
+
+const store = userStore();
+const isAdmin = ref(false);
+
+onMounted(async () => {
+  isAdmin.value = await store.isAdmin();
+  console.log(props.notification);
+});
+
+const props = defineProps({
+  notification: {
+    type: Object,
+    required: true,
+  },
+});
+</script>
+
 <template>
   <v-card
     color="backgroundDarken"
@@ -31,21 +51,3 @@
   </v-card>
 </template>
 
-<script setup>
-import { ref, onMounted } from "vue";
-import { userStore } from "../../stores/userStore";
-
-const store = userStore();
-const isAdmin = ref(false);
-
-onMounted(async () => {
-  isAdmin.value = await store.isAdmin();
-});
-
-const props = defineProps({
-  notification: {
-    type: Object,
-    required: true,
-  },
-});
-</script>
