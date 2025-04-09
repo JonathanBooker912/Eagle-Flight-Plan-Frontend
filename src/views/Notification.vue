@@ -16,7 +16,6 @@ const totalPages = ref(1);
 const store = userStore();
 
 const getNotifications = async (page = 1) => {
-
   try {
     const res = await notificationServices.getAllNotificationsForUser(
       store.user.userId,
