@@ -25,6 +25,7 @@ const color = computed(
 );
 
 const points = computed(() => {
+  console.log(props.flightPlanItem);
   return {
     Task: props.flightPlanItem.task?.points,
     Experience: props.flightPlanItem.experience?.points,

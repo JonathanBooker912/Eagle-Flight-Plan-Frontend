@@ -19,6 +19,9 @@ export default {
   getEvent(eventId) {
     return apiClient.get(`/event/${eventId}`);
   },
+  getEventByToken(eventToken) {
+    return apiClient.get(`/event/token/${eventToken}`);
+  },
   deleteEvent(eventId) {
     return apiClient.delete(`/event/${eventId}`);
   },
@@ -61,5 +64,25 @@ export default {
 
   getAttendingStudents(eventId) {
     return apiClient.get(`/event/${eventId}/attending-students`);
+  },
+
+  getFulfillableFlightPlanItems(eventId, studentId) {
+    return apiClient.get(
+      `/event/${eventId}/fulfillableFlightPlanItems/${studentId}`,
+    );
+  },
+
+  generateCheckInToken(eventId, expirationTimestamp) {
+    return apiClient.post(`/event/${eventId}/check-in-token`, {
+      expirationTimestamp,
+    });
+  },
+
+  getCheckInToken(eventId) {
+    return apiClient.get(`/event/${eventId}/check-in-token`);
+  },
+
+  checkInWithToken(eventId, studentId, token) {
+    return apiClient.post(`/event/${eventId}/check-in/${studentId}`, { token });
   },
 };
