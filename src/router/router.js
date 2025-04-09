@@ -50,6 +50,11 @@ const adminRoutes = [
     component: Notifications,
   },
   {
+    path: "dashboard",
+    name: "admin-dashboard",
+    component: AdminDashboard,
+  },
+  {
     path: "profile",
     name: "admin-profile",
     component: Profile,
