@@ -162,7 +162,9 @@ onMounted(async () => {
               <strong>{{ progress }}%</strong>
             </v-progress-linear>
             <div class="text-center mt-2">
-              <span class="text-subtitle-1">Available Points: {{ points }}</span>
+              <span class="text-subtitle-1"
+                >Available Points: {{ points }}</span
+              >
             </div>
           </v-card-text>
         </v-card>
@@ -171,7 +173,9 @@ onMounted(async () => {
 
     <div class="dashboard-grid">
       <v-card color="backgroundDarken" class="dashboard-cell">
-        <strong style="font-size: 24px; text-align:center; margin-left: 10px">Flight Plan</strong>
+        <strong style="font-size: 24px; text-align: center; margin-left: 10px"
+          >Flight Plan</strong
+        >
         <div id="flightPlanList">
           <FlightPlanItemCard
             v-for="(item, index) in flightPlanItems"
@@ -193,7 +197,7 @@ onMounted(async () => {
         </v-btn>
       </v-card>
       <v-card color="backgroundDarken" class="dashboard-cell">
-        <strong style="font-size: 24px; text-align:center; margin-left: 10px">
+        <strong style="font-size: 24px; text-align: center; margin-left: 10px">
           Notifications
         </strong>
         <div id="notifList">
@@ -215,7 +219,9 @@ onMounted(async () => {
         </v-btn>
       </v-card>
       <v-card color="backgroundDarken" class="dashboard-cell">
-        <strong style="font-size: 24px; text-align:center; margin-left: 10px">Calendar</strong>
+        <strong style="font-size: 24px; text-align: center; margin-left: 10px"
+          >Calendar</strong
+        >
         <div id="eventList">
           <EventCard
             v-for="(event, index) in events"

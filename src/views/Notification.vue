@@ -46,9 +46,8 @@ watch(currentPage, (newPage) => {
 });
 
 onMounted(async () => {
-
   await getNotifications();
-  
+
   if (notifStore.activeNotification) {
     var chosenNotif = null;
     for (const notif of notifications.value) {
@@ -157,7 +156,6 @@ const editItem = async (item) => {
   overflow-y: auto;
   overflow-x: auto;
 }
-
 
 .no-notifications {
   text-align: center;

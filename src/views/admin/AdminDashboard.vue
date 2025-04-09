@@ -55,7 +55,9 @@ onMounted(() => {
     <div class="dashboard-container">
       <div class="dashboard-row">
         <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-          <strong style="font-size: 20px; padding-bottom: 5px">Upcoming Events</strong>
+          <strong style="font-size: 20px; padding-bottom: 5px"
+            >Upcoming Events</strong
+          >
           <div class="scrollable-content">
             <EventCard
               v-for="(item, index) in events.splice(0, 2)"
@@ -79,7 +81,9 @@ onMounted(() => {
       </div>
       <div class="dashboard-row">
         <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-          <strong style="font-size: 20px; padding-bottom: 5px">Notifications</strong>
+          <strong style="font-size: 20px; padding-bottom: 5px"
+            >Notifications</strong
+          >
           <div class="scrollable-content" id="notifList">
             <v-card
               v-for="(item, index) in notifications.slice(0, 3)"
