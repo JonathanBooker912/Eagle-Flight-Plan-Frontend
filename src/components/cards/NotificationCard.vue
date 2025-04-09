@@ -50,4 +50,3 @@ const props = defineProps({
     </v-row>
   </v-card>
 </template>
-

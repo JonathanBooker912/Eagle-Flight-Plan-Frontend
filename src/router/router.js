@@ -262,6 +262,11 @@ const studentRoutes = [
     props: { isAdmin: false },
   },
   {
+    path: "dashboard",
+    name: "student-dashboard",
+    component: StudentDashboard,
+  },
+  {
     path: "notifications",
     name: "student-notifications",
     component: Notifications,
@@ -316,7 +321,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      component: StudentDashboard,
+      redirect: { name: "student-dashboard" },
       children: [...studentRoutes],
     },
 
