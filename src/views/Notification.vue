@@ -9,6 +9,7 @@ import { userStore } from "../stores/userStore";
 const notifications = ref([]);
 const selectedNotif = ref({});
 const showsidebar = ref(false);
+const noNotifications = ref(false);
 
 const currentPage = ref(1);
 const pageSize = ref(14);
@@ -23,7 +24,15 @@ const getNotifications = async (page = 1) => {
       pageSize.value,
     );
 
-    notifications.value = res.data.notifications; // Update the notifications array
+    console.log(res);
+
+    if (!res.data.notifications || res.data.notifications.length === 0) {
+      console.log("No notifications");
+      noNotifications.value = true;
+      return;
+    }
+    notifications.value = res.data.notifications;
+    // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
   } catch (err) {
@@ -69,7 +78,12 @@ const editItem = async (item) => {
   <div class="container">
     <div class="notifContainer">
       <h1>Notifications</h1>
-      <div id="notifList">
+      <v-card
+        class="adminItem"
+        color="background"
+        v-if="!noNotifications"
+        id="notifList"
+      >
         <NotificationCard
           v-for="(item, index) in notifications"
           :key="index"
@@ -78,6 +92,10 @@ const editItem = async (item) => {
           :class="{ unread: !item.read, read: item.read }"
           @click="editItem(item)"
         />
+      </v-card>
+      <div v-else class="adminItem" color="background">
+        <h3>No Notifications!</h3>
+        <p>Complete some flight plan items to be notified!</p>
       </div>
     </div>
 
