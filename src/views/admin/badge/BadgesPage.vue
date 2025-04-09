@@ -20,10 +20,10 @@ const count = ref(0);
 
 // Handlers
 const handleAdd = () => {
-  router.push({ name: "add" });
+  router.push({ name: "addBadge" });
 };
 const handleEdit = (badgeId) =>
-  router.push({ name: "edit", params: { id: badgeId } });
+  router.push({ name: "editBadge", params: { id: badgeId } });
 
 const handleDelete = async (badgeId, badgeFileName) => {
   try {
