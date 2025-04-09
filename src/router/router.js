@@ -338,13 +338,24 @@ router.beforeEach(async (to, from, next) => {
   const isAuthenticated = await store.isAuthenticated();
   if (!isAuthenticated) {
     if (to.path !== "/login" && to.path !== "/") {
+      // Store the intended destination in localStorage
+      localStorage.setItem("redirectAfterLogin", to.fullPath);
       next({ name: "login" });
     } else {
       next();
     }
   } else {
-    if (to.path == "/login" || to.path == "/") {
-      next(await loginRedirect());
+    const redirectPath = localStorage.getItem("redirectAfterLogin");
+    if (from.path === "/" && redirectPath) {
+      // Check if there's a stored redirect path
+      if (redirectPath) {
+        localStorage.removeItem("redirectAfterLogin");
+        next(redirectPath);
+      } else {
+        next(await loginRedirect());
+      }
+    } else if (!redirectPath) {
+      next();
     } else {
       next();
     }
