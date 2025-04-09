@@ -24,7 +24,6 @@ const getNotifications = async (page = 1) => {
       pageSize.value,
     );
 
-
     if (!res.data.notifications || res.data.notifications.length === 0) {
       noNotifications.value = true;
       return;
