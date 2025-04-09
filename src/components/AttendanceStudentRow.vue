@@ -23,7 +23,6 @@ const props = defineProps({
 
 const emit = defineEmits(["update-student"]);
 
-// eslint-disable-next-line
 const toggleSelected = () => {
   selectedStudentsStore.toggleStudent(props.student.studentId);
 };
