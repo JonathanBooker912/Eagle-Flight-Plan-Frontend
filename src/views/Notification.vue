@@ -55,9 +55,7 @@ onMounted(async () => {
       chosenNotif.read = true;
       selectedNotif.value = chosenNotif;
       showsidebar.value = true;
-    } else {
     }
-  } else {
   }
 });
 
