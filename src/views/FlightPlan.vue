@@ -170,7 +170,7 @@ const handlePendingButtonClick = (flightPlanItem) => {
 onMounted(async () => {
   await fetchStudent();
   await fetchFlightPlan();
-  if (flightPlan.value) {
+  if (selectedFlightPlan.value) {
     await Promise.all([
       fetchFlightPlanAndItems(),
       fetchFlightPlanProgress(),
@@ -181,8 +181,10 @@ onMounted(async () => {
 });
 
 watch(selectedFlightPlan, () => {
-  fetchFlightPlanAndItems();
-  fetchFlightPlanProgress();
+  if (selectedFlightPlan.value) {
+    fetchFlightPlanAndItems();
+    fetchFlightPlanProgress();
+  }
 });
 
 watch([page, searchQuery], fetchFlightPlanAndItems);
@@ -193,7 +195,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       <div class="mt-2 d-flex justify-center">
         <div class="mr-4 mb-5 text-h5">{{ userName }}</div>
       </div>
-      <v-row>
+      <v-row v-if="flightPlans.length > 0">
         <v-col :cols="6" class="d-flex justify-end">
           <v-select
             v-model="selectedFlightPlan"
@@ -212,6 +214,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           <span class="text-subtitle-1"> Available Points: {{ points }} </span>
         </v-col>
       </v-row>
+      <p v-else class="text-h6 text-center">No flight plans found</p>
     </div>
     <div v-else>
       <div class="mt-2 d-flex justify-center">
