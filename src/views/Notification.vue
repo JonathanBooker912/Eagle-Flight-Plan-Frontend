@@ -5,15 +5,18 @@ import notificationServices from "../services/notificationServices";
 import apiClient from "../services/services";
 import moment from "moment";
 import { userStore } from "../stores/userStore";
+import { useNotificationStore } from "../stores/notificationStore";
 
 const notifications = ref([]);
 const selectedNotif = ref({});
 const showsidebar = ref(false);
+const noNotifications = ref(false);
 
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
+const notifStore = useNotificationStore();
 
 const getNotifications = async (page = 1) => {
   try {
@@ -23,7 +26,12 @@ const getNotifications = async (page = 1) => {
       pageSize.value,
     );
 
-    notifications.value = res.data.notifications; // Update the notifications array
+    if (!res.data.notifications || res.data.notifications.length === 0) {
+      noNotifications.value = true;
+      return;
+    }
+    notifications.value = res.data.notifications;
+    // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
   } catch (err) {
@@ -36,8 +44,25 @@ watch(currentPage, (newPage) => {
   getNotifications(newPage);
 });
 
-onMounted(() => {
-  getNotifications();
+onMounted(async () => {
+  await getNotifications();
+
+  // Check if a notification was set in the store
+  if (notifStore.activeNotification) {
+    var chosenNotif = null;
+    for (const notif of notifications.value) {
+      if (notif.id === notifStore.activeNotification) {
+        chosenNotif = notif;
+        break;
+      }
+    }
+
+    if (chosenNotif) {
+      chosenNotif.read = true;
+      selectedNotif.value = chosenNotif;
+      showsidebar.value = true;
+    }
+  }
 });
 
 const formattedDateTime = (item) => {
@@ -69,7 +94,12 @@ const editItem = async (item) => {
   <div class="container">
     <div class="notifContainer">
       <h1>Notifications</h1>
-      <div id="notifList">
+      <v-card
+        class="adminItem"
+        color="background"
+        v-if="!noNotifications"
+        id="notifList"
+      >
         <NotificationCard
           v-for="(item, index) in notifications"
           :key="index"
@@ -78,6 +108,10 @@ const editItem = async (item) => {
           :class="{ unread: !item.read, read: item.read }"
           @click="editItem(item)"
         />
+      </v-card>
+      <div v-else class="adminItem" color="background">
+        <h3>No Notifications!</h3>
+        <p>Complete some flight plan items to be notified!</p>
       </div>
     </div>
 

@@ -16,18 +16,17 @@
         class="mr-3 flex-shrink-0"
       />
 
-      <v-typography class="font-weight-bold mr-3">
-        {{ props.notification.user.fName }}
-        {{ props.notification.user.lName }}
-      </v-typography>
+      <div class="font-weight-bold mr-3">
+        {{ props.notification.user.fullName }}
+      </div>
 
-      <v-typography class="mr-3">
+      <div class="mr-3">
         {{ props.notification.header }}
-      </v-typography>
+      </div>
 
-      <v-typography class="text-body-2">
+      <div class="text-body-2">
         {{ props.notification.description }}
-      </v-typography>
+      </div>
     </v-row>
   </v-card>
 </template>

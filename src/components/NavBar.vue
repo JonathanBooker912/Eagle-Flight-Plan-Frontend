@@ -15,7 +15,7 @@ const admin = [
 ];
 
 const faculty = [
-  { "route-name": "adminProfile", "link-text": "Profile" },
+  { "route-name": "faculty-profile", "link-text": "Profile" },
   { "route-name": "faculty", "link-text": "Dashboard" },
   { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "faculty-calendar", "link-text": "Calendar" },
@@ -24,7 +24,7 @@ const faculty = [
 ];
 
 const student = [
-  { "route-name": "adminProfile", "link-text": "Profile" },
+  { "route-name": "student-profile", "link-text": "Profile" },
   { "route-name": "student", "link-text": "Dashboard" },
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
