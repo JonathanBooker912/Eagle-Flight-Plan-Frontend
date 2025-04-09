@@ -119,7 +119,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   text-align: left;
-  margin: 1%;
+  margin: 2% 1% 2% 1%;
   height: 45vh;
   padding: 2vh 2vw;
 
