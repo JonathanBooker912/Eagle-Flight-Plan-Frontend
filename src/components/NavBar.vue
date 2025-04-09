@@ -6,13 +6,28 @@ import apiClient from "../services/services";
 import { useTheme } from "vuetify";
 
 const theme = useTheme();
-const isDark = ref(theme.global.current.value.dark);
+const isDark = ref(false);
+
+// Initialize theme from localStorage or system preference
+onMounted(() => {
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    theme.global.name.value = savedTheme;
+    isDark.value = savedTheme === "darkTheme";
+  } else {
+    // If no saved theme, use system preference
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    theme.global.name.value = prefersDark ? "darkTheme" : "lightTheme";
+    isDark.value = prefersDark;
+    localStorage.setItem("theme", theme.global.name.value);
+  }
+});
 
 const toggleTheme = () => {
-  theme.global.name.value = theme.global.current.value.dark
-    ? "lightTheme"
-    : "darkTheme";
+  const newTheme = theme.global.current.value.dark ? "lightTheme" : "darkTheme";
+  theme.global.name.value = newTheme;
   isDark.value = theme.global.current.value.dark;
+  localStorage.setItem("theme", newTheme);
 };
 
 const admin = [
