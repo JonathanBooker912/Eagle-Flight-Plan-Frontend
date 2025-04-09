@@ -17,8 +17,7 @@
       />
 
       <div class="font-weight-bold mr-3">
-        {{ props.notification.user.fName }}
-        {{ props.notification.user.lName }}
+        {{ props.notification.user.fullName }}
       </div>
 
       <div class="mr-3">
@@ -40,7 +39,6 @@ const store = userStore();
 const isAdmin = ref(false);
 
 onMounted(async () => {
-  console.log("Notification:", props.notification);
   isAdmin.value = await store.isAdmin();
 });
 
