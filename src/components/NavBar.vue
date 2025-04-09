@@ -16,7 +16,9 @@ onMounted(() => {
     isDark.value = savedTheme === "darkTheme";
   } else {
     // If no saved theme, use system preference
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
     theme.global.name.value = prefersDark ? "darkTheme" : "lightTheme";
     isDark.value = prefersDark;
     localStorage.setItem("theme", theme.global.name.value);
