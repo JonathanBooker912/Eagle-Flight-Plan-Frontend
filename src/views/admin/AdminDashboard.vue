@@ -5,15 +5,10 @@ import EventCard from "../../components/cards/EventCard.vue";
 import { userStore } from "../../stores/userStore";
 import { onMounted, ref } from "vue";
 import { useNotificationStore } from "../../stores/notificationStore";
-//import { useRoute } from "vue-router";
-// import { useModalStore } from "../../store/modal.store";
-// import { storeToRefs } from "pinia";
-//const modalStore = useModalStore();
-//const items = ref([]);
+
 const events = ref([]);
 const notifications = ref([]);
 const isLoaded = ref(false);
-//const route = useRoute();
 const store = userStore();
 const notifStore = useNotificationStore();
 const currentPage = ref(1);
@@ -49,7 +44,6 @@ onMounted(() => {
   getEvents();
   getNotifications();
 });
-//ok so now that we have the services, get the data.
 </script>
 
 <template>
