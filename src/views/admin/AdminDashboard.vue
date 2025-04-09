@@ -31,7 +31,6 @@ const getEvents = async () => {
     .then((res) => {
       events.value = res.data.events;
       isLoaded.value = true;
-      console.log("Events data:", events.value);
     })
     .catch((err) => console.error(err));
 };
@@ -47,8 +46,6 @@ const getNotifications = async (page = 1) => {
     notifications.value = res.data.notifications; // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
-
-    console.log("Updated Notifications:", notifications.value); // Debugging: Check if notifications update
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
