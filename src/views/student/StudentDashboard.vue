@@ -1,16 +1,10 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
 import notificationServices from "../../services/notificationServices";
 import NotificationCard from "../../components/cards/NotificationCard.vue";
-
 import { userStore } from "../../stores/userStore";
-const route = useRoute();
 
 const notifications = ref([]);
-const selectedNotif = ref({});
-const showsidebar = ref(false);
-
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
@@ -24,11 +18,9 @@ const getNotifications = async (page = 1) => {
       pageSize.value,
     );
 
-    notifications.value = res.data.notifications; // Update the notifications array
+    notifications.value = res.data.notifications;
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
-    currentPage.value = page; // Ensure currentPage updates correctly
-
-    console.log("Updated Notifications:", notifications.value); // Debugging: Check if notifications update
+    currentPage.value = page;
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
@@ -48,29 +40,18 @@ onMounted(() => {
       <strong style="font-size: 20px; padding-bottom: 5px">Flight Plan</strong>
     </v-card>
     <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-      <strong style="font-size: 20px; padding-bottom: 5px"
-        >Notifications</strong
-      >
+      <strong style="font-size: 20px; padding-bottom: 5px">
+        Notifications
+      </strong>
       <div id="notifList">
-        <v-card
+        <NotificationCard
           v-for="(item, index) in notifications.slice(0, 4)"
           :key="index"
           :to="{ name: 'student-notifications' }"
           class="notification"
           color="background"
           @click="openNotification(item.id)"
-        >
-          <div style="display: flex; align-items: center">
-            <img
-              style="height: 30px; margin-right: 5px"
-              src="../../../public/Birb.png"
-            />
-            <div>
-              <strong style="font-size: 18px">{{ item.header }}</strong>
-              <p style="font-size: 14px">{{ item.description }}</p>
-            </div>
-          </div>
-        </v-card>
+        />
       </div>
     </v-card>
     <v-card color="backgroundDarken" class="adminItem">
