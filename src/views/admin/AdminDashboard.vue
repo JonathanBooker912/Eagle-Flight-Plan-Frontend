@@ -54,39 +54,47 @@ onMounted(() => {
 
 <template>
   <v-row justify="center">
-    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-      <strong style="font-size: 20px; padding-bottom: 5px"
-        >Upcoming Events</strong
-      >
-      <EventCard
-        v-for="(item, index) in events.splice(0, 2)"
-        :key="index"
-        :event="item"
-        :isEventViewing="false"
-        :to="{ name: 'admin-calendar' }"
-      ></EventCard>
-    </v-card>
-    <v-card color="backgroundDarken" class="adminItem adminItemBig">
-      <p>Engagement Breakdown by Classification</p>
-    </v-card>
-    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-      <strong style="font-size: 20px; padding-bottom: 5px"
-        >Notifications</strong
-      >
-      <div id="notifList">
-        <NotificationCard
-          v-for="(item, index) in notifications.slice(0, 4)"
+    <v-col cols="4">
+      <v-card color="backgroundDarken" class="adminItem">
+        <strong style="font-size: 20px; padding-bottom: 5px"
+          >Upcoming Events</strong
+        >
+        <EventCard
+          v-for="(item, index) in events.splice(0, 2)"
           :key="index"
-          :to="{ name: 'admin-notifications' }"
-          class="notification"
-          color="background"
-          @click="openNotification(item.id)"
-        />
-      </div>
-    </v-card>
-    <v-card color="backgroundDarken" class="adminItem adminItemBig">
-      <p>Percentage of students on track to complete their flight plan</p>
-    </v-card>
+          :event="item"
+          :isEventViewing="false"
+          :to="{ name: 'admin-calendar' }"
+        ></EventCard>
+      </v-card>
+    </v-col>
+    <v-col cols="6">
+      <v-card color="backgroundDarken" class="adminItem adminItemBig">
+        <p>Engagement Breakdown by Classification</p>
+      </v-card>
+    </v-col>
+    <v-col cols="4">
+      <v-card color="backgroundDarken" class="adminItem">
+        <strong style="font-size: 20px; padding-bottom: 5px"
+          >Notifications</strong
+        >
+        <div id="notifList">
+          <NotificationCard
+            v-for="(item, index) in notifications.slice(0, 4)"
+            :key="index"
+            :to="{ name: 'admin-notifications' }"
+            class="notification"
+            color="background"
+            @click="openNotification(item.id)"
+          />
+        </div>
+      </v-card>
+    </v-col>
+    <v-col cols="6">
+      <v-card color="backgroundDarken" class="adminItem adminItemBig">
+        <p>Percentage of students on track to complete their flight plan</p>
+      </v-card>
+    </v-col>
   </v-row>
 </template>
 
@@ -97,16 +105,13 @@ onMounted(() => {
   text-align: left;
   margin: 2% 1% 2% 1%;
   height: 45vh;
-  padding: 2vh 2vw;
+  padding: 2vh;
   border-radius: 25px;
 }
-.adminItemSmall {
-  width: 35vw;
-}
+
 .adminItemBig {
   justify-content: center;
   align-items: center;
-  width: 45vw;
 }
 .notification {
   padding: 0px 10px 0px 10px;
