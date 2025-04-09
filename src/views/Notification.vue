@@ -5,6 +5,7 @@ import notificationServices from "../services/notificationServices";
 import apiClient from "../services/services";
 import moment from "moment";
 import { userStore } from "../stores/userStore";
+import { useNotificationStore } from "../stores/notificationStore";
 
 const notifications = ref([]);
 const selectedNotif = ref({});
@@ -15,6 +16,7 @@ const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
+const notifStore = useNotificationStore();
 
 const getNotifications = async (page = 1) => {
   try {
@@ -42,8 +44,28 @@ watch(currentPage, (newPage) => {
   getNotifications(newPage);
 });
 
-onMounted(() => {
-  getNotifications();
+onMounted(async () => {
+  await getNotifications();
+
+  // Check if a notification was set in the store
+  if (notifStore.activeNotification) {
+    var chosenNotif = null;
+    for (const notif of notifications.value) {
+      if (notif.id === notifStore.activeNotification) {
+        chosenNotif = notif;
+        break;
+      }
+    }
+
+    if (chosenNotif) {
+      chosenNotif.read = true;
+      selectedNotif.value = chosenNotif;
+      showsidebar.value = true;
+    } else {
+
+    }
+  } else {
+  }
 });
 
 const formattedDateTime = (item) => {
