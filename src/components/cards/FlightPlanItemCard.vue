@@ -49,7 +49,7 @@ const handleClick = () => {
 <template>
   <v-card
     color="backgroundDarken"
-    class="cardContainer pa-0 ma-0"
+    class="cardContainer pa-0 ma-1"
     @click="handleClick"
   >
     <v-container class="pa-2">

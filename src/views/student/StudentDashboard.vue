@@ -295,7 +295,6 @@ onMounted(async () => {
 }
 
 .flightPlanItem {
-  padding: 0px 10px 0px 10px;
   margin: 0px 10px 0px 10px;
   height: 17vh;
   width: 100%;
