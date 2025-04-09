@@ -233,8 +233,8 @@ const facultyRoutes = [
     component: Notifications,
   },
   {
-    path: "profile",
-    name: "faculty-profile/:userId",
+    path: "faculty-profile/:userId",
+    name: "faculty-profile",
     component: Profile,
   },
   {
