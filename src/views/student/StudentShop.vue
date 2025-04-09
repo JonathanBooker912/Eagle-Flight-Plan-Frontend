@@ -10,6 +10,9 @@
     const totalPages = ref(0);
     const searchQuery = ref("");
     const page = ref(1);
+    const showReward = ref(false);
+    const rewardToShow = ref({});
+
     const display = useDisplay();
     const numCardColumns = computed(() => {
         if (display.xxl.value) return 4;
@@ -35,6 +38,11 @@
         await fetchRewards();
     };
 
+    const handleShowReward = (reward) => {
+        rewardToShow.value = reward;
+        showReward.value = true;
+    };
+
     watch([page, searchQuery], () => fetchRewards(), { immediate: true });
 </script>
 <template>
@@ -46,12 +54,34 @@
             @changed="handleSearch"
         >
         </CardHeader>
-        <CardTable :items="rewards" :totalPages="totalPages">
+        <CardTable
+            :items="rewards"
+            :totalPages="totalPages"
+            :show-info="showReward"
+            :info-label="rewardToShow.name"
+            @close-info="showReward = false"
+        >
             <template #item="{ item }">
-                <RewardCard :reward="item" />
+                <RewardCard :reward="item" @show="handleShowReward" />
             </template>
             <template #pagination>
                 <v-pagination v-model="page" :length="totalPages" />
+            </template>
+            <template #info>
+                <p class="text-h6 mt-2">Description:</p>
+                <p class="mb-2 text-subtitle-1">
+                    {{ rewardToShow.description }}
+                </p>
+                <p class="text-h6">Points:</p>
+                <p class="mb-2 text-subtitle-1">
+                    {{ rewardToShow.points }} pts
+                </p>
+
+                <p class="text-h6">Redeem at:</p>
+                <p class="mb-2 text-subtitle-1">
+                    This reward can be redeemed by visiting the Career Services
+                    office.
+                </p>
             </template>
         </CardTable>
     </v-container>
