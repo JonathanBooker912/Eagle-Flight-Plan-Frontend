@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import notificationServices from "../../services/notificationServices";
 import flightPlanServices from "../../services/flightPlanServices";
-import flightPlanItemServices from "../../services/flightPlanItemServices";
 import eventServices from "../../services/eventServices";
 import studentServices from "../../services/studentServices";
 import NotificationCard from "../../components/cards/NotificationCard.vue";
@@ -10,6 +9,7 @@ import FlightPlanItemCard from "../../components/cards/FlightPlanItemCard.vue";
 import EventCard from "../../components/cards/EventCard.vue";
 import { userStore } from "../../stores/userStore";
 import { useNotificationStore } from "../../stores/notificationStore";
+import { useFlightPlanStore } from "../../stores/flightPlanStore";
 
 const notifications = ref([]);
 const currentPage = ref(1);
@@ -17,6 +17,7 @@ const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
 const notifStore = useNotificationStore();
+const flightPlanStore = useFlightPlanStore();
 const progress = ref(0);
 const points = ref(0);
 const selectedFlightPlan = ref(null);
@@ -64,37 +65,28 @@ const fetchFlightPlan = async () => {
       studentResponse.data.id,
     );
 
-    flightPlans.value = response.data.map((flightPlan) => ({
-      label: `${flightPlan.semester.term.charAt(0).toUpperCase() + flightPlan.semester.term.slice(1)} ${flightPlan.semester.year}`,
-      value: flightPlan.id,
-    }));
+    flightPlans.value = response.data.map((flightPlan) => {
+      if (!flightPlan.semester) {
+        return {
+          label: "Unknown Semester",
+          value: flightPlan.id,
+        };
+      }
+      return {
+        label: `${flightPlan.semester.term.charAt(0).toUpperCase() + flightPlan.semester.term.slice(1)} ${flightPlan.semester.year}`,
+        value: flightPlan.id,
+      };
+    });
 
     if (flightPlans.value.length > 0) {
       selectedFlightPlan.value = flightPlans.value[0];
+      flightPlanItems.value = response.data[0].flightPlanItems
+        .filter((item) => item.status === "Incomplete")
+        .slice(0, 3);
       await fetchFlightPlanProgress();
     }
   } catch (err) {
     console.error("Error fetching flight plan:", err);
-  }
-};
-
-const fetchFlightPlanItems = async () => {
-  if (!selectedFlightPlan.value) return;
-
-  try {
-    const response =
-      await flightPlanItemServices.getAllFlightPlanItemsForFlightPlan(
-        selectedFlightPlan.value.value,
-        {
-          page: 1,
-          pageSize: 3,
-          searchQuery: "",
-          filters: {},
-        },
-      );
-    flightPlanItems.value = response.data.flightPlanItems;
-  } catch (err) {
-    console.error("Error fetching flight plan items:", err);
   }
 };
 
@@ -107,7 +99,6 @@ const fetchFlightPlanProgress = async () => {
         selectedFlightPlan.value.value,
       );
     progress.value = response.data.progress;
-    await fetchFlightPlanItems();
   } catch (err) {
     console.error("Error fetching flight plan progress:", err);
   }
@@ -117,13 +108,18 @@ const getEvents = async () => {
   await eventServices
     .getAllEvents()
     .then((res) => {
-      events.value = res.data.events;
+      events.value = res.data.events.slice(0, 3);
       isLoaded.value = true;
     })
     .catch((err) => console.error(err));
 };
+
 const openNotification = (x) => {
   notifStore.setActiveNotification(x);
+};
+
+const openFlightPlanItem = (item) => {
+  flightPlanStore.setActiveFlightPlanItem(item);
 };
 
 onMounted(async () => {
@@ -137,10 +133,10 @@ onMounted(async () => {
 </script>
 
 <template>
+  <h1>Welcome, {{ store.user.fullName }}!</h1>
   <v-row justify="center">
     <v-col cols="12">
-      <v-card color="backgroundDarken" class="mb-4">
-        <v-card-title class="text-h5">Flight Plan Progress</v-card-title>
+      <v-card color="backgroundDarken" class="mb-1">
         <v-card-text>
           <v-select
             v-model="selectedFlightPlan"
@@ -174,7 +170,9 @@ onMounted(async () => {
 
   <v-row>
     <v-card color="backgroundDarken" class="adminItem">
-      <strong style="font-size: 20px; padding-bottom: 5px">Flight Plan</strong>
+      <strong style="font-size: 24px; padding-bottom: 5px; margin-left: 10px"
+        >Flight Plan</strong
+      >
       <div id="flightPlanList">
         <FlightPlanItemCard
           v-for="(item, index) in flightPlanItems"
@@ -182,11 +180,14 @@ onMounted(async () => {
           :flight-plan-item="item"
           class="flightPlanItem"
           color="background"
+          :to="{ name: 'student-flightPlan' }"
+          :is-flight-plan-view="false"
+          @click="openFlightPlanItem(item)"
         />
       </div>
     </v-card>
-    <v-card color="backgroundDarken" class="adminItem">
-      <strong style="font-size: 20px; padding-bottom: 5px">
+    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
+      <strong style="font-size: 24px; padding-bottom: 5px; margin-left: 10px">
         Notifications
       </strong>
       <div id="notifList">
@@ -202,15 +203,18 @@ onMounted(async () => {
       </div>
     </v-card>
     <v-card color="backgroundDarken" class="adminItem">
-      <strong style="font-size: 20px; padding-bottom: 5px">Calendar</strong>
+      <strong style="font-size: 24px; padding-bottom: 20px; margin-left: 10px"
+        >Calendar</strong
+      >
       <div id="eventList">
         <EventCard
-          v-for="(item, index) in events.splice(0, 3)"
+          v-for="(event, index) in events"
           :key="index"
-          :event="item"
-          :isEventViewing="false"
+          :event="event"
+          class="event"
           :to="{ name: 'student-calendar' }"
-        ></EventCard>
+          color="background"
+        />
       </div>
     </v-card>
   </v-row>
@@ -223,9 +227,8 @@ onMounted(async () => {
   text-align: left;
   margin: 1%;
   height: 65vh;
-  padding: 15px 0px 5px 0px;
+  padding: 10px 5px 5px 5px;
   width: 29vw;
-  text-align: center;
   border-radius: 25px;
 }
 
@@ -233,20 +236,6 @@ onMounted(async () => {
   padding: 0px 10px 0px 10px;
   margin: 10px 5px 10px 5px;
   height: 10vh;
-  width: 100%;
-}
-
-.flightPlanItem {
-  padding: 0px 10px 0px 10px;
-  margin: 10px 5px 10px 5px;
-  height: 8vh;
-  width: 100%;
-}
-
-.event {
-  padding: 0px 10px 0px 10px;
-  margin: 10px 5px 10px 5px;
-  height: 8vh;
   width: 100%;
 }
 

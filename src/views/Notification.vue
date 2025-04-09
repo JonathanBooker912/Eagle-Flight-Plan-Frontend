@@ -94,7 +94,7 @@ const editItem = async (item) => {
   <div class="container">
     <div class="notifContainer">
       <h1>Notifications</h1>
-      <v-card
+      <div
         class="adminItem"
         color="background"
         v-if="!noNotifications"
@@ -108,7 +108,7 @@ const editItem = async (item) => {
           :class="{ unread: !item.read, read: item.read }"
           @click="editItem(item)"
         />
-      </v-card>
+      </div>
       <div v-else class="adminItem" color="background">
         <h3>No Notifications!</h3>
         <p>Complete some flight plan items to be notified!</p>
