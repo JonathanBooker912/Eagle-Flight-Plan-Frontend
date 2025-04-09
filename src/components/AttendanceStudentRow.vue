@@ -24,12 +24,7 @@ const props = defineProps({
 const emit = defineEmits(["update-student"]);
 
 // eslint-disable-next-line
-const isSelected = computed(() => {
-  selectedStudentsStore.selectedStudentIds.includes(props.student.studentId);
-});
-
 const toggleSelected = () => {
-  isSelected.value = !isSelected.value;
   selectedStudentsStore.toggleStudent(props.student.studentId);
 };
 
@@ -80,7 +75,11 @@ const closeDialogs = () => {
       selected: isSelected,
     }"
     :ripple="false"
-    :color="isSelected ? 'secondary' : 'backgroundDarken'"
+    :color="
+      selectedStudentsStore.selectedStudentIds.includes(props.student.studentId)
+        ? 'secondary'
+        : 'backgroundDarken'
+    "
     class="roundedCard"
     role="row"
     :aria-label="`Attendance card for ${props.student.fName ?? 'Unknown'} with ID ${props.student.studentId ?? 'N/A'}`"
