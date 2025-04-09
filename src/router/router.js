@@ -18,7 +18,7 @@ import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 import Profile from "../views/Profile.vue";
 import Notifications from "../views/Notification.vue";
 
-import AdminLanding from "../views/admin/AdminLanding.vue";
+import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
@@ -278,7 +278,6 @@ const studentRoutes = [
     props: true,
   },
 ];
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -294,8 +293,8 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
-      component: AdminLanding,
       beforeEnter: isAdmin,
+      redirect: { name: "admin-dashboard" },
       children: [...adminRoutes, ...adminMaintenanceRoutes],
     },
 
