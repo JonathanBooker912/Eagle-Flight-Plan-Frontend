@@ -2,29 +2,23 @@
 import eventServices from "../../services/eventServices";
 import notificationServices from "../../services/notificationServices";
 import EventCard from "../../components/cards/EventCard.vue";
-
 import { userStore } from "../../stores/userStore";
 import { onMounted, ref } from "vue";
 import { useNotificationStore } from "../../stores/notificationStore";
 //import { useRoute } from "vue-router";
 // import { useModalStore } from "../../store/modal.store";
 // import { storeToRefs } from "pinia";
-
 //const modalStore = useModalStore();
-
 //const items = ref([]);
 const events = ref([]);
 const notifications = ref([]);
 const isLoaded = ref(false);
 //const route = useRoute();
-
 const store = userStore();
 const notifStore = useNotificationStore();
-
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
-
 const getEvents = async () => {
   await eventServices
     .getAllEvents()
@@ -34,7 +28,6 @@ const getEvents = async () => {
     })
     .catch((err) => console.error(err));
 };
-
 const getNotifications = async (page = 1) => {
   try {
     const res = await notificationServices.getAllNotificationsForUser(
@@ -42,7 +35,6 @@ const getNotifications = async (page = 1) => {
       page,
       pageSize.value,
     );
-
     notifications.value = res.data.notifications; // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
@@ -50,11 +42,9 @@ const getNotifications = async (page = 1) => {
     console.error("Error fetching notifications:", err);
   }
 };
-
 const openNotification = (x) => {
   notifStore.setActiveNotification(x);
 };
-
 onMounted(() => {
   getEvents();
   getNotifications();
@@ -84,25 +74,14 @@ onMounted(() => {
         >Notifications</strong
       >
       <div id="notifList">
-        <v-card
+        <NotificationCard
           v-for="(item, index) in notifications.slice(0, 4)"
           :key="index"
           :to="{ name: 'admin-notifications' }"
           class="notification"
           color="background"
           @click="openNotification(item.id)"
-        >
-          <div style="display: flex; align-items: center">
-            <img
-              style="height: 30px; margin-right: 5px"
-              src="../../../public/Birb.png"
-            />
-            <div>
-              <strong style="font-size: 18px">{{ item.header }}</strong>
-              <p style="font-size: 14px">{{ item.description }}</p>
-            </div>
-          </div>
-        </v-card>
+        />
       </div>
     </v-card>
     <v-card color="backgroundDarken" class="adminItem adminItemBig">
@@ -119,20 +98,16 @@ onMounted(() => {
   margin: 2% 1% 2% 1%;
   height: 45vh;
   padding: 2vh 2vw;
-
   border-radius: 25px;
 }
-
 .adminItemSmall {
   width: 35vw;
 }
-
 .adminItemBig {
   justify-content: center;
   align-items: center;
   width: 45vw;
 }
-
 .notification {
   padding: 0px 10px 0px 10px;
   margin: 10px 5px 10px 5px;
