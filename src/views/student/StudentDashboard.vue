@@ -133,121 +133,178 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h1>Welcome, {{ store.user.fullName }}!</h1>
-  <v-row justify="center">
-    <v-col cols="12">
-      <v-card color="backgroundDarken" class="mb-1">
-        <v-card-text>
-          <v-select
-            v-model="selectedFlightPlan"
-            :items="flightPlans"
-            :item-title="(item) => item.label"
-            :item-value="(item) => item.value"
-            variant="solo"
-            bg-color="background"
-            return-object
-            class="mb-4"
-            density="comfortable"
-            flat
-            @update:model-value="fetchFlightPlanProgress"
-          ></v-select>
-          <v-progress-linear
-            v-model="progress"
-            color="primary"
-            bg-color="backgroundLighten"
-            height="20"
-            rounded
-          >
-            <strong>{{ progress }}%</strong>
-          </v-progress-linear>
-          <div class="text-center mt-2">
-            <span class="text-subtitle-1">Available Points: {{ points }}</span>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div class="dashboard-container">
+    <h1 class="mt-1">Welcome, {{ store.user.fullName }}!</h1>
+    <v-row justify="center" class="mr-2">
+      <v-col cols="12">
+        <v-card color="backgroundDarken">
+          <v-card-text>
+            <v-select
+              v-model="selectedFlightPlan"
+              :items="flightPlans"
+              :item-title="(item) => item.label"
+              :item-value="(item) => item.value"
+              variant="solo"
+              bg-color="background"
+              return-object
+              class="mb-4"
+              density="comfortable"
+              flat
+              @update:model-value="fetchFlightPlanProgress"
+            ></v-select>
+            <v-progress-linear
+              v-model="progress"
+              color="primary"
+              bg-color="backgroundLighten"
+              height="20"
+              rounded
+            >
+              <strong>{{ progress }}%</strong>
+            </v-progress-linear>
+            <div class="text-center mt-2">
+              <span class="text-subtitle-1">Available Points: {{ points }}</span>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
 
-  <v-row>
-    <v-card color="backgroundDarken" class="adminItem">
-      <strong style="font-size: 24px; padding-bottom: 5px; margin-left: 10px"
-        >Flight Plan</strong
-      >
-      <div id="flightPlanList">
-        <FlightPlanItemCard
-          v-for="(item, index) in flightPlanItems"
-          :key="index"
-          :flight-plan-item="item"
-          class="flightPlanItem"
-          color="background"
+    <div class="dashboard-grid">
+      <v-card color="backgroundDarken" class="dashboard-cell">
+        <strong style="font-size: 24px; text-align:center; margin-left: 10px">Flight Plan</strong>
+        <div id="flightPlanList">
+          <FlightPlanItemCard
+            v-for="(item, index) in flightPlanItems"
+            :key="index"
+            :flight-plan-item="item"
+            class="flightPlanItem"
+            color="background"
+            :to="{ name: 'student-flightPlan' }"
+            :is-flight-plan-view="false"
+            @click="openFlightPlanItem(item)"
+          />
+        </div>
+        <v-btn
+          class="see-more-btn"
+          variant="text"
           :to="{ name: 'student-flightPlan' }"
-          :is-flight-plan-view="false"
-          @click="openFlightPlanItem(item)"
-        />
-      </div>
-    </v-card>
-    <v-card color="backgroundDarken" class="adminItem adminItemSmall">
-      <strong style="font-size: 24px; padding-bottom: 5px; margin-left: 10px">
-        Notifications
-      </strong>
-      <div id="notifList">
-        <NotificationCard
-          v-for="(item, index) in notifications.slice(0, 5)"
-          :key="index"
+        >
+          See More Flight Plan Items
+        </v-btn>
+      </v-card>
+      <v-card color="backgroundDarken" class="dashboard-cell">
+        <strong style="font-size: 24px; text-align:center; margin-left: 10px">
+          Notifications
+        </strong>
+        <div id="notifList">
+          <NotificationCard
+            v-for="(item, index) in notifications.slice(0, 5)"
+            :key="index"
+            :to="{ name: 'student-notifications' }"
+            :notification="item"
+            class="notification"
+            @click="openNotification(item.id)"
+          />
+        </div>
+        <v-btn
+          class="see-more-btn"
+          variant="text"
           :to="{ name: 'student-notifications' }"
-          :notification="item"
-          class="notification"
-          color="background"
-          @click="openNotification(item.id)"
-        />
-      </div>
-    </v-card>
-    <v-card color="backgroundDarken" class="adminItem">
-      <strong style="font-size: 24px; padding-bottom: 20px; margin-left: 10px"
-        >Calendar</strong
-      >
-      <div id="eventList">
-        <EventCard
-          v-for="(event, index) in events"
-          :key="index"
-          :event="event"
-          class="event"
+        >
+          See More Notifications
+        </v-btn>
+      </v-card>
+      <v-card color="backgroundDarken" class="dashboard-cell">
+        <strong style="font-size: 24px; text-align:center; margin-left: 10px">Calendar</strong>
+        <div id="eventList">
+          <EventCard
+            v-for="(event, index) in events"
+            :key="index"
+            :event="event"
+            class="event"
+            :to="{ name: 'student-calendar' }"
+          />
+        </div>
+        <v-btn
+          class="see-more-btn"
+          variant="text"
           :to="{ name: 'student-calendar' }"
-          color="background"
-        />
-      </div>
-    </v-card>
-  </v-row>
+        >
+          See More Events
+        </v-btn>
+      </v-card>
+    </div>
+  </div>
 </template>
 
 <style>
-.adminItem {
+.dashboard-container {
+  height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
-  text-align: left;
-  margin: 1%;
-  height: 65vh;
+  padding: 0vh 1vw;
+}
+
+.dashboard-grid {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px 0 0;
+  flex: 1;
+  margin-top: 10px;
+}
+
+.dashboard-cell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
   padding: 10px 5px 5px 5px;
-  width: 29vw;
   border-radius: 25px;
+}
+
+.dashboard-cell:first-child {
+  padding-left: 0;
+}
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.see-more-btn {
+  margin-top: auto;
+  text-align: center;
+  width: 100%;
+}
+
+#notifList,
+#flightPlanList,
+#calendarList {
+  flex: 1;
+  overflow: hidden;
+  margin-bottom: 10px;
 }
 
 .notification {
   padding: 0px 10px 0px 10px;
   margin: 10px 5px 10px 5px;
-  height: 10vh;
+  height: 8vh;
   width: 100%;
 }
 
-#flightPlanList {
-  overflow-y: auto;
-  height: 100%;
-  padding: 0 10px;
+.flightPlanItem {
+  padding: 0px 10px 0px 10px;
+  margin: 0px 10px 0px 10px;
+  height: 17vh;
+  width: 100%;
 }
 
-#eventList {
-  overflow-y: auto;
-  height: 100%;
-  padding: 0 10px;
+.calendarItem {
+  padding: 0px 10px 0px 10px;
+  margin: 10px 5px 10px 5px;
+  height: 8vh;
+  width: 100%;
 }
 </style>

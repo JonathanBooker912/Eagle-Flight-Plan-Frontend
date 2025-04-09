@@ -89,7 +89,7 @@ const showEventInfo = () => {
   <v-card
     v-else
     color="background"
-    class="cardContainer mb-4"
+    class="cardContainer mb-2"
     @click="viewCard"
   >
     <v-row no-gutters>

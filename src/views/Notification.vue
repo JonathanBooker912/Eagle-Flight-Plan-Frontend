@@ -11,13 +11,11 @@ const notifications = ref([]);
 const selectedNotif = ref({});
 const showsidebar = ref(false);
 const noNotifications = ref(false);
-
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
 const notifStore = useNotificationStore();
-
 const getNotifications = async (page = 1) => {
   try {
     const res = await notificationServices.getAllNotificationsForUser(
@@ -26,7 +24,10 @@ const getNotifications = async (page = 1) => {
       pageSize.value,
     );
 
+    console.log(res);
+
     if (!res.data.notifications || res.data.notifications.length === 0) {
+      console.log("No notifications");
       noNotifications.value = true;
       return;
     }
@@ -45,9 +46,9 @@ watch(currentPage, (newPage) => {
 });
 
 onMounted(async () => {
-  await getNotifications();
 
-  // Check if a notification was set in the store
+  await getNotifications();
+  
   if (notifStore.activeNotification) {
     var chosenNotif = null;
     for (const notif of notifications.value) {
@@ -94,12 +95,7 @@ const editItem = async (item) => {
   <div class="container">
     <div class="notifContainer">
       <h1>Notifications</h1>
-      <div
-        class="adminItem"
-        color="background"
-        v-if="!noNotifications"
-        id="notifList"
-      >
+      <div v-if="!noNotifications" id="notifList">
         <NotificationCard
           v-for="(item, index) in notifications"
           :key="index"
@@ -109,7 +105,7 @@ const editItem = async (item) => {
           @click="editItem(item)"
         />
       </div>
-      <div v-else class="adminItem" color="background">
+      <div v-else class="no-notifications">
         <h3>No Notifications!</h3>
         <p>Complete some flight plan items to be notified!</p>
       </div>
@@ -162,6 +158,13 @@ const editItem = async (item) => {
   overflow-x: auto;
 }
 
+
+.no-notifications {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--v-text-lighten1);
+}
+
 .header {
   font-size: 24px;
 }
@@ -176,8 +179,8 @@ const editItem = async (item) => {
 
 .close-btn {
   position: fixed;
-  top: 50px; /* Adjust as needed */
-  right: 40px; /* Right-aligned */
-  z-index: 9999; /* Make sure it stays above the content */
+  top: 50px;
+  right: 40px;
+  z-index: 9999;
 }
 </style>
