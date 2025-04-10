@@ -11,12 +11,12 @@ const notifications = ref([]);
 const selectedNotif = ref({});
 const showsidebar = ref(false);
 const noNotifications = ref(false);
-
 const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
 const notifStore = useNotificationStore();
+const isAdmin = ref(false);
 
 const getNotifications = async (page = 1) => {
   try {
@@ -45,9 +45,9 @@ watch(currentPage, (newPage) => {
 });
 
 onMounted(async () => {
+  isAdmin.value = await store.isAdmin();
   await getNotifications();
 
-  // Check if a notification was set in the store
   if (notifStore.activeNotification) {
     var chosenNotif = null;
     for (const notif of notifications.value) {
@@ -94,22 +94,19 @@ const editItem = async (item) => {
   <div class="container">
     <div class="notifContainer">
       <h1>Notifications</h1>
-      <v-card
-        class="adminItem"
-        color="background"
-        v-if="!noNotifications"
-        id="notifList"
-      >
+      <div v-if="!noNotifications" id="notifList">
         <NotificationCard
           v-for="(item, index) in notifications"
           :key="index"
-          :to="{ name: 'admin-notifications' }"
+          :to="{
+            name: isAdmin ? 'admin-notifications' : 'student-notifications',
+          }"
           :notification="item"
           :class="{ unread: !item.read, read: item.read }"
           @click="editItem(item)"
         />
-      </v-card>
-      <div v-else class="adminItem" color="background">
+      </div>
+      <div v-else class="no-notifications">
         <h3>No Notifications!</h3>
         <p>Complete some flight plan items to be notified!</p>
       </div>
@@ -126,7 +123,8 @@ const editItem = async (item) => {
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <p>
-        Sent By: {{ selectedNotif.user.fName }} {{ selectedNotif.user.lName }}
+        Sent By: {{ selectedNotif.user.fName }}
+        {{ selectedNotif.user.lName }}
       </p>
       <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
       <p>
@@ -162,6 +160,12 @@ const editItem = async (item) => {
   overflow-x: auto;
 }
 
+.no-notifications {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--v-text-lighten1);
+}
+
 .header {
   font-size: 24px;
 }
@@ -176,8 +180,8 @@ const editItem = async (item) => {
 
 .close-btn {
   position: fixed;
-  top: 50px; /* Adjust as needed */
-  right: 40px; /* Right-aligned */
-  z-index: 9999; /* Make sure it stays above the content */
+  top: 50px;
+  right: 40px;
+  z-index: 9999;
 }
 </style>

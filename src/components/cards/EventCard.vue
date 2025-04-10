@@ -86,7 +86,12 @@ const showEventInfo = () => {
       </v-col>
     </v-row>
   </v-card>
-  <v-card v-else color="background" class="cardContainer" @click="viewCard">
+  <v-card
+    v-else
+    color="background"
+    class="cardContainer mb-2"
+    @click="viewCard"
+  >
     <v-row no-gutters>
       <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
       <v-col>

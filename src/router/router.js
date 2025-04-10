@@ -20,15 +20,15 @@ import Notifications from "../views/Notification.vue";
 
 import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
 
-import StudentLanding from "../views/student/StudentLanding.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 import StudentEventCheckIn from "../views/student/StudentEventCheckIn.vue";
+import StudentShop from "../views/student/StudentShop.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
@@ -206,11 +206,10 @@ const adminMaintenanceRoutes = [
     name: "user",
     component: AdminUserPage,
   },
-
   {
     path: "user/profile/:userId",
     name: "adminProfile",
-    component: AdminProfile,
+    component: Profile,
     props: { isAdmin: true },
   },
   ...adminTaskRoutes,
@@ -262,6 +261,11 @@ const studentRoutes = [
     props: { isAdmin: false },
   },
   {
+    path: "dashboard",
+    name: "student-dashboard",
+    component: StudentDashboard,
+  },
+  {
     path: "notifications",
     name: "student-notifications",
     component: Notifications,
@@ -281,6 +285,11 @@ const studentRoutes = [
     name: "studentEventCheckin",
     component: StudentEventCheckIn,
     props: true,
+  },
+  {
+    path: "shop",
+    name: "student-shop",
+    component: StudentShop,
   },
 ];
 const router = createRouter({
@@ -316,7 +325,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      component: StudentLanding,
+      redirect: { name: "student-dashboard" },
       children: [...studentRoutes],
     },
 
