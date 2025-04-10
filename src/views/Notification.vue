@@ -16,6 +16,8 @@ const pageSize = ref(14);
 const totalPages = ref(1);
 const store = userStore();
 const notifStore = useNotificationStore();
+const isAdmin = ref(false);
+
 const getNotifications = async (page = 1) => {
   try {
     const res = await notificationServices.getAllNotificationsForUser(
@@ -24,10 +26,7 @@ const getNotifications = async (page = 1) => {
       pageSize.value,
     );
 
-    console.log(res);
-
     if (!res.data.notifications || res.data.notifications.length === 0) {
-      console.log("No notifications");
       noNotifications.value = true;
       return;
     }
@@ -46,6 +45,7 @@ watch(currentPage, (newPage) => {
 });
 
 onMounted(async () => {
+  isAdmin.value = await store.isAdmin();
   await getNotifications();
 
   if (notifStore.activeNotification) {
@@ -98,7 +98,9 @@ const editItem = async (item) => {
         <NotificationCard
           v-for="(item, index) in notifications"
           :key="index"
-          :to="{ name: 'admin-notifications' }"
+          :to="{
+            name: isAdmin ? 'admin-notifications' : 'student-notifications',
+          }"
           :notification="item"
           :class="{ unread: !item.read, read: item.read }"
           @click="editItem(item)"
@@ -121,7 +123,8 @@ const editItem = async (item) => {
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <p>
-        Sent By: {{ selectedNotif.user.fName }} {{ selectedNotif.user.lName }}
+        Sent By: {{ selectedNotif.user.fName }}
+        {{ selectedNotif.user.lName }}
       </p>
       <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
       <p>
