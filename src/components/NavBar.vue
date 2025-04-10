@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 import apiClient from "../services/services";
+import ConfirmDialog from "./dialogs/ConfirmDialog.vue";
 import { useTheme } from "vuetify";
 
 const theme = useTheme();
@@ -64,6 +65,7 @@ const role = ref("");
 const route = useRoute();
 const userId = ref(null);
 const router = useRouter();
+const showLogoutDialog = ref(false);
 
 onMounted(async () => {
   const store = userStore();
@@ -180,7 +182,10 @@ const handleLogout = async () => {
           </v-list-item-title>
         </div>
       </v-list-item>
-      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+      <v-list-item
+        class="bg-secondary mt-auto"
+        @click="showLogoutDialog = true"
+      >
         <div>
           <v-list-item-title
             class="text-body-1 font-weight-bold text-backgroundDarken"
@@ -242,7 +247,10 @@ const handleLogout = async () => {
           </v-list-item-title>
         </div>
       </v-list-item>
-      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+      <v-list-item
+        class="bg-secondary mt-auto"
+        @click="showLogoutDialog = true"
+      >
         <div>
           <v-list-item-title
             class="text-body-1 font-weight-bold text-backgroundDarken"
@@ -304,7 +312,10 @@ const handleLogout = async () => {
           </v-list-item-title>
         </div>
       </v-list-item>
-      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+      <v-list-item
+        class="bg-secondary mt-auto"
+        @click="showLogoutDialog = true"
+      >
         <div>
           <v-list-item-title
             class="text-body-1 font-weight-bold text-backgroundDarken"
@@ -319,6 +330,19 @@ const handleLogout = async () => {
         </div>
       </v-list-item>
     </v-list>
+
+    <!-- Logout Confirmation Dialog -->
+    <v-dialog v-model="showLogoutDialog" max-width="400">
+      <ConfirmDialog
+        v-model="showLogoutDialog"
+        title="Are you sure you want to logout?"
+        confirm-text="Logout"
+        cancel-text="Cancel"
+        confirm-color="danger"
+        @confirm="handleLogout"
+        @cancel="showLogoutDialog = false"
+      />
+    </v-dialog>
   </v-container>
 </template>
 
