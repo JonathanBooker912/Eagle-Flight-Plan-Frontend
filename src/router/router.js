@@ -25,7 +25,7 @@ import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
 
-import StudentLanding from "../views/student/StudentLanding.vue";
+import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 import StudentEventCheckIn from "../views/student/StudentEventCheckIn.vue";
@@ -262,6 +262,11 @@ const studentRoutes = [
     props: { isAdmin: false },
   },
   {
+    path: "dashboard",
+    name: "student-dashboard",
+    component: StudentDashboard,
+  },
+  {
     path: "notifications",
     name: "student-notifications",
     component: Notifications,
@@ -316,7 +321,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      component: StudentLanding,
+      redirect: { name: "student-dashboard" },
       children: [...studentRoutes],
     },
 
