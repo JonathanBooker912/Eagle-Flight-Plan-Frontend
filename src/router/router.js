@@ -20,7 +20,6 @@ import Notifications from "../views/Notification.vue";
 
 import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
@@ -210,7 +209,7 @@ const adminMaintenanceRoutes = [
   {
     path: "user/profile/:userId",
     name: "adminProfile",
-    component: AdminProfile,
+    component: Profile,
     props: { isAdmin: true },
   },
   ...adminTaskRoutes,
