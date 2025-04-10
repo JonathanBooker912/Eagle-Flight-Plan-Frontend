@@ -29,7 +29,7 @@ const props = defineProps({
   >
     <v-row align="center" class="d-flex w-100">
       <v-img
-        src="../../../public/Birb.png"
+        src="/Birb.png"
         alt="Notification Image"
         max-width="40"
         max-height="40"
