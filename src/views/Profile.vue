@@ -172,7 +172,7 @@ onMounted(async () => {
             v-if="isAdmin"
             :size="32"
             style="margin-left: 85%; margin-top: 5%"
-            :color="text"
+            color="primary"
             class="d-flex align-right"
             @click="toFlightPlan"
             >mdi-airplane</v-icon
