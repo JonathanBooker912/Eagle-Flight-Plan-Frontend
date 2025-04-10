@@ -19,12 +19,12 @@ const vuetify = createVuetify({
       lightTheme: {
         dark: false,
         colors: {
-          primary: "#2684BB",
+          primary: "#118acb",
           secondary: "#353841",
-          accent: "#FCA311",
+          accent: "#f4ecd0",
           danger: "#E04125",
-          warning: "#FCA311",
-          background: "#D5E6ED",
+          warning: "#f9c633",
+          background: "#d5dfe7",
           backgroundDarken: "#BDD2DE",
           black: "#1A1A1A",
           white: "#E8E8E8",
@@ -34,11 +34,11 @@ const vuetify = createVuetify({
       darkTheme: {
         dark: true,
         colors: {
-          primary: "#2684BB",
-          secondary: "#DCDCDC",
-          accent: "#FCA311",
+          primary: "#118acb",
+          secondary: "#d5dfe7",
+          accent: "#f4ecd0",
           danger: "#E04125",
-          warning: "#FCA311",
+          warning: "#f9c633",
           background: "#42444C",
           backgroundDarken: "#32343A",
           black: "#1A1A1A",
