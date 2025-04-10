@@ -59,6 +59,7 @@ const student = [
   { "route-name": "student-calendar", "link-text": "Calendar" },
   { "route-name": "student-notifications", "link-text": "Notifications" },
   { "route-name": "student-search", "link-text": "Search" },
+  { "route-name": "student-shop", "link-text": "Shop" },
 ];
 
 const role = ref("");
@@ -99,6 +100,7 @@ const getIcon = (linkText) => {
     Search: "mdi-magnify",
     Maintenance: "mdi-cog",
     Approvals: "mdi-check",
+    Shop: "mdi-cart",
   };
 
   return icons[linkText] || "mdi-circle"; // Default if not found
