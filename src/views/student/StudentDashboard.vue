@@ -299,7 +299,7 @@ onMounted(async () => {
 .notification {
   padding: 0px 10px 0px 10px;
   margin: 10px 5px 10px 5px;
-  height: 8vh;
+  height: 9vh;
   width: 100%;
 }
 

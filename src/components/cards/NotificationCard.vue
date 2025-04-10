@@ -25,7 +25,7 @@ const props = defineProps({
       'opacity-40': props.notification.read,
       'opacity-100': !props.notification.read,
     }"
-    class="pa-3 my-2 rounded-lg"
+    class="pa-3 my-2 mx-3 rounded-lg"
   >
     <v-row align="center" class="d-flex w-100">
       <v-img
@@ -44,7 +44,7 @@ const props = defineProps({
         {{ props.notification.header }}
       </div>
 
-      <div class="text-body-2">
+      <div class="text-body-2 mr-3">
         {{ props.notification.description }}
       </div>
     </v-row>

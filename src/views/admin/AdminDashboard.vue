@@ -63,6 +63,8 @@ onMounted(() => {
               v-for="(item, index) in events.splice(0, 2)"
               :key="index"
               :event="item"
+              :view-only="true"
+              color="background"
               :isEventViewing="false"
               :to="{ name: 'admin-calendar' }"
             ></EventCard>
@@ -148,7 +150,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   text-align: left;
-  height: 40vh;
+  height: 45vh;
   padding: 1vh 1vw;
   border-radius: 25px;
   overflow: hidden;
