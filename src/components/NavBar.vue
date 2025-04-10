@@ -3,6 +3,35 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 import apiClient from "../services/services";
+import ConfirmDialog from "./dialogs/ConfirmDialog.vue";
+import { useTheme } from "vuetify";
+
+const theme = useTheme();
+const isDark = ref(false);
+
+// Initialize theme from localStorage or system preference
+onMounted(() => {
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    theme.global.name.value = savedTheme;
+    isDark.value = savedTheme === "darkTheme";
+  } else {
+    // If no saved theme, use system preference
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    theme.global.name.value = prefersDark ? "darkTheme" : "lightTheme";
+    isDark.value = prefersDark;
+    localStorage.setItem("theme", theme.global.name.value);
+  }
+});
+
+const toggleTheme = () => {
+  const newTheme = theme.global.current.value.dark ? "lightTheme" : "darkTheme";
+  theme.global.name.value = newTheme;
+  isDark.value = theme.global.current.value.dark;
+  localStorage.setItem("theme", newTheme);
+};
 
 const admin = [
   { "route-name": "adminProfile", "link-text": "Profile" },
@@ -30,12 +59,14 @@ const student = [
   { "route-name": "student-calendar", "link-text": "Calendar" },
   { "route-name": "student-notifications", "link-text": "Notifications" },
   { "route-name": "student-search", "link-text": "Search" },
+  { "route-name": "student-shop", "link-text": "Shop" },
 ];
 
 const role = ref("");
 const route = useRoute();
 const userId = ref(null);
 const router = useRouter();
+const showLogoutDialog = ref(false);
 
 onMounted(async () => {
   const store = userStore();
@@ -69,6 +100,7 @@ const getIcon = (linkText) => {
     Search: "mdi-magnify",
     Maintenance: "mdi-cog",
     Approvals: "mdi-check",
+    Shop: "mdi-cart",
   };
 
   return icons[linkText] || "mdi-circle"; // Default if not found
@@ -136,7 +168,26 @@ const handleLogout = async () => {
           </div>
         </v-list-item>
       </div>
-      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+      <v-list-item class="bg-secondary" @click="toggleTheme">
+        <div>
+          <v-list-item-title
+            class="text-body-1 font-weight-bold text-backgroundDarken"
+          >
+            <div class="nav-item-content">
+              <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
+              </v-icon>
+              <span class="nav-text text-backgroundDarken">{{
+                isDark ? "Dark Mode" : "Light Mode"
+              }}</span>
+            </div>
+          </v-list-item-title>
+        </div>
+      </v-list-item>
+      <v-list-item
+        class="bg-secondary mt-auto"
+        @click="showLogoutDialog = true"
+      >
         <div>
           <v-list-item-title
             class="text-body-1 font-weight-bold text-backgroundDarken"
@@ -182,7 +233,26 @@ const handleLogout = async () => {
           </div>
         </v-list-item>
       </div>
-      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+      <v-list-item class="bg-secondary" @click="toggleTheme">
+        <div>
+          <v-list-item-title
+            class="text-body-1 font-weight-bold text-backgroundDarken"
+          >
+            <div class="nav-item-content">
+              <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
+              </v-icon>
+              <span class="nav-text text-backgroundDarken">{{
+                isDark ? "Dark Mode" : "Light Mode"
+              }}</span>
+            </div>
+          </v-list-item-title>
+        </div>
+      </v-list-item>
+      <v-list-item
+        class="bg-secondary mt-auto"
+        @click="showLogoutDialog = true"
+      >
         <div>
           <v-list-item-title
             class="text-body-1 font-weight-bold text-backgroundDarken"
@@ -228,7 +298,26 @@ const handleLogout = async () => {
           </div>
         </v-list-item>
       </div>
-      <v-list-item class="bg-secondary mt-auto" @click="handleLogout">
+      <v-list-item class="bg-secondary" @click="toggleTheme">
+        <div>
+          <v-list-item-title
+            class="text-body-1 font-weight-bold text-backgroundDarken"
+          >
+            <div class="nav-item-content">
+              <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
+              </v-icon>
+              <span class="nav-text text-backgroundDarken">{{
+                isDark ? "Dark Mode" : "Light Mode"
+              }}</span>
+            </div>
+          </v-list-item-title>
+        </div>
+      </v-list-item>
+      <v-list-item
+        class="bg-secondary mt-auto"
+        @click="showLogoutDialog = true"
+      >
         <div>
           <v-list-item-title
             class="text-body-1 font-weight-bold text-backgroundDarken"
@@ -243,6 +332,19 @@ const handleLogout = async () => {
         </div>
       </v-list-item>
     </v-list>
+
+    <!-- Logout Confirmation Dialog -->
+    <v-dialog v-model="showLogoutDialog" max-width="400">
+      <ConfirmDialog
+        v-model="showLogoutDialog"
+        title="Are you sure you want to logout?"
+        confirm-text="Logout"
+        cancel-text="Cancel"
+        confirm-color="danger"
+        @confirm="handleLogout"
+        @cancel="showLogoutDialog = false"
+      />
+    </v-dialog>
   </v-container>
 </template>
 

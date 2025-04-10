@@ -10,9 +10,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isFlightPlanView: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["incomplete", "view", "register", "sign-in"]);
+const emit = defineEmits([
+  "incomplete",
+  "view",
+  "register",
+  "sign-in",
+  "click",
+]);
 
 const color = computed(
   () =>
@@ -31,9 +41,17 @@ const points = computed(() => {
     Experience: props.flightPlanItem.experience?.points,
   }[props.flightPlanItem.flightPlanItemType];
 });
+
+const handleClick = () => {
+  emit("click");
+};
 </script>
 <template>
-  <v-card color="backgroundDarken" class="cardContainer pa-0 ma-0">
+  <v-card
+    color="backgroundDarken"
+    class="cardContainer pa-0 ma-1"
+    @click="handleClick"
+  >
     <v-container class="pa-2">
       <v-row no-gutters>
         <v-col cols="1">
@@ -71,7 +89,8 @@ const points = computed(() => {
             <v-row
               v-if="
                 flightPlanItem.status == 'Incomplete' &&
-                flightPlanItem.flightPlanItemType == 'Task'
+                flightPlanItem.flightPlanItemType == 'Task' &&
+                isFlightPlanView
               "
               justify="end"
               ><v-btn
@@ -90,7 +109,8 @@ const points = computed(() => {
             <v-row
               v-if="
                 flightPlanItem.status == 'Rejected' &&
-                flightPlanItem.flightPlanItemType == 'Task'
+                flightPlanItem.flightPlanItemType == 'Task' &&
+                isFlightPlanView
               "
               justify="end"
               ><v-btn
@@ -108,7 +128,8 @@ const points = computed(() => {
             <v-row
               v-if="
                 flightPlanItem.status == 'Incomplete' &&
-                flightPlanItem.flightPlanItemType == 'Experience'
+                flightPlanItem.flightPlanItemType == 'Experience' &&
+                isFlightPlanView
               "
               justify="end"
               ><v-btn
