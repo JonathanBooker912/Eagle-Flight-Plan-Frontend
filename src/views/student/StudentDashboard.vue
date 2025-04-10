@@ -228,6 +228,7 @@ onMounted(async () => {
             v-for="(event, index) in events"
             :key="index"
             color="background"
+            :view-only="true"
             :event="event"
             class="event"
             :to="{ name: 'student-calendar' }"
