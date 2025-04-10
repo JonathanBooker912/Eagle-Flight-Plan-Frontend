@@ -117,7 +117,7 @@ onMounted(async () => {
       <v-row class="w-100">
         <v-col cols="2" class="d-flex flex-column align-center justify-center">
           <v-img
-            src="../../public/Birb.png"
+            src="/Birb.png"
             height="200"
             width="200"
             class="profile-pic"

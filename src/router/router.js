@@ -206,7 +206,6 @@ const adminMaintenanceRoutes = [
     name: "user",
     component: AdminUserPage,
   },
-
   {
     path: "user/profile/:userId",
     name: "adminProfile",
