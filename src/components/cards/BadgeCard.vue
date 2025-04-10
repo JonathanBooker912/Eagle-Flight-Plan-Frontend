@@ -24,7 +24,7 @@ const cardClass = computed(() => {
 </script>
 
 <template>
-  <v-card :class="['rounded-xl', cardClass]">
+  <v-card :class="['rounded-xl', cardClass, 'bg-backgroundDarken']">
     <v-card-text>
       <v-img
         v-if="imageSrc"
