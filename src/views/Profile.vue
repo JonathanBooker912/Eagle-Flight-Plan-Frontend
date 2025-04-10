@@ -117,7 +117,7 @@ onMounted(async () => {
       <v-row class="w-100">
         <v-col cols="2" class="d-flex flex-column align-center justify-center">
           <v-img
-            src="../../public/Birb.png"
+            src="/Birb.png"
             height="200"
             width="200"
             class="profile-pic"
@@ -172,7 +172,7 @@ onMounted(async () => {
             v-if="isAdmin"
             :size="32"
             style="margin-left: 85%; margin-top: 5%"
-            :color="text"
+            color="primary"
             class="d-flex align-right"
             @click="toFlightPlan"
             >mdi-airplane</v-icon
@@ -282,6 +282,7 @@ onMounted(async () => {
   flex-direction: column;
   padding: 15px 0px 5px 0px;
   border-radius: 25px;
+  height: 100%;
 }
 
 .pagination {
