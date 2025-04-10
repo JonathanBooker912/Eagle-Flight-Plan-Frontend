@@ -282,6 +282,7 @@ onMounted(async () => {
   flex-direction: column;
   padding: 15px 0px 5px 0px;
   border-radius: 25px;
+  height: 100%;
 }
 
 .pagination {
