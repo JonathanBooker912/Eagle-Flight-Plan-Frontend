@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { userStore } from "../stores/userStore"; // Adjust this import based on your store path
 import apiClient from "../services/services";
+import ConfirmDialog from "./dialogs/ConfirmDialog.vue";
 
 const admin = [
   { "route-name": "adminProfile", "link-text": "Profile" },
@@ -255,28 +256,16 @@ const handleLogout = async () => {
     </v-list>
 
     <!-- Logout Confirmation Dialog -->
-    <v-dialog
-      v-model="showLogoutDialog"
-      max-width="400"
-      color="backgroundDarken"
-    >
-      <v-card>
-        <v-card-title class="text-h5">Confirm Logout</v-card-title>
-        <v-card-text>Are you sure you want to logout?</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="grey-darken-1"
-            variant="text"
-            @click="showLogoutDialog = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn color="primary" variant="text" @click="handleLogout">
-            Logout
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+    <v-dialog v-model="showLogoutDialog" max-width="400">
+      <ConfirmDialog
+        v-model="showLogoutDialog"
+        title="Are you sure you want to logout?"
+        confirm-text="Logout"
+        cancel-text="Cancel"
+        confirm-color="danger"
+        @confirm="handleLogout"
+        @cancel="showLogoutDialog = false"
+      />
     </v-dialog>
   </v-container>
 </template>
