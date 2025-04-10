@@ -66,7 +66,6 @@ const handleReject = async () => {
         description: rejectReason.value ?? "No reason provided",
         read: false,
         userId: student.user.id,
-        sentBy: 1, // Sent by the system
       });
     }
     rejectMessage.value = "Flight plan item rejected";
@@ -89,10 +88,9 @@ const handleApprove = async () => {
     if (student?.user?.id) {
       await notificationServices.createNotification({
         header: "Flight plan item approved",
-        description: `${flightPlanItem.value.name} has been approved and you have received ${flightPlanItem.value.task.points} points`,
+        description: `${flightPlanItem.value.name} has been approved and you have received ${flightPlanItem.value.points} points`,
         read: false,
         userId: student.user.id,
-        sentBy: 1, // Sent by the system
       });
       await studentServices.updatePoints(
         student.id,

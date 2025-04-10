@@ -1,23 +1,3 @@
-<script setup>
-import { ref, onMounted } from "vue";
-import { userStore } from "../../stores/userStore";
-
-const store = userStore();
-const isAdmin = ref(false);
-
-onMounted(async () => {
-  isAdmin.value = await store.isAdmin();
-  console.log(props.notification);
-});
-
-const props = defineProps({
-  notification: {
-    type: Object,
-    required: true,
-  },
-});
-</script>
-
 <template>
   <v-card
     color="backgroundDarken"
@@ -25,7 +5,7 @@ const props = defineProps({
       'opacity-40': props.notification.read,
       'opacity-100': !props.notification.read,
     }"
-    class="pa-3 my-2 mx-3 rounded-lg"
+    class="pa-3 my-2 rounded-lg"
   >
     <v-row align="center" class="d-flex w-100">
       <v-img
@@ -36,17 +16,37 @@ const props = defineProps({
         class="mr-3 flex-shrink-0"
       />
 
-      <div class="font-weight-bold mr-3">
-        {{ props.notification.user.fullName }}
-      </div>
+      <v-typography class="font-weight-bold mr-3">
+        {{ props.notification.user.fName }}
+        {{ props.notification.user.lName }}
+      </v-typography>
 
-      <div class="mr-3">
+      <v-typography class="mr-3">
         {{ props.notification.header }}
-      </div>
+      </v-typography>
 
-      <div class="text-body-2 mr-3">
+      <v-typography class="text-body-2">
         {{ props.notification.description }}
-      </div>
+      </v-typography>
     </v-row>
   </v-card>
 </template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { userStore } from "../../stores/userStore";
+
+const store = userStore();
+const isAdmin = ref(false);
+
+onMounted(async () => {
+  isAdmin.value = await store.isAdmin();
+});
+
+const props = defineProps({
+  notification: {
+    type: Object,
+    required: true,
+  },
+});
+</script>

@@ -2,16 +2,15 @@ import apiClient from "./services.js";
 import axios from "axios";
 import { getAuthHeader, jsonToFormData, getBaseURL } from "./serviceUtils.js";
 export default {
-  getAllRewards(page, pageSize, searchQuery, filters = {}) {
-    console.log(searchQuery);
+  getAllRewards(page, pageSize, searchQuery, filters) {
     return apiClient.get("/reward", {
       params: {
         page: page,
         pageSize: pageSize,
         searchQuery: searchQuery,
-        redemptionType: filters?.redemptionType,
-        sortAttribute: filters?.sortAttribute,
-        sortDirection: filters?.sortDirection,
+        redemptionType: filters.redemptionType,
+        sortAttribute: filters.sortAttribute,
+        sortDirection: filters.sortDirection,
       },
     });
   },

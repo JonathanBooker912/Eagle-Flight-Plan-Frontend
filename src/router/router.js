@@ -18,18 +18,17 @@ import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
 import Profile from "../views/Profile.vue";
 import Notifications from "../views/Notification.vue";
 
-import AdminDashboard from "../views/admin/AdminDashboard.vue";
+import AdminLanding from "../views/admin/AdminLanding.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
 import AdminProfile from "../views/admin/AdminProfile.vue";
 import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
 
-import StudentDashboard from "../views/student/StudentDashboard.vue";
+import StudentLanding from "../views/student/StudentLanding.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
 import StudentSearch from "../views/student/StudentSearch.vue";
 import StudentEventCheckIn from "../views/student/StudentEventCheckIn.vue";
-import StudentShop from "../views/student/StudentShop.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
@@ -49,11 +48,6 @@ const adminRoutes = [
     path: "notifications",
     name: "admin-notifications",
     component: Notifications,
-  },
-  {
-    path: "dashboard",
-    name: "admin-dashboard",
-    component: AdminDashboard,
   },
   {
     path: "profile",
@@ -263,11 +257,6 @@ const studentRoutes = [
     props: { isAdmin: false },
   },
   {
-    path: "dashboard",
-    name: "student-dashboard",
-    component: StudentDashboard,
-  },
-  {
     path: "notifications",
     name: "student-notifications",
     component: Notifications,
@@ -288,12 +277,8 @@ const studentRoutes = [
     component: StudentEventCheckIn,
     props: true,
   },
-  {
-    path: "shop",
-    name: "student-shop",
-    component: StudentShop,
-  },
 ];
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -309,8 +294,8 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
+      component: AdminLanding,
       beforeEnter: isAdmin,
-      redirect: { name: "admin-dashboard" },
       children: [...adminRoutes, ...adminMaintenanceRoutes],
     },
 
@@ -327,7 +312,7 @@ const router = createRouter({
     {
       path: "/student",
       name: "student",
-      redirect: { name: "student-dashboard" },
+      component: StudentLanding,
       children: [...studentRoutes],
     },
 

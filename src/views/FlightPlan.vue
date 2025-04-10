@@ -15,8 +15,6 @@ import { studentApprovalDialogStore } from "../stores/studentApprovalDialogStore
 import ViewSubmissionDialog from "../components/dialogs/ViewSubmissionDialog.vue";
 import { studentViewSubmissionDialogStore } from "../stores/studentViewSubmissionDialogStore";
 import userServices from "../services/userServices";
-import { useFlightPlanStore } from "../stores/flightPlanStore";
-
 const props = defineProps({
   isAdmin: {
     type: Boolean,
@@ -64,9 +62,6 @@ const numCardColumns = computed(() => {
 });
 const pageSize = computed(() => numCardColumns.value * 2);
 
-const flightPlanStore = useFlightPlanStore();
-const selectedItem = computed(() => flightPlanStore.activeFlightPlanItem);
-
 const fetchStudent = async () => {
   let studentResponse;
 
@@ -89,13 +84,10 @@ const fetchStudent = async () => {
 
 const fetchFlightPlan = async () => {
   const formatFlightPlanLabel = (flightPlan) => {
-    if (!flightPlan.semester) {
-      return "Unknown Semester";
-    }
     const term =
-      flightPlan.semester?.term?.charAt(0).toUpperCase() +
-      flightPlan.semester?.term?.slice(1);
-    return `${term} ${flightPlan.semester?.year}`;
+      flightPlan.semester.term.charAt(0).toUpperCase() +
+      flightPlan.semester.term.slice(1);
+    return `${term} ${flightPlan.semester.year}`;
   };
 
   const response = await flightPlanServices.getFlightPlanForStudent(student.id);
@@ -176,17 +168,9 @@ const handlePendingButtonClick = (flightPlanItem) => {
 };
 
 onMounted(async () => {
-  if (selectedItem.value) {
-    // Scroll to the selected item
-    const element = document.getElementById(`item-${selectedItem.value.id}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
   await fetchStudent();
   await fetchFlightPlan();
-  if (selectedFlightPlan.value) {
+  if (flightPlan.value) {
     await Promise.all([
       fetchFlightPlanAndItems(),
       fetchFlightPlanProgress(),
@@ -197,10 +181,8 @@ onMounted(async () => {
 });
 
 watch(selectedFlightPlan, () => {
-  if (selectedFlightPlan.value) {
-    fetchFlightPlanAndItems();
-    fetchFlightPlanProgress();
-  }
+  fetchFlightPlanAndItems();
+  fetchFlightPlanProgress();
 });
 
 watch([page, searchQuery], fetchFlightPlanAndItems);
@@ -211,7 +193,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       <div class="mt-2 d-flex justify-center">
         <div class="mr-4 mb-5 text-h5">{{ userName }}</div>
       </div>
-      <v-row v-if="flightPlans.length > 0">
+      <v-row>
         <v-col :cols="6" class="d-flex justify-end">
           <v-select
             v-model="selectedFlightPlan"
@@ -230,7 +212,6 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           <span class="text-subtitle-1"> Available Points: {{ points }} </span>
         </v-col>
       </v-row>
-      <p v-else class="text-h6 text-center">No flight plans found</p>
     </div>
     <div v-else>
       <div class="mt-2 d-flex justify-center">
@@ -286,7 +267,6 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           :key="item.id"
           :flight-plan-item="item"
           :is-admin="props.isAdmin"
-          :is-flight-plan-view="!props.isAdmin"
           @incomplete="handleIncompleteButtonClick"
           @view="handlePendingButtonClick"
         ></FlightPlanItemCard>

@@ -5,9 +5,8 @@ import defaultImage from "/defaultRewardImage.png";
 // Define statements for vue
 const props = defineProps({
   reward: { type: Object, required: true },
-  isView: { type: Boolean, default: true },
 });
-const emit = defineEmits(["edit", "delete", "shop", "show"]);
+const emit = defineEmits(["edit", "delete", "shop"]);
 
 // Reactive states
 const imageSrc = ref("");
@@ -30,17 +29,17 @@ onMounted(() => {
 onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 </script>
 <template>
-  <v-card color="backgroundDarken" class="rounded-xl">
+  <v-card color="backgroundDarken" class="cardContainer">
     <v-card-text>
       <v-img
         v-if="imageSrc"
-        class="image mb-3"
+        class="image"
         :src="imageSrc"
         alt="Uploaded Image"
       ></v-img>
       <v-img
         v-else
-        class="image mb-3"
+        class="image"
         :src="defaultImage"
         alt="Generic Merchandise Image"
       >
@@ -48,36 +47,24 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
       <p class="text-h5 text-center my-2">
         {{ props.reward.name }}
       </p>
-      <v-row v-if="isView" class="justify-center ma-2">
+      <v-row class="ma-2 justify-center">
         <v-btn
           color="primary"
-          class="mr-2 rounded-lg"
-          @click="emit('show', props.reward)"
-        >
-          <v-icon icon="mdi-eye" color="text" size="x-large"></v-icon>
-        </v-btn>
-      </v-row>
-      <!-- <p v-if="isView" class="text-subtitle-1 text-center my-2">
-                {{ props.reward.points }} pts
-            </p> -->
-      <v-row v-if="!isView" class="ma-2 justify-center">
-        <v-btn
-          color="primary"
-          class="mr-2 rounded-lg"
+          class="mr-2 cardButton"
           @click="emit('shop', props.reward.id)"
         >
           <v-icon icon="mdi-shopping" color="text" size="x-large"></v-icon>
         </v-btn>
         <v-btn
           color="warning"
-          class="mr-2 rounded-lg"
+          class="mr-2 cardButton"
           @click="emit('edit', props.reward.id)"
         >
           <v-icon icon="mdi-pencil" color="text" size="x-large"></v-icon>
         </v-btn>
         <v-btn
           color="danger"
-          class="rounded-lg"
+          class="cardButton"
           @click="emit('delete', props.reward.id, props.reward.imageName)"
           ><v-icon icon="mdi-delete" color="text" size="x-large"></v-icon
         ></v-btn>
@@ -87,6 +74,12 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 </template>
 
 <style scoped>
+.cardContainer {
+  border-radius: 25px;
+}
+.cardButton {
+  border-radius: 13px;
+}
 .image {
   max-height: 150px;
 }

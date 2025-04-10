@@ -124,7 +124,6 @@ watch([page, searchQuery, showFilters], getRewards, { immediate: true });
         <RewardCard
           :key="item.id"
           :reward="item"
-          :is-view="false"
           @shop="handleShop"
           @edit="handleEdit"
           @delete="handleDelete"
