@@ -203,6 +203,7 @@ onMounted(async () => {
         <div id="notifList">
           <NotificationCard
             v-for="(item, index) in notifications.slice(0, 5)"
+            color="background"
             :key="index"
             :to="{ name: 'student-notifications' }"
             :notification="item"
@@ -226,6 +227,7 @@ onMounted(async () => {
           <EventCard
             v-for="(event, index) in events"
             :key="index"
+            color="background"
             :event="event"
             class="event"
             :to="{ name: 'student-calendar' }"
