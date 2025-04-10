@@ -35,7 +35,8 @@ export const generateEventQRCodePDF = async (event, token) => {
 
   // Generate QR code with full URL
   const baseUrl = import.meta.env.VITE_APP_CLIENT_URL;
-  const checkInUrl = `${baseUrl}student/event/checkIn/${token.token}`;
+  const viteAppExtension = "2025/flight-plan/t1/";
+  const checkInUrl = `${baseUrl}${viteAppExtension}student/event/checkIn/${token.token}`;
   const qrDataUrl = await QRCode.toDataURL(checkInUrl, {
     width: 500,
     margin: 1,
