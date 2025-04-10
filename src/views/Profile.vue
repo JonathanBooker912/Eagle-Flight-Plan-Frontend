@@ -33,7 +33,7 @@ const totalPages = ref(1);
 const getUser = async (id) => {
   try {
     const res = await userServices.getOneUser(id); // PASS IN THE ID
-    selectedUser.value = res.data; // Update links
+    selectedUser.value = res.data; // Up
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
