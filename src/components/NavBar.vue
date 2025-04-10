@@ -138,199 +138,144 @@ const handleLogout = async () => {
 
 <template>
   <v-container class="d-flex flex-column pa-2 userNav bg-secondary">
-    <v-list v-if="role === 'admin'" class="pa-0">
-      <div v-for="(item, index) in admin" :key="index">
-        <v-list-item
-          :to="
-            item['link-text'] === 'Profile' && userId
-              ? {
-                  name: item['route-name'],
-                  params: { userId: userId },
-                }
-              : { name: item['route-name'] }
-          "
-          class="bg-secondary"
-          exact
-        >
+    <v-list
+      v-if="role === 'admin'"
+      class="pa-0 d-flex flex-column bg-secondary"
+      style="height: 100%"
+    >
+      <div class="flex-grow-1">
+        <div v-for="(item, index) in admin" :key="index">
+          <v-list-item
+            :to="
+              item['link-text'] === 'Profile' && userId
+                ? {
+                    name: item['route-name'],
+                    params: { userId: userId },
+                  }
+                : { name: item['route-name'] }
+            "
+            class="bg-secondary"
+            exact
+          >
+            <div>
+              <v-list-item-title
+                class="text-body-1 font-weight-bold text-backgroundDarken"
+              >
+                <div class="nav-item-content">
+                  <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                    {{ getIcon(item["link-text"]) }}
+                  </v-icon>
+                  <span class="nav-text text-backgroundDarken">{{
+                    item["link-text"]
+                  }}</span>
+                </div>
+              </v-list-item-title>
+            </div>
+          </v-list-item>
+        </div>
+      </div>
+      <div class="mt-auto">
+        <v-list-item class="bg-secondary" @click="toggleTheme">
           <div>
             <v-list-item-title
               class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                  {{ getIcon(item["link-text"]) }}
+                  {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
                 </v-icon>
                 <span class="nav-text text-backgroundDarken">{{
-                  item["link-text"]
+                  isDark ? "Dark Mode" : "Light Mode"
                 }}</span>
               </div>
             </v-list-item-title>
           </div>
         </v-list-item>
+        <v-list-item class="bg-secondary" @click="showLogoutDialog = true">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
+              <div class="nav-item-content">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2"
+                  >mdi-logout</v-icon
+                >
+                <span class="nav-text text-backgroundDarken">Logout</span>
+              </div>
+            </v-list-item-title>
+          </div>
+        </v-list-item>
       </div>
-      <v-list-item class="bg-secondary" @click="toggleTheme">
-        <div>
-          <v-list-item-title
-            class="text-body-1 font-weight-bold text-backgroundDarken"
-          >
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
-              </v-icon>
-              <span class="nav-text text-backgroundDarken">{{
-                isDark ? "Dark Mode" : "Light Mode"
-              }}</span>
-            </div>
-          </v-list-item-title>
-        </div>
-      </v-list-item>
-      <v-list-item
-        class="bg-secondary mt-auto"
-        @click="showLogoutDialog = true"
-      >
-        <div>
-          <v-list-item-title
-            class="text-body-1 font-weight-bold text-backgroundDarken"
-          >
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2"
-                >mdi-logout</v-icon
-              >
-              <span class="nav-text text-backgroundDarken">Logout</span>
-            </div>
-          </v-list-item-title>
-        </div>
-      </v-list-item>
     </v-list>
 
-    <v-list v-if="role === 'faculty'" class="pa-0">
-      <div v-for="(item, index) in faculty" :key="index">
-        <v-list-item
-          :to="
-            item['link-text'] === 'Profile' && userId
-              ? {
-                  name: item['route-name'],
-                  params: { userId: userId },
-                }
-              : { name: item['route-name'] }
-          "
-          class="bg-secondary"
-          exact
-        >
+    <v-list
+      v-if="role === 'student'"
+      class="pa-0 d-flex flex-column bg-secondary"
+      style="height: 100%"
+    >
+      <div class="flex-grow-1">
+        <div v-for="(item, index) in student" :key="index">
+          <v-list-item
+            :to="
+              item['link-text'] === 'Profile' && userId
+                ? {
+                    name: item['route-name'],
+                    params: { userId: userId },
+                  }
+                : { name: item['route-name'] }
+            "
+            class="bg-secondary"
+            exact
+          >
+            <div>
+              <v-list-item-title
+                class="text-body-1 font-weight-bold text-backgroundDarken"
+              >
+                <div class="nav-item-content">
+                  <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                    {{ getIcon(item["link-text"]) }}
+                  </v-icon>
+                  <span class="nav-text text-backgroundDarken">{{
+                    item["link-text"]
+                  }}</span>
+                </div>
+              </v-list-item-title>
+            </div>
+          </v-list-item>
+        </div>
+      </div>
+      <div class="mt-auto">
+        <v-list-item class="bg-secondary" @click="toggleTheme">
           <div>
             <v-list-item-title
               class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
                 <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                  {{ getIcon(item["link-text"]) }}
+                  {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
                 </v-icon>
                 <span class="nav-text text-backgroundDarken">{{
-                  item["link-text"]
+                  isDark ? "Dark Mode" : "Light Mode"
                 }}</span>
               </div>
             </v-list-item-title>
           </div>
         </v-list-item>
-      </div>
-      <v-list-item class="bg-secondary" @click="toggleTheme">
-        <div>
-          <v-list-item-title
-            class="text-body-1 font-weight-bold text-backgroundDarken"
-          >
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
-              </v-icon>
-              <span class="nav-text text-backgroundDarken">{{
-                isDark ? "Dark Mode" : "Light Mode"
-              }}</span>
-            </div>
-          </v-list-item-title>
-        </div>
-      </v-list-item>
-      <v-list-item
-        class="bg-secondary mt-auto"
-        @click="showLogoutDialog = true"
-      >
-        <div>
-          <v-list-item-title
-            class="text-body-1 font-weight-bold text-backgroundDarken"
-          >
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2"
-                >mdi-logout</v-icon
-              >
-              <span class="nav-text text-backgroundDarken">Logout</span>
-            </div>
-          </v-list-item-title>
-        </div>
-      </v-list-item>
-    </v-list>
-
-    <v-list v-if="role === 'student'" class="pa-0">
-      <div v-for="(item, index) in student" :key="index">
-        <v-list-item
-          :to="
-            item['link-text'] === 'Profile' && userId
-              ? {
-                  name: item['route-name'],
-                  params: { userId: userId },
-                }
-              : { name: item['route-name'] }
-          "
-          class="bg-secondary"
-          exact
-        >
+        <v-list-item class="bg-secondary" @click="showLogoutDialog = true">
           <div>
             <v-list-item-title
               class="text-body-1 font-weight-bold text-backgroundDarken"
             >
               <div class="nav-item-content">
-                <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                  {{ getIcon(item["link-text"]) }}
-                </v-icon>
-                <span class="nav-text text-backgroundDarken">{{
-                  item["link-text"]
-                }}</span>
+                <v-icon :size="32" color="backgroundDarken" class="mr-2"
+                  >mdi-logout</v-icon
+                >
+                <span class="nav-text text-backgroundDarken">Logout</span>
               </div>
             </v-list-item-title>
           </div>
         </v-list-item>
       </div>
-      <v-list-item class="bg-secondary" @click="toggleTheme">
-        <div>
-          <v-list-item-title
-            class="text-body-1 font-weight-bold text-backgroundDarken"
-          >
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2">
-                {{ isDark ? "mdi-weather-night" : "mdi-weather-sunny" }}
-              </v-icon>
-              <span class="nav-text text-backgroundDarken">{{
-                isDark ? "Dark Mode" : "Light Mode"
-              }}</span>
-            </div>
-          </v-list-item-title>
-        </div>
-      </v-list-item>
-      <v-list-item
-        class="bg-secondary mt-auto"
-        @click="showLogoutDialog = true"
-      >
-        <div>
-          <v-list-item-title
-            class="text-body-1 font-weight-bold text-backgroundDarken"
-          >
-            <div class="nav-item-content">
-              <v-icon :size="32" color="backgroundDarken" class="mr-2"
-                >mdi-logout</v-icon
-              >
-              <span class="nav-text text-backgroundDarken">Logout</span>
-            </div>
-          </v-list-item-title>
-        </div>
-      </v-list-item>
     </v-list>
 
     <!-- Logout Confirmation Dialog -->
