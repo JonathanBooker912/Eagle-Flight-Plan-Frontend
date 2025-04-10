@@ -43,15 +43,6 @@ const admin = [
   { "route-name": "admin-approvals", "link-text": "Approvals" },
 ];
 
-const faculty = [
-  { "route-name": "faculty-profile", "link-text": "Profile" },
-  { "route-name": "faculty", "link-text": "Dashboard" },
-  { "route-name": "faculty-flightPlan", "link-text": "Flight Plan" },
-  { "route-name": "faculty-calendar", "link-text": "Calendar" },
-  { "route-name": "faculty-notifications", "link-text": "Notifications" },
-  { "route-name": "faculty-search", "link-text": "Search" },
-];
-
 const student = [
   { "route-name": "student-profile", "link-text": "Profile" },
   { "route-name": "student", "link-text": "Dashboard" },
