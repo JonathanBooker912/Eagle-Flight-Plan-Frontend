@@ -30,7 +30,10 @@ const getNotifications = async (page = 1) => {
       noNotifications.value = true;
       return;
     }
-    notifications.value = res.data.notifications;
+    // Sort notifications by creation date (most recent first)
+    notifications.value = res.data.notifications.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
     // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page; // Ensure currentPage updates correctly
@@ -123,8 +126,7 @@ const editItem = async (item) => {
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <p>
-        Sent By: {{ selectedNotif.user.fName }}
-        {{ selectedNotif.user.lName }}
+        Sent By: {{ selectedNotif.user.fullName }}
       </p>
       <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
       <p>
