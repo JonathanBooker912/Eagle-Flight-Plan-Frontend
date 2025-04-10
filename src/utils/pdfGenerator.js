@@ -34,8 +34,8 @@ export const generateEventQRCodePDF = async (event, token) => {
   ctx.fillText("Check-In", canvas.width / 2, 250);
 
   // Generate QR code with full URL
-  const baseUrl = window.location.origin;
-  const checkInUrl = `${baseUrl}/student/event/checkIn/${token.token}`;
+  const baseUrl = import.meta.env.VITE_APP_CLIENT_URL;
+  const checkInUrl = `${baseUrl}student/event/checkIn/${token.token}`;
   const qrDataUrl = await QRCode.toDataURL(checkInUrl, {
     width: 500,
     margin: 1,
