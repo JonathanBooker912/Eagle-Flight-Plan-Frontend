@@ -57,3 +57,4 @@ const vuetify = createVuetify({
 });
 
 export default vuetify;
+// new colors
