@@ -12,9 +12,9 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  isEventViewing: {
+  viewOnly: {
     type: Boolean,
-    required: true,
+    default: false,
   },
 });
 
@@ -42,7 +42,7 @@ const showEventInfo = () => {
 </script>
 
 <template>
-  <v-card v-if="isEventViewing" color="backgroundDarken" class="cardContainer">
+  <v-card v-if="!viewOnly" color="backgroundDarken" class="cardContainer">
     <v-row no-gutters>
       <v-col>
         <v-card-text>
