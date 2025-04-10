@@ -194,7 +194,7 @@ onMounted(async () => {
               cols="12"
               md="4"
             >
-              <BadgeCard :badge="item" :isProfilePage="true" />
+              <BadgeCard :badge="item" :is-profile-page="true" />
             </v-col>
           </v-row>
           <v-row v-else>

@@ -63,7 +63,7 @@ watch([page, searchQuery], () => fetchRewards(), { immediate: true });
     <v-row class="ml-5">
       <CardHeader
         :label="`Points: ${points}`"
-        :addButton="false"
+        :add-button="false"
         :filter-button="false"
         @changed="handleSearch"
       >
@@ -72,7 +72,7 @@ watch([page, searchQuery], () => fetchRewards(), { immediate: true });
 
     <CardTable
       :items="rewards"
-      :totalPages="totalPages"
+      :total-pages="totalPages"
       :show-info="showReward"
       :info-label="rewardToShow.name"
       @close-info="showReward = false"

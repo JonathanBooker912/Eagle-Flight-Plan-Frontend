@@ -30,4 +30,7 @@ export default {
       },
     });
   },
+  getRuleTypes() {
+    return apiClient.get("/badge/types/rules");
+  },
 };

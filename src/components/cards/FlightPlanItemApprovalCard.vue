@@ -52,7 +52,7 @@ const showPoints = computed(
           <v-card-text class="text-no-wrap">
             <!-- Name with Tooltip -->
             <v-tooltip bottom>
-              <template v-slot:activator="{ props: tooltipProps }">
+              <template #activator="{ props: tooltipProps }">
                 <p v-bind="tooltipProps" class="text-h6 mb-2 truncate-text">
                   {{ flightPlanItem.name }}
                 </p>
