@@ -33,4 +33,10 @@ export default {
   getRuleTypes() {
     return apiClient.get("/badge/types/rules");
   },
+  getUnviewedBadges(studentId) {
+    return apiClient.get(`/badge/student/${studentId}/unviewed`);
+  },
+  viewBadge(badgeId) {
+    return apiClient.put(`/badge/${badgeId}/view`);
+  },
 };

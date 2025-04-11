@@ -9,19 +9,22 @@ import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
 import { useRouter } from "vue-router";
+import { viewBadgeAwardsStore } from "../stores/viewBadgeAwardsStore";
+import ViewBadgeAwards from "../components/dialogs/ViewBadgeAwards.vue";
 
 const store = userStore();
 const route = useRoute();
 const router = useRouter();
 
 const user = store.user;
-
+const badgeAwardsStore = viewBadgeAwardsStore();
 const noBadges = ref(false);
 const noStrengths = ref(false);
 
 const links = ref([]);
 const strengths = ref([]);
 const badges = ref([]);
+const unviewedBadges = ref([]);
 const selectedUser = ref([]);
 const isAdmin = ref(false);
 
@@ -90,6 +93,14 @@ const getBadges = async (id, page = 1) => {
   }
 };
 
+const fetchUnviewedBadges = async () => {
+  const response = await badgeServices.getUnviewedBadges(route.params.userId);
+  if (response.data.length > 0) {
+    unviewedBadges.value = response.data;
+    badgeAwardsStore.toggleVisibility();
+  }
+};
+
 const toFlightPlan = () => {
   router.push({ name: "student-flightPlan" });
 };
@@ -102,6 +113,10 @@ watch(currentPage, (newPage) => {
 onMounted(async () => {
   const passedId = route.params.userId;
   isAdmin.value = await store.isAdmin();
+
+  if (!isAdmin.value) {
+    await fetchUnviewedBadges();
+  }
 
   getLinks(passedId); // Fetch links on component mount
   getStrengths(passedId);
@@ -200,7 +215,8 @@ onMounted(async () => {
           <v-row v-else>
             <div class="adminItem" style="text-align: center">
               No badges! <br />
-              Complete some flight plan items to be rewarded! <br />
+              Complete some flight plan items to be rewarded!
+              <br />
               <br />
               <b
                 >The LORD repay you for what you have done, and a full reward be
@@ -261,6 +277,7 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-row>
+  <ViewBadgeAwards :badges="unviewedBadges" />
 </template>
 
 <style scoped>

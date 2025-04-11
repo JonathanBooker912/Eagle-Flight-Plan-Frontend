@@ -16,6 +16,9 @@ import ViewSubmissionDialog from "../components/dialogs/ViewSubmissionDialog.vue
 import { studentViewSubmissionDialogStore } from "../stores/studentViewSubmissionDialogStore";
 import userServices from "../services/userServices";
 import { useFlightPlanStore } from "../stores/flightPlanStore";
+import badgeServices from "../services/badgeServices";
+import ViewBadgeAwards from "../components/dialogs/ViewBadgeAwards.vue";
+import { viewBadgeAwardsStore } from "../stores/viewBadgeAwardsStore";
 
 const props = defineProps({
   isAdmin: {
@@ -40,10 +43,13 @@ const flightPlanItemTypes = ref([]);
 const flightPlanItemStatuses = ref([]);
 const points = ref(0);
 const userName = ref(null);
-
+const unviewedBadges = ref([]);
 const useStudentApprovalDialogStore = studentApprovalDialogStore();
 const useStudentViewSubmissionDialogStore = studentViewSubmissionDialogStore();
 const useUserStore = userStore();
+
+const badgeAwardsStore = viewBadgeAwardsStore();
+
 const { user } = storeToRefs(useUserStore);
 
 const showFilters = ref(false);
@@ -144,6 +150,14 @@ const fetchFlightPlanItemStatuses = async () => {
   flightPlanItemStatuses.value = response.data;
 };
 
+const fetchUnviewedBadges = async () => {
+  const response = await badgeServices.getUnviewedBadges(student.id);
+  if (response.data.length > 0) {
+    unviewedBadges.value = response.data;
+    badgeAwardsStore.toggleVisibility();
+  }
+};
+
 const handleSearchChange = (input) => {
   searchQuery.value = input;
   page.value = 1; // Reset to first page on search change
@@ -192,6 +206,7 @@ onMounted(async () => {
       fetchFlightPlanProgress(),
       fetchFlightPlanItemStatuses(),
       fetchFlightPlanItemTypes(),
+      fetchUnviewedBadges(),
     ]);
   }
 });
@@ -324,4 +339,5 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
   <ViewSubmissionDialog
     @discard="fetchFlightPlanAndItems"
   ></ViewSubmissionDialog>
+  <ViewBadgeAwards :badges="unviewedBadges" />
 </template>
