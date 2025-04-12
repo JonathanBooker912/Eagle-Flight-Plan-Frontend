@@ -20,6 +20,9 @@ export default {
       params: { page, pageSize },
     });
   },
+  getAllEventsForCalendar(){
+    return apiClient.get('')
+  },
   getEvent(eventId) {
     return apiClient.get(`/event/${eventId}`);
   },
