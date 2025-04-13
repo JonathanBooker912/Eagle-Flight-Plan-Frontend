@@ -26,11 +26,12 @@ const dialogVisible = ref(false);
 const selectedEvent = ref(null);
 const registeredEventIds = ref(new Set());
 const checkedInEventIds = ref(new Set());
+const allEvents = ref([]); // Local ref for all events
 
 const getEvents = async () => {
   try {
     const result = await eventServices.getAllEvents(1, 1000);
-    props.events.splice(0, props.events.length, ...result.data.events);
+    allEvents.value = result.data.events;
   } catch (error) {
     console.error("Failed to refresh events:", error);
   }
@@ -104,10 +105,10 @@ const fetchStudentStatus = async () => {
       eventServices.getAttendingEventsForStudent(studentId.value),
     ]);
     registeredEventIds.value = new Set(
-      registeredRes.data.map((event) => event.id)
+      registeredRes.data.map((event) => event.id),
     );
     checkedInEventIds.value = new Set(
-      checkedInRes.data.map((event) => event.id)
+      checkedInRes.data.map((event) => event.id),
     );
   } catch (err) {
     console.error("Error fetching student status:", err);
@@ -127,13 +128,13 @@ const eventDots = ref([]);
 const attributes = ref([]);
 
 const eventsGroupedByDate = computed(() => {
-  if (!props.events || selectedDates.value.length === 0) return {};
+  if (!allEvents.value || selectedDates.value.length === 0) return {};
   const grouped = {};
   [...selectedDates.value]
     .sort((a, b) => a - b)
     .forEach((selectedDate) => {
       const dateStr = selectedDate.toDateString();
-      grouped[dateStr] = props.events
+      grouped[dateStr] = allEvents.value
         .filter((event) => new Date(event.date).toDateString() === dateStr)
         .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     });
@@ -143,9 +144,9 @@ const eventsGroupedByDate = computed(() => {
 const filteredEventsGroupedByDate = computed(() => {
   if (selectedDates.value.length === 1) return eventsGroupedByDate.value;
   const filtered = {};
-  for (const [date, events] of Object.entries(eventsGroupedByDate.value)) {
-    if (events.length > 0) {
-      filtered[date] = events;
+  for (const [date, eventList] of Object.entries(eventsGroupedByDate.value)) {
+    if (eventList.length > 0) {
+      filtered[date] = eventList;
     }
   }
   return filtered;
@@ -194,19 +195,15 @@ const generateEventDots = (eventList) => {
 };
 
 watch(selectedDates, updateAttributes, { deep: true });
+
 watch(
-  () => JSON.stringify(props.events),
-  (json) => {
-    try {
-      const parsed = JSON.parse(json);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        generateEventDots(parsed);
-      }
-    } catch (e) {
-      console.error("Failed to parse event JSON:", e);
+  allEvents,
+  (updatedList) => {
+    if (Array.isArray(updatedList) && updatedList.length > 0) {
+      generateEventDots(updatedList);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 function handleDayClick(day, event) {
@@ -229,11 +226,11 @@ function onDayClick(day, isCtrlPressed = false, isShiftPressed = false) {
     selectedDates.value = newDates;
   } else if (isCtrlPressed) {
     const exists = selectedDates.value.find(
-      (d) => d.toDateString() === clickedDate.toDateString()
+      (d) => d.toDateString() === clickedDate.toDateString(),
     );
     if (exists) {
       selectedDates.value = selectedDates.value.filter(
-        (d) => d.toDateString() !== clickedDate.toDateString()
+        (d) => d.toDateString() !== clickedDate.toDateString(),
       );
     } else {
       selectedDates.value.push(clickedDate);
@@ -268,6 +265,7 @@ onMounted(async () => {
   window.addEventListener("resize", updateRows);
   await fetchStudentId();
   await fetchStudentStatus();
+  await getEvents(); // <-- Load events here
 });
 
 onBeforeUnmount(() => {
@@ -289,7 +287,7 @@ const getEventCardColor = (eventId) => {
         <VCalendar
           :rows="calendarRows"
           :attributes="attributes"
-          isDark="system"
+          is-dark="system"
           view="monthly"
           borderless
           title-position="left"
@@ -299,7 +297,7 @@ const getEventCardColor = (eventId) => {
         />
       </v-card>
 
-      <!-- Right card: Multi-Date Timeline -->
+      <!-- Right card: Timeline -->
       <v-card class="calendarDetails-card pa-4" color="backgroundDarken">
         <div class="timeline-header">
           <strong class="timeline-title">Event Timeline</strong>
@@ -308,15 +306,15 @@ const getEventCardColor = (eventId) => {
 
         <div v-if="Object.keys(filteredEventsGroupedByDate).length > 0">
           <div
-            v-for="(events, dateLabel) in filteredEventsGroupedByDate"
+            v-for="(dayEvents, dateLabel) in filteredEventsGroupedByDate"
             :key="dateLabel"
             class="timeline-day"
           >
             <h3 class="timeline-day-label">{{ dateLabel }}</h3>
 
-            <div v-if="events.length > 0" class="timeline">
+            <div v-if="dayEvents.length > 0" class="timeline">
               <div
-                v-for="(group, time) in groupByStartTime(events)"
+                v-for="(group, time) in groupByStartTime(dayEvents)"
                 :key="time"
                 class="timeline-item"
               >
@@ -329,7 +327,7 @@ const getEventCardColor = (eventId) => {
                     :view-only="true"
                     color="background"
                     :status="getEventCardColor(event.id)"
-                    :isEventViewing="false"
+                    :is-event-viewing="false"
                     @click="openDialog(event)"
                   />
                 </div>
@@ -341,7 +339,6 @@ const getEventCardColor = (eventId) => {
             </div>
           </div>
 
-          <!-- Event Dialog -->
           <EventDialog
             v-model="dialogVisible"
             :event="selectedEvent"
