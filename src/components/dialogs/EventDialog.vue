@@ -8,12 +8,14 @@ import { userStore } from "../../stores/userStore.js";
 import studentServices from "../../services/studentServices.js";
 
 const store = userStore();
-const studentId = ref(null);
 
 // Props
 const props = defineProps({
   modelValue: Boolean,
-  event: Object,
+  event: {
+    type: Object,
+    default: () => ({}),
+  },
   isAdmin: Boolean,
 });
 
@@ -60,14 +62,14 @@ const checkIfStudentIsRegistered = async () => {
     const studentId = studentRes.data.id;
 
     const registeredRes = await eventServices.getRegisteredStudents(
-      props.event.id
+      props.event.id,
     );
     registered.value = registeredRes.data.some(
-      (s) => s.studentId === studentId
+      (s) => s.studentId === studentId,
     );
 
     const attendingRes = await eventServices.getAttendingStudents(
-      props.event.id
+      props.event.id,
     );
     attending.value = attendingRes.data.some((s) => s.studentId === studentId);
   } catch (err) {
@@ -132,7 +134,7 @@ const handleGenerateQRCode = async (expirationTimestamp) => {
   try {
     const response = await eventServices.generateCheckInToken(
       eventToShow.value.id,
-      expirationTimestamp
+      expirationTimestamp,
     );
     generatedToken.value = response.data;
   } catch (error) {
@@ -168,7 +170,7 @@ watch(
     getCurrentToken();
     checkIfStudentIsRegistered();
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

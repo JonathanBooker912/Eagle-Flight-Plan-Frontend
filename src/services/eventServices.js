@@ -20,8 +20,8 @@ export default {
       params: { page, pageSize },
     });
   },
-  getAllEventsForCalendar(){
-    return apiClient.get('')
+  getAllEventsForCalendar() {
+    return apiClient.get("");
   },
   getEvent(eventId) {
     return apiClient.get(`/event/${eventId}`);
@@ -83,7 +83,7 @@ export default {
   getRegisteredEventsForStudent(studentId) {
     return apiClient.get(`/event/student/${studentId}/registered-events`);
   },
-  
+
   getAttendingEventsForStudent(studentId) {
     return apiClient.get(`/event/student/${studentId}/attending-events`);
   },
