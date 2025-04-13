@@ -55,7 +55,14 @@ export default {
     return apiClient.get("/event/types/registrationTypes");
   },
   registerStudents(eventId, studentIds) {
+    console.log(studentIds);
     return apiClient.post(`/event/${eventId}/register`, { studentIds });
+  },
+
+  unregisterStudents(eventId, studentIds) {
+    return apiClient.delete(`/event/${eventId}/unregister`, {
+      data: { studentIds },
+    });
   },
 
   markAttendance(eventId, studentIds) {
@@ -72,6 +79,15 @@ export default {
   getAttendingStudents(eventId) {
     return apiClient.get(`/event/${eventId}/attending-students`);
   },
+
+  getRegisteredEventsForStudent(studentId) {
+    return apiClient.get(`/event/student/${studentId}/registered-events`);
+  },
+  
+  getAttendingEventsForStudent(studentId) {
+    return apiClient.get(`/event/student/${studentId}/attending-events`);
+  },
+
   getFulfillableFlightPlanItems(eventId, studentId) {
     return apiClient.get(
       `/event/${eventId}/fulfillableFlightPlanItems/${studentId}`,
