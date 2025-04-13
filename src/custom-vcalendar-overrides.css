@@ -1,3 +1,4 @@
+
 .vc-title-wrapper .vc-title span {
   color: rgb(var(--v-theme-text)) !important;
   font-size: 25px;
@@ -60,6 +61,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
+
 }
 
 .vc-day-box-center-bottom {

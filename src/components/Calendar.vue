@@ -3,6 +3,12 @@ import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import EventCard from "./cards/EventCard.vue";
 import EventDialog from "./dialogs/EventDialog.vue";
 import { useRouter } from "vue-router";
+import eventServices from "../services/eventServices";
+import studentServices from "../services/studentServices";
+import { userStore } from "../stores/userStore";
+
+const store = userStore();
+const studentId = ref(null);
 
 const router = useRouter();
 const props = defineProps({
@@ -18,6 +24,17 @@ const props = defineProps({
 
 const dialogVisible = ref(false);
 const selectedEvent = ref(null);
+const registeredEventIds = ref(new Set());
+const checkedInEventIds = ref(new Set());
+
+const getEvents = async () => {
+  try {
+    const result = await eventServices.getAllEvents(1, 1000);
+    props.events.splice(0, props.events.length, ...result.data.events);
+  } catch (error) {
+    console.error("Failed to refresh events:", error);
+  }
+};
 
 const openDialog = (event) => {
   selectedEvent.value = event;
@@ -35,8 +52,66 @@ const handleGenerateQRCode = (event) => {
   console.log("Generating QR for:", event.name);
 };
 
-const handleRegister = (event) => {
-  console.log("Registering for event:", event.id);
+const handleRegister = async (event) => {
+  if (!studentId.value) return;
+  try {
+    await eventServices.registerStudents(event.id, [studentId.value]);
+    await getEvents();
+    await fetchStudentStatus();
+  } catch (err) {
+    console.error("Registration error:", err);
+  }
+};
+
+const handleUnregister = async (event) => {
+  if (!studentId.value) return;
+  try {
+    await eventServices.unregisterStudents(event.id, [studentId.value]);
+    await getEvents();
+    await fetchStudentStatus();
+  } catch (err) {
+    console.error("Unregistration error:", err);
+  }
+};
+
+const checkin = async (event) => {
+  if (!studentId.value) return;
+  try {
+    await eventServices.markAttendance(event.id, [studentId.value]);
+    await getEvents();
+    await fetchStudentStatus();
+  } catch (err) {
+    console.error("Check in error:", err);
+  }
+};
+
+const fetchStudentId = async () => {
+  try {
+    const userId = store.user?.userId;
+    if (!userId) return;
+    const res = await studentServices.getStudentForUserId(userId);
+    studentId.value = res.data.id;
+  } catch (err) {
+    console.error("Failed to fetch student ID:", err);
+  }
+};
+
+const fetchStudentStatus = async () => {
+  if (!studentId.value) return;
+  try {
+    const [registeredRes, checkedInRes] = await Promise.all([
+      eventServices.getRegisteredEventsForStudent(studentId.value),
+      eventServices.getAttendingEventsForStudent(studentId.value),
+    ]);
+    registeredEventIds.value = new Set(
+      registeredRes.data.map((event) => event.id)
+    );
+    checkedInEventIds.value = new Set(
+      checkedInRes.data.map((event) => event.id)
+    );
+  } catch (err) {
+    console.error("Error fetching student status:", err);
+  }
 };
 
 const today = new Date();
@@ -53,26 +128,20 @@ const attributes = ref([]);
 
 const eventsGroupedByDate = computed(() => {
   if (!props.events || selectedDates.value.length === 0) return {};
-
   const grouped = {};
   [...selectedDates.value]
     .sort((a, b) => a - b)
     .forEach((selectedDate) => {
       const dateStr = selectedDate.toDateString();
       grouped[dateStr] = props.events
-        .filter((event) => {
-          const eventDate = new Date(event.date);
-          return eventDate.toDateString() === dateStr;
-        })
+        .filter((event) => new Date(event.date).toDateString() === dateStr)
         .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     });
-
   return grouped;
 });
 
 const filteredEventsGroupedByDate = computed(() => {
   if (selectedDates.value.length === 1) return eventsGroupedByDate.value;
-
   const filtered = {};
   for (const [date, events] of Object.entries(eventsGroupedByDate.value)) {
     if (events.length > 0) {
@@ -98,11 +167,9 @@ function groupByStartTime(events) {
 const updateAttributes = () => {
   interactiveAttribute.value.dates = [...selectedDates.value];
   attributes.value = [];
-
   if (interactiveAttribute.value.dates.length > 0) {
     attributes.value.push({ ...interactiveAttribute.value });
   }
-
   if (eventDots.value.length > 0) {
     attributes.value.push(...eventDots.value);
   }
@@ -114,19 +181,19 @@ const generateEventDots = (eventList) => {
     updateAttributes();
     return;
   }
-
-  eventDots.value = eventList.map((event, index) => ({
-    key: `event-${index}`,
-    dot: { color: "orange" },
-    dates: new Date(event.date),
-    popover: { label: event.name },
-  }));
-
+  eventDots.value = eventList.map((event, index) => {
+    const color = getEventCardColor(event.id);
+    return {
+      key: `event-${index}`,
+      dot: { color },
+      dates: new Date(event.date),
+      popover: { label: event.name },
+    };
+  });
   updateAttributes();
 };
 
 watch(selectedDates, updateAttributes, { deep: true });
-
 watch(
   () => JSON.stringify(props.events),
   (json) => {
@@ -151,12 +218,10 @@ function handleDayClick(day, event) {
 function onDayClick(day, isCtrlPressed = false, isShiftPressed = false) {
   const clickedDate = new Date(day.date);
   let newDates = [];
-
   if (isShiftPressed && lastSelectedDate.value) {
     const start = new Date(Math.min(lastSelectedDate.value, clickedDate));
     const end = new Date(Math.max(lastSelectedDate.value, clickedDate));
     const tempDate = new Date(start);
-
     while (tempDate <= end) {
       newDates.push(new Date(tempDate));
       tempDate.setDate(tempDate.getDate() + 1);
@@ -166,7 +231,6 @@ function onDayClick(day, isCtrlPressed = false, isShiftPressed = false) {
     const exists = selectedDates.value.find(
       (d) => d.toDateString() === clickedDate.toDateString()
     );
-
     if (exists) {
       selectedDates.value = selectedDates.value.filter(
         (d) => d.toDateString() !== clickedDate.toDateString()
@@ -177,41 +241,44 @@ function onDayClick(day, isCtrlPressed = false, isShiftPressed = false) {
   } else {
     selectedDates.value = [clickedDate];
   }
-
   lastSelectedDate.value = clickedDate;
   updateAttributes();
 }
 
 const selectedDateRangeLabel = computed(() => {
   if (selectedDates.value.length === 0) return "";
-
   const sorted = [...selectedDates.value].sort((a, b) => a - b);
   const start = sorted[0];
   const end = sorted[sorted.length - 1];
-
   const options = { month: "short", day: "numeric", year: "numeric" };
   const startLabel = start.toLocaleDateString(undefined, options);
   const endLabel = end.toLocaleDateString(undefined, options);
-
   return startLabel === endLabel
     ? `(${startLabel})`
     : `(${startLabel} – ${endLabel})`;
 });
 
-// Responsive calendar row setting based on screen height
 const calendarRows = ref(window.innerHeight < 700 ? 1 : 2);
 const updateRows = () => {
   calendarRows.value = window.innerHeight < 700 ? 1 : 2;
 };
 
-onMounted(() => {
+onMounted(async () => {
   updateRows();
   window.addEventListener("resize", updateRows);
+  await fetchStudentId();
+  await fetchStudentStatus();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateRows);
 });
+
+const getEventCardColor = (eventId) => {
+  if (checkedInEventIds.value.has(eventId)) return "success";
+  if (registeredEventIds.value.has(eventId)) return "accent";
+  return "primary";
+};
 </script>
 
 <template>
@@ -261,6 +328,7 @@ onBeforeUnmount(() => {
                     :event="event"
                     :view-only="true"
                     color="background"
+                    :status="getEventCardColor(event.id)"
                     :isEventViewing="false"
                     @click="openDialog(event)"
                   />
@@ -281,6 +349,8 @@ onBeforeUnmount(() => {
             @record-attendance="handleRecordAttendance"
             @generate-qr="handleGenerateQRCode"
             @register="handleRegister"
+            @unregister="handleUnregister"
+            @checkin="checkin"
           />
         </div>
 
