@@ -84,7 +84,7 @@ watch(
     await getCurrentToken();
     await checkIfStudentIsRegistered();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Initial mount
