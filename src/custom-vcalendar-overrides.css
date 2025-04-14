@@ -67,7 +67,7 @@
 }
 
 .vc-weekday {
-  color: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-text)) !important;
   font-weight: bold;
   font-size: 1.2rem !important; /* Adjust as needed */
   margin-bottom: 15%;
@@ -95,4 +95,9 @@
 
 .vc-popover-content {
   border: rgba(var(--v-theme-text), 0.9);
+}
+
+.vc-day-past .vc-day-content {
+  opacity: 0.4;
+  pointer-events: none; /* disables clicks — optional */
 }

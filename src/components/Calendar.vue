@@ -129,15 +129,24 @@ const attributes = ref([]);
 
 const eventsGroupedByDate = computed(() => {
   if (!allEvents.value || selectedDates.value.length === 0) return {};
+
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+
   const grouped = {};
   [...selectedDates.value]
     .sort((a, b) => a - b)
     .forEach((selectedDate) => {
-      const dateStr = selectedDate.toDateString();
+      const dateStr = formatDate(selectedDate);
       grouped[dateStr] = allEvents.value
-        .filter((event) => new Date(event.date).toDateString() === dateStr)
+        .filter((event) => formatDate(event.date) === dateStr)
         .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     });
+
   return grouped;
 });
 
@@ -272,11 +281,53 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", updateRows);
 });
 
+function goToToday() {
+  const today = new Date();
+  selectedDates.value = [today];
+  lastSelectedDate.value = today;
+  updateAttributes();
+}
+
 const getEventCardColor = (eventId) => {
   if (checkedInEventIds.value.has(eventId)) return "success";
   if (registeredEventIds.value.has(eventId)) return "accent";
   return "primary";
 };
+
+function clearSelection() {
+  selectedDates.value = [];
+  updateAttributes();
+}
+
+function selectThisWeek() {
+  const today = new Date();
+  const start = new Date(today);
+  start.setDate(today.getDate() - today.getDay()); // Sunday
+  const week = [];
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + i);
+    week.push(day);
+  }
+  selectedDates.value = week;
+  lastSelectedDate.value = today;
+  updateAttributes();
+}
+
+function selectThisMonth() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const monthDates = [];
+  for (let i = 1; i <= daysInMonth; i++) {
+    monthDates.push(new Date(year, month, i));
+  }
+  selectedDates.value = monthDates;
+  lastSelectedDate.value = today;
+  updateAttributes();
+}
 </script>
 
 <template>
@@ -284,6 +335,48 @@ const getEventCardColor = (eventId) => {
     <div class="calendar-row">
       <!-- Left card: Calendar -->
       <v-card class="calendar-card pa-4 bg-backgroundDarken" flat>
+        <div class="d-flex justify-space-between align-center mb-3 px-4">
+          <div>
+            <v-btn
+              color="secondary"
+              size="small"
+              prepend-icon="mdi-calendar-today"
+              @click="goToToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              size="small"
+              color="secondary"
+              prepend-icon="mdi-calendar-week"
+              class="ml-2"
+              @click="selectThisWeek"
+            >
+              This Week
+            </v-btn>
+            <v-btn
+              size="small"
+              color="secondary"
+              prepend-icon="mdi-calendar-month"
+              class="ml-2"
+              @click="selectThisMonth"
+            >
+              This Month
+            </v-btn>
+          </div>
+
+          <div v-if="selectedDates.length > 1">
+            <v-btn
+              size="small"
+              color="danger"
+              prepend-icon="mdi-close-circle-outline"
+              @click="clearSelection"
+            >
+              Clear
+            </v-btn>
+          </div>
+        </div>
+
         <VCalendar
           :rows="calendarRows"
           :attributes="attributes"
@@ -310,15 +403,13 @@ const getEventCardColor = (eventId) => {
             :key="dateLabel"
             class="timeline-day"
           >
-            <h3 class="timeline-day-label">{{ dateLabel }}</h3>
-
             <div v-if="dayEvents.length > 0" class="timeline">
               <div
                 v-for="(group, time) in groupByStartTime(dayEvents)"
                 :key="time"
                 class="timeline-item"
               >
-                <div class="timeline-time">{{ time }}</div>
+                <div class="timeline-time">{{ dateLabel }}</div>
                 <div class="timeline-group">
                   <EventCard
                     v-for="(event, idx) in group"
@@ -421,14 +512,7 @@ const getEventCardColor = (eventId) => {
 }
 
 .timeline-day {
-  margin-bottom: 30px;
-}
-
-.timeline-day-label {
-  font-size: 15px;
-  font-weight: bold;
-  color: rgb(var(--v-theme-text));
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .timeline {
@@ -447,6 +531,7 @@ const getEventCardColor = (eventId) => {
 
 .timeline-time {
   min-width: 65px;
+  width: 95px;
   color: rgb(var(--v-theme-text));
 }
 

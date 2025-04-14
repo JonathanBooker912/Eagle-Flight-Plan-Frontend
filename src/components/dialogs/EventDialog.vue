@@ -1,15 +1,8 @@
 <script setup>
-import { watch, computed, ref, onMounted } from "vue";
-import dayjs from "dayjs";
-import eventServices from "../../services/eventServices";
-import { generateEventQRCodePDF } from "../../utils/pdfGenerator.js";
+import { computed, watch, onMounted, ref } from "vue";
 import QRCodeGenerationModal from "../../components/modals/QRCodeGenerationModal.vue";
-import { userStore } from "../../stores/userStore.js";
-import studentServices from "../../services/studentServices.js";
+import { useEventCheckIn } from "../../utils/useEventCheckin";
 
-const store = userStore();
-
-// Props
 const props = defineProps({
   modelValue: Boolean,
   event: {
@@ -19,7 +12,6 @@ const props = defineProps({
   isAdmin: Boolean,
 });
 
-// Emits
 const emit = defineEmits([
   "update:modelValue",
   "record-attendance",
@@ -29,149 +21,77 @@ const emit = defineEmits([
   "checkin",
 ]);
 
-// Local refs & state
-const eventToShow = ref({});
-const generatingToken = ref(false);
-const generatingPDF = ref(false);
-const generatedToken = ref(null);
+// Composable for shared event logic
+const {
+  eventToShow,
+  setEvent,
+  generatedToken,
+  getCurrentToken,
+  generateToken: handleGenerateQRCode,
+  downloadQRCode,
+  generatingToken,
+  generatingPDF,
+  checkingToken,
+  successMessage,
+  isEventInFuture,
+  checkIfStudentIsRegistered,
+  registered,
+  attending,
+} = useEventCheckIn();
+
 const showQRCodeModal = ref(false);
-const checkingToken = ref(false);
 
-const registered = ref(false);
-const attending = ref(false);
-const successMessage = ref("");
-
-// Internal dialog model
+// Sync dialog visibility with parent
 const internalValue = computed({
   get: () => props.modelValue,
   set: (val) => emit("update:modelValue", val),
 });
 
-// Check if event is in the future
-const isEventInFuture = computed(() => {
-  if (!eventToShow.value?.date) return false;
-  return dayjs(eventToShow.value.date).isAfter(dayjs());
-});
-
-const checkIfStudentIsRegistered = async () => {
-  try {
-    const userId = store.user?.userId;
-    if (!userId || !props.event?.id) return;
-
-    const studentRes = await studentServices.getStudentForUserId(userId);
-    const studentId = studentRes.data.id;
-
-    const registeredRes = await eventServices.getRegisteredStudents(
-      props.event.id,
-    );
-    registered.value = registeredRes.data.some(
-      (s) => s.studentId === studentId,
-    );
-
-    const attendingRes = await eventServices.getAttendingStudents(
-      props.event.id,
-    );
-    attending.value = attendingRes.data.some((s) => s.studentId === studentId);
-  } catch (err) {
-    console.error("Error checking registration:", err);
-  }
-};
-
-// Methods
+// Local event-specific actions
 const recordAttendance = () => {
   emit("record-attendance", props.event);
-  successMessage.value = "Attendance recorded!";
-  setTimeout(() => {
-    successMessage.value = "";
-    internalValue.value = false;
-  }, 2000);
+  showSuccess("Attendance recorded!");
 };
 
 const register = () => {
   emit("register", props.event);
-  successMessage.value = "Successfully registered!";
-  setTimeout(() => {
-    successMessage.value = "";
-    internalValue.value = false;
-  }, 2000);
+  showSuccess("Successfully registered!");
 };
 
 const unregister = () => {
   emit("unregister", props.event);
-  successMessage.value = "Unregistered successfully!";
-  setTimeout(() => {
-    successMessage.value = "";
-    internalValue.value = false;
-  }, 2000);
+  showSuccess("Unregistered successfully!");
 };
 
 const checkin = () => {
   emit("checkin", props.event);
-  successMessage.value = "Checked in successfully!";
+  showSuccess("Checked in successfully!");
+};
+
+const showSuccess = (msg) => {
+  successMessage.value = msg;
   setTimeout(() => {
     successMessage.value = "";
     internalValue.value = false;
   }, 2000);
 };
 
-const getCurrentToken = async () => {
-  if (!eventToShow.value?.id) return;
-
-  checkingToken.value = true;
-  try {
-    const response = await eventServices.getCheckInToken(eventToShow.value.id);
-    generatedToken.value = response.data;
-  } catch (error) {
-    console.error("Error getting check-in token:", error);
-    generatedToken.value = null;
-  } finally {
-    checkingToken.value = false;
-  }
-};
-
-const handleGenerateQRCode = async (expirationTimestamp) => {
-  generatingToken.value = true;
-  try {
-    const response = await eventServices.generateCheckInToken(
-      eventToShow.value.id,
-      expirationTimestamp,
-    );
-    generatedToken.value = response.data;
-  } catch (error) {
-    console.error("Error generating check-in token:", error);
-  } finally {
-    generatingToken.value = false;
-  }
-};
-
-const downloadQRCode = async () => {
-  if (!generatedToken.value) return;
-
-  generatingPDF.value = true;
-  try {
-    await generateEventQRCodePDF(eventToShow.value, generatedToken.value);
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-  } finally {
-    generatingPDF.value = false;
-  }
-};
-
-// On mount/load
-onMounted(() => {
-  eventToShow.value = props.event;
-  getCurrentToken();
-});
-
+// Watch for event prop changes
 watch(
   () => props.event,
-  (newEvent) => {
-    eventToShow.value = newEvent;
-    getCurrentToken();
-    checkIfStudentIsRegistered();
+  async (newEvent) => {
+    setEvent(newEvent);
+    await getCurrentToken();
+    await checkIfStudentIsRegistered();
   },
   { immediate: true },
 );
+
+// Initial mount
+onMounted(() => {
+  setEvent(props.event);
+  getCurrentToken();
+});
 </script>
 
 <template>
@@ -204,7 +124,10 @@ watch(
                 <v-btn
                   color="primary"
                   rounded="xl"
-                  :class="generatedToken?.token ? 'button-half' : 'button-full'"
+                  :class="{
+                    'button-half': generatedToken?.token,
+                    'button-full': !generatedToken?.token && !isEventInFuture,
+                  }"
                   @click="recordAttendance"
                 >
                   Record Attendance
@@ -220,20 +143,18 @@ watch(
                 >
                   Download QR Code PDF
                 </v-btn>
+                <v-btn
+                  v-if="!generatedToken?.token && isEventInFuture"
+                  color="primary"
+                  rounded="xl"
+                  class="button-half"
+                  :loading="generatingToken"
+                  :disabled="checkingToken"
+                  @click="showQRCodeModal = true"
+                >
+                  Generate Check-In Code
+                </v-btn>
               </div>
-
-              <!-- Generate Token (separate full-width button if no token yet) -->
-              <v-btn
-                v-if="!generatedToken?.token && isEventInFuture"
-                color="primary"
-                rounded="xl"
-                class="mt-2 button-full"
-                :loading="generatingToken"
-                :disabled="checkingToken"
-                @click="showQRCodeModal = true"
-              >
-                Generate Check-In Code
-              </v-btn>
 
               <QRCodeGenerationModal
                 v-model:show="showQRCodeModal"
