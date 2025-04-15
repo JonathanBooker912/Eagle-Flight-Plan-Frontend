@@ -20,23 +20,33 @@ const isAdmin = ref(false);
 
 const getNotifications = async (page = 1) => {
   try {
-    const res = await notificationServices.getAllNotificationsForUser(
-      store.user.userId,
-      page,
-      pageSize.value,
+    // First get all notifications
+    const allRes = await notificationServices.getAllNotificationsForUserWithoutPagination(
+      store.user.userId
     );
 
-    if (!res.data.notifications || res.data.notifications.length === 0) {
+    if (!allRes.data.notifications || allRes.data.notifications.length === 0) {
       noNotifications.value = true;
       return;
     }
-    // Sort notifications by creation date (most recent first)
-    notifications.value = res.data.notifications.sort((a, b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt);
+    
+    // Sort all notifications by date in descending order (newest first)
+    const sortedNotifications = allRes.data.notifications.sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return dateB - dateA;
     });
-    // Update the notifications array
-    totalPages.value = Math.ceil(res.data.total / pageSize.value);
-    currentPage.value = page; // Ensure currentPage updates correctly
+    
+    // Calculate pagination
+    const startIndex = (page - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    
+    // Update the notifications array with the current page
+    notifications.value = sortedNotifications.slice(startIndex, endIndex);
+    
+    // Update total pages based on all notifications
+    totalPages.value = Math.ceil(sortedNotifications.length / pageSize.value);
+    currentPage.value = page;
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
@@ -69,7 +79,8 @@ onMounted(async () => {
 });
 
 const formattedDateTime = (item) => {
-  return moment(item.dateTime).format("MM/DD/YYYY hh:mm A");
+  console.log(item);
+  return moment(item).format("MM/DD/YYYY hh:mm A");
 };
 
 const editItem = async (item) => {
