@@ -62,7 +62,7 @@ const handleClick = () => {
           <v-card-text class="text-no-wrap">
             <v-tooltip bottom>
               <!-- eslint-disable-next-line vue/no-template-shadow -->
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <p v-bind="props" class="text-h6 mb-2 truncate-text">
                   {{ flightPlanItem.name }}
                 </p>

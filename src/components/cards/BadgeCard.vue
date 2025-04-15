@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import defaultImage from "../../assets/DefaultBadgeImage.png";
 import { loadImage } from "../componentUtilities";
-
+import fileServices from "../../services/fileServices";
 const props = defineProps({
   badge: { type: Object, required: true },
   isProfilePage: { type: Boolean, default: false },
@@ -11,9 +11,15 @@ const emit = defineEmits(["edit", "delete"]);
 
 const imageSrc = ref("");
 
+const fetchImage = async () => {
+  const response = await fileServices.getFileForName(props.badge.imageName);
+  if (!response.data.image) return;
+  imageSrc.value = loadImage(response.data.image.data);
+};
+
 // Vue functions
-onMounted(() => {
-  loadImage(props.badge.image);
+onMounted(async () => {
+  await fetchImage();
 });
 onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 
@@ -24,7 +30,7 @@ const cardClass = computed(() => {
 </script>
 
 <template>
-  <v-card :class="['rounded-xl', cardClass]">
+  <v-card :class="['rounded-xl', cardClass, 'bg-backgroundDarken']">
     <v-card-text>
       <v-img
         v-if="imageSrc"

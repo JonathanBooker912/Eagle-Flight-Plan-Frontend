@@ -17,7 +17,7 @@ export default {
     );
   },
   getFileForName(fileName) {
-    return apiClient.get(`/file/${fileName}`, { responseType: "blob" });
+    return apiClient.get(`/file/${fileName}`);
   },
   deleteFileForName(fileName) {
     return apiClient.delete(`/file/${fileName}`);
