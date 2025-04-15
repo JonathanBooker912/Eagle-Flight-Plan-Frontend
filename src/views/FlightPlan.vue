@@ -115,7 +115,7 @@ const fetchFlightPlan = async () => {
   if (flightPlanStore.selectedSemester) {
     selectedFlightPlan.value = flightPlanStore.selectedSemester;
     flightPlan.value = response.data.find(
-      (plan) => plan.id === flightPlanStore.selectedSemester.value
+      (plan) => plan.id === flightPlanStore.selectedSemester.value,
     );
   } else {
     selectedFlightPlan.value = flightPlans.value[0];

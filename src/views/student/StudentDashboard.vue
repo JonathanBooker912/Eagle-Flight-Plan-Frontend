@@ -112,7 +112,7 @@ const fetchFlightPlanProgress = async () => {
         .filter((item) => item.status === "Incomplete")
         .slice(0, 3);
     }
-    
+
     // Store the selected semester in the flight plan store
     flightPlanStore.setSelectedSemester(selectedFlightPlan.value);
   } catch (err) {
@@ -207,7 +207,9 @@ onMounted(async () => {
             />
           </template>
           <div v-else class="text-center pa-4">
-            <span class="text-subtitle-1">No Incomplete Items Found For This Semester!</span>
+            <span class="text-subtitle-1"
+              >No Incomplete Items Found For This Semester!</span
+            >
           </div>
         </div>
         <v-btn
