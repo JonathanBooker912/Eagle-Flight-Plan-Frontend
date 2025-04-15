@@ -26,6 +26,10 @@ const routes = [
     name: "Badges",
     routeName: "badge",
   },
+  {
+    name: "Majors",
+    routeName: "majors",
+  },
 ];
 const router = useRouter();
 
