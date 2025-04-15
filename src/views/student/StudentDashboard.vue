@@ -203,8 +203,8 @@ onMounted(async () => {
         <div id="notifList">
           <NotificationCard
             v-for="(item, index) in notifications.slice(0, 5)"
-            color="background"
             :key="index"
+            color="background"
             :to="{ name: 'student-notifications' }"
             :notification="item"
             class="notification"

@@ -31,9 +31,9 @@ const categoryColor = computed(() => {
 
 <template>
   <v-card
+    v-show="hoveredStrength === null || hoveredStrength === strength.name"
     color="backgroundDarken"
     class="pa-3 my-2 rounded-lg strengthCard"
-    v-show="hoveredStrength === null || hoveredStrength === strength.name"
     :class="{
       expanded: hoveredStrength === strength.name,
     }"

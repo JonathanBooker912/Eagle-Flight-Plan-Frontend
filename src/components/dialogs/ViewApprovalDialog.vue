@@ -122,13 +122,13 @@ watch(visible, async (newValue) => {
 });
 </script>
 <template>
-  <v-dialog transition="dialog-bottom-transition" v-model="visible">
-    <v-card color="backgroundDarken rounded-lg" v-if="!showReject">
+  <v-dialog v-model="visible" transition="dialog-bottom-transition">
+    <v-card v-if="!showReject" color="backgroundDarken rounded-lg">
       <v-card-title class="d-flex justify-space-between align-center">
         <span class="flex-grow-1 text-center"
           >Approve: {{ flightPlanItem.name }}</span
         >
-        <v-icon @click="visible = false" class="cursor-pointer"
+        <v-icon class="cursor-pointer" @click="visible = false"
           >mdi-close</v-icon
         >
       </v-card-title>
@@ -184,17 +184,17 @@ watch(visible, async (newValue) => {
               {{ flightPlanItem?.submission[0].value }}
             </v-row>
             <v-row
-              v-else-if="submissions.length > 0"
               v-for="(submission, index) in submissions"
+              v-else-if="submissions.length > 0"
               :key="index"
               class="bg-background rounded-lg mb-1"
             >
               <v-col class="d-flex justify-space-between align-center">
                 <span>File {{ index + 1 }}</span>
                 <v-btn
-                  @click="handleDownload(index)"
                   variant="solo"
                   density="comfortable"
+                  @click="handleDownload(index)"
                 >
                   <v-icon icon="mdi-download"></v-icon>
                 </v-btn>
@@ -229,7 +229,7 @@ watch(visible, async (newValue) => {
         <span class="flex-grow-1 text-center"
           >Reject: {{ flightPlanItem.name }}</span
         >
-        <v-icon @click="visible = false" class="cursor-pointer"
+        <v-icon class="cursor-pointer" @click="visible = false"
           >mdi-close</v-icon
         >
       </v-card-title>
