@@ -21,29 +21,30 @@ const isAdmin = ref(false);
 const getNotifications = async (page = 1) => {
   try {
     // First get all notifications
-    const allRes = await notificationServices.getAllNotificationsForUserWithoutPagination(
-      store.user.userId
-    );
+    const allRes =
+      await notificationServices.getAllNotificationsForUserWithoutPagination(
+        store.user.userId,
+      );
 
     if (!allRes.data.notifications || allRes.data.notifications.length === 0) {
       noNotifications.value = true;
       return;
     }
-    
+
     // Sort all notifications by date in descending order (newest first)
     const sortedNotifications = allRes.data.notifications.sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
       return dateB - dateA;
     });
-    
+
     // Calculate pagination
     const startIndex = (page - 1) * pageSize.value;
     const endIndex = startIndex + pageSize.value;
-    
+
     // Update the notifications array with the current page
     notifications.value = sortedNotifications.slice(startIndex, endIndex);
-    
+
     // Update total pages based on all notifications
     totalPages.value = Math.ceil(sortedNotifications.length / pageSize.value);
     currentPage.value = page;
