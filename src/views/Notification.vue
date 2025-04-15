@@ -125,9 +125,7 @@ const editItem = async (item) => {
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
-      <p>
-        Sent By: {{ selectedNotif.user.fullName }}
-      </p>
+      <p>Sent By: {{ selectedNotif.user.fullName }}</p>
       <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
       <p>
         ------------------------------------------------------------------------
