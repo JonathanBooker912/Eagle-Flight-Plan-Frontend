@@ -74,7 +74,7 @@ onMounted(() => {
     >
       <template #item="{ item }">
         <FlightPlanItemApprovalCard
-          :flightPlanItem="item"
+          :flight-plan-item="item"
           @approve="handleApprove(item)"
         />
       </template>

@@ -34,7 +34,9 @@ export const generateEventQRCodePDF = async (event, token) => {
   ctx.fillText("Check-In", canvas.width / 2, 250);
 
   // Generate QR code with full URL
-  const baseUrl = import.meta.env.VITE_APP_CLIENT_URL;
+  // I Tried to make this dynamic but it never worked
+  const baseUrl =
+    "https://flightplan.eaglesoftwareteam.com/2025/flight-plan/t1/";
   const checkInUrl = `${baseUrl}student/event/checkIn/${token.token}`;
   const qrDataUrl = await QRCode.toDataURL(checkInUrl, {
     width: 500,

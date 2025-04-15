@@ -8,7 +8,10 @@ import {
 } from "../../../utils/formValidators";
 import badgeServices from "../../../services/badgeServices";
 import fileServices from "../../../services/fileServices";
-
+import { addTaskToBadgeStore } from "../../../stores/addTaskToBadgeStore";
+import { addExperienceToBadgeStore } from "../../../stores/addExperienceToBadgeStore";
+import AddTaskToBadge from "../../../components/dialogs/AddTaskToBadge.vue";
+import AddExperienceToBadge from "../../../components/dialogs/AddExperienceToBadge.vue";
 // Define statements for vue
 const props = defineProps({
   isAdd: Boolean,
@@ -17,21 +20,71 @@ const props = defineProps({
 // Vue specific statements
 const route = useRoute();
 const router = useRouter();
-
+const addTaskStore = addTaskToBadgeStore();
+const addExperienceStore = addExperienceToBadgeStore();
 // Reactive states
 const errorMessage = ref("");
 const form = ref(null);
 const formData = ref({});
 const image = ref(null);
+const rules = ref([]);
+const selectedRule = ref("Task and Experience Defined");
+const ruleTasks = ref([]);
+const ruleExperiences = ref([]);
 
 // Functions
 const handleCancel = () => {
   router.push({ name: "badge" });
 };
 
+const handleAddTaskToBadge = (response) => {
+  const existingTaskIndex = ruleTasks.value.findIndex(
+    (task) => task.task.id === response.task.id,
+  );
+
+  if (existingTaskIndex !== -1) {
+    ruleTasks.value[existingTaskIndex] = response;
+  } else {
+    ruleTasks.value = [...ruleTasks.value, response];
+  }
+};
+
+const handleAddExperienceToBadge = (response) => {
+  const existingExperienceIndex = ruleExperiences.value.findIndex(
+    (experience) => experience.experience.id === response.experience.id,
+  );
+
+  if (existingExperienceIndex !== -1) {
+    ruleExperiences.value[existingExperienceIndex] = response;
+  } else {
+    ruleExperiences.value = [...ruleExperiences.value, response];
+  }
+};
+
+const removeTask = (task) => {
+  ruleTasks.value = ruleTasks.value.filter((t) => t.task.id !== task.task.id);
+};
+
+const removeExperience = (experience) => {
+  ruleExperiences.value = ruleExperiences.value.filter(
+    (e) => e.experience.id !== experience.experience.id,
+  );
+};
+
 const handleSubmit = async () => {
   const isValid = (await form.value?.validate())?.valid;
+
+  if (selectedRule.value === "Task and Experience Defined") {
+    if (ruleTasks.value.length === 0 && ruleExperiences.value.length === 0) {
+      errorMessage.value = "You must add at least one task or experience";
+      return;
+    }
+    formData.value.tasks = ruleTasks.value;
+    formData.value.experiences = ruleExperiences.value;
+  }
+
   if (!isValid) return;
+
   try {
     if (props.isAdd) {
       await uploadImage();
@@ -73,19 +126,76 @@ const handleImageUpdate = async () => {
   formData.value.image = undefined;
 };
 
-// Vue functions
+// Helper Functions
+const fetchRuleTypes = async () => {
+  try {
+    const response = await badgeServices.getRuleTypes();
+    rules.value = response.data;
+  } catch (error) {
+    console.error("Error fetching rule types:", error);
+    errorMessage.value = "Failed to load rule types";
+  }
+};
+
+const mapTasksToRuleFormat = (tasks) => {
+  return (
+    tasks?.map((task) => ({
+      task: task,
+      quantity: task.badExpTask.quantity,
+    })) || []
+  );
+};
+
+const mapExperiencesToRuleFormat = (experiences) => {
+  return (
+    experiences?.map((experience) => ({
+      experience: experience,
+      quantity: experience.badExpTask.quantity,
+    })) || []
+  );
+};
+
+const fetchBadgeImage = async (imageName) => {
+  try {
+    const response = await fileServices.getFileForName(imageName);
+    return new File([response.data.image], imageName);
+  } catch (error) {
+    console.error("Error fetching badge image:", error);
+    return null;
+  }
+};
+
+// Lifecycle Hooks
 onMounted(async () => {
-  if (!props.isAdd) {
-    try {
-      let response = await badgeServices.getBadge(route.params.id);
-      formData.value = response.data;
-      if (formData.value.imageName) {
-        response = await fileServices.getFileForName(formData.value.imageName);
-        image.value = new File([response.data.image], formData.value.imageName);
+  await fetchRuleTypes();
+  if (props.isAdd) return;
+
+  try {
+    // Fetch badge data
+    const response = await badgeServices.getBadge(route.params.id);
+    const badgeData = response.data;
+
+    // Update form data
+    formData.value = badgeData;
+
+    // Map tasks and experiences
+    ruleTasks.value = mapTasksToRuleFormat(badgeData.tasks);
+    ruleExperiences.value = mapExperiencesToRuleFormat(badgeData.experiences);
+
+    // Set rule type
+    selectedRule.value = badgeData.ruleType;
+
+    // Fetch and set image if exists
+    if (badgeData.imageName) {
+      const imageFile = await fetchBadgeImage(badgeData.imageName);
+      if (imageFile) {
+        image.value = imageFile;
+        formData.value.image = imageFile;
       }
-    } catch (err) {
-      console.log("Error", err);
     }
+  } catch (error) {
+    console.error("Error loading badge data:", error);
+    // TODO: Add user-facing error notification
   }
 });
 </script>
@@ -97,7 +207,10 @@ onMounted(async () => {
     {{ props.isAdd ? "Add Badge" : "Edit Badge" }}
   </h1>
   <v-form ref="form" @submit.prevent>
-    <v-container class="bg-backgroundDarken rounded-t-xl">
+    <v-container
+      class="bg-backgroundDarken rounded-t-xl"
+      style="max-height: 90vh; overflow-y: auto"
+    >
       <v-text-field
         v-model="formData.name"
         variant="solo"
@@ -132,6 +245,84 @@ onMounted(async () => {
         label="Description"
         :rules="[required]"
       ></v-textarea>
+      <v-select
+        v-model="selectedRule"
+        variant="solo"
+        rounded="lg"
+        label="Rule Type"
+        :items="rules"
+      ></v-select>
+      <div v-if="selectedRule === 'Task and Experience Defined'">
+        <v-expansion-panels class="mb-4 rounded-lg">
+          <v-expansion-panel class="mb-2">
+            <v-expansion-panel-title>Tasks</v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-row
+                v-for="ruleTask in ruleTasks"
+                :key="ruleTask.id"
+                class="bg-backgroundDarken my-2 rounded-lg d-flex justify-space-between"
+                ><div class="ma-5">
+                  {{ ruleTask.task.name }}
+                </div>
+
+                <div class="ma-2 d-flex">
+                  <div class="ma-3">Quantity: {{ ruleTask.quantity }}</div>
+                  <v-btn
+                    class="rounded-lg bg-danger"
+                    icon="mdi-delete"
+                    @click="removeTask(ruleTask)"
+                  >
+                  </v-btn>
+                </div>
+              </v-row>
+              <v-row>
+                <v-btn
+                  block
+                  class="rounded-lg bg-backgroundDarken mb-2 mt-4"
+                  @click="addTaskStore.toggleVisibility"
+                  >Add Task</v-btn
+                ></v-row
+              >
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <v-expansion-panels class="mb-4 rounded-lg">
+          <v-expansion-panel class="mb-2">
+            <v-expansion-panel-title>Experiences</v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-row
+                v-for="ruleExperience in ruleExperiences"
+                :key="ruleExperience.id"
+                class="bg-backgroundDarken my-2 rounded-lg d-flex justify-space-between"
+              >
+                <div class="ma-5">
+                  {{ ruleExperience.experience.name }}
+                </div>
+
+                <div class="ma-2 d-flex">
+                  <div class="ma-3">
+                    Quantity: {{ ruleExperience.quantity }}
+                  </div>
+                  <v-btn
+                    class="rounded-lg bg-danger"
+                    icon="mdi-delete"
+                    @click="removeExperience(ruleExperience)"
+                  >
+                  </v-btn>
+                </div>
+              </v-row>
+              <v-row>
+                <v-btn
+                  block
+                  class="rounded-lg bg-backgroundDarken mb-2 mt-4"
+                  @click="addExperienceStore.toggleVisibility"
+                  >Add Experience</v-btn
+                ></v-row
+              >
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </div>
       <v-file-input
         v-model="image"
         variant="solo"
@@ -152,4 +343,6 @@ onMounted(async () => {
       </v-row>
     </v-container>
   </v-form>
+  <AddTaskToBadge @add-task-to-badge="handleAddTaskToBadge" />
+  <AddExperienceToBadge @add-experience-to-badge="handleAddExperienceToBadge" />
 </template>

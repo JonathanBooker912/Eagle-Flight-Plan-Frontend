@@ -65,7 +65,7 @@ onMounted(() => {
               :event="item"
               :view-only="true"
               color="background"
-              :isEventViewing="false"
+              :is-event-viewing="false"
               :to="{ name: 'admin-calendar' }"
             ></EventCard>
           </div>
@@ -86,7 +86,7 @@ onMounted(() => {
           <strong style="font-size: 20px; padding-bottom: 5px"
             >Notifications</strong
           >
-          <div class="scrollable-content" id="notifList">
+          <div id="notifList" class="scrollable-content">
             <v-card
               v-for="(item, index) in notifications.slice(0, 3)"
               :key="index"
