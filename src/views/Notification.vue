@@ -30,10 +30,11 @@ const getNotifications = async (page = 1) => {
       noNotifications.value = true;
       return;
     }
+
+    // Update the notifications array with the paginated results
     notifications.value = res.data.notifications;
-    // Update the notifications array
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
-    currentPage.value = page; // Ensure currentPage updates correctly
+    currentPage.value = page;
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
@@ -66,7 +67,7 @@ onMounted(async () => {
 });
 
 const formattedDateTime = (item) => {
-  return moment(item.dateTime).format("MM/DD/YYYY hh:mm A");
+  return moment(item).format("MM/DD/YYYY hh:mm A");
 };
 
 const editItem = async (item) => {
@@ -122,10 +123,7 @@ const editItem = async (item) => {
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
-      <p>
-        Sent By: {{ selectedNotif.user.fName }}
-        {{ selectedNotif.user.lName }}
-      </p>
+      <p>Sent By: {{ selectedNotif.user.fullName }}</p>
       <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
       <p>
         ------------------------------------------------------------------------
