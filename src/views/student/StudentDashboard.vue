@@ -99,6 +99,22 @@ const fetchFlightPlanProgress = async () => {
         selectedFlightPlan.value.value,
       );
     progress.value = response.data.progress;
+
+    // Fetch and update flight plan items for the selected semester
+    const flightPlanResponse = await flightPlanServices.getFlightPlanForStudent(
+      store.user.userId,
+    );
+    const selectedFlightPlanData = flightPlanResponse.data.find(
+      (plan) => plan.id === selectedFlightPlan.value.value,
+    );
+    if (selectedFlightPlanData) {
+      flightPlanItems.value = selectedFlightPlanData.flightPlanItems
+        .filter((item) => item.status === "Incomplete")
+        .slice(0, 3);
+    }
+    
+    // Store the selected semester in the flight plan store
+    flightPlanStore.setSelectedSemester(selectedFlightPlan.value);
   } catch (err) {
     console.error("Error fetching flight plan progress:", err);
   }
@@ -120,6 +136,7 @@ const openNotification = (x) => {
 
 const openFlightPlanItem = (item) => {
   flightPlanStore.setActiveFlightPlanItem(item);
+  flightPlanStore.setSelectedSemester(selectedFlightPlan.value);
 };
 
 onMounted(async () => {
@@ -177,16 +194,21 @@ onMounted(async () => {
           >Flight Plan</strong
         >
         <div id="flightPlanList">
-          <FlightPlanItemCard
-            v-for="(item, index) in flightPlanItems"
-            :key="index"
-            :flight-plan-item="item"
-            class="flightPlanItem"
-            color="background"
-            :to="{ name: 'student-flightPlan' }"
-            :is-flight-plan-view="false"
-            @click="openFlightPlanItem(item)"
-          />
+          <template v-if="flightPlanItems.length > 0">
+            <FlightPlanItemCard
+              v-for="(item, index) in flightPlanItems"
+              :key="index"
+              :flight-plan-item="item"
+              class="flightPlanItem"
+              color="background"
+              :to="{ name: 'student-flightPlan' }"
+              :is-flight-plan-view="false"
+              @click="openFlightPlanItem(item)"
+            />
+          </template>
+          <div v-else class="text-center pa-4">
+            <span class="text-subtitle-1">No Incomplete Items Found For This Semester!</span>
+          </div>
         </div>
         <v-btn
           class="see-more-btn"
