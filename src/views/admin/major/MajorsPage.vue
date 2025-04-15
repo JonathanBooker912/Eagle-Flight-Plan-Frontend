@@ -57,7 +57,7 @@ const getMajors = async (pageNumber = page.value) => {
       pageNumber,
       pageSize.value,
       searchQuery.value,
-      { ...filters.value, ...sortOptions.value }
+      { ...filters.value, ...sortOptions.value },
     );
     console.log(result);
     majors.value = result.data.majors;
