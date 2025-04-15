@@ -43,6 +43,7 @@ const adminRoutes = [
     path: "calendar",
     name: "admin-calendar",
     component: AdminCalendar,
+    props: { isAdmin: true },
   },
   {
     path: "notifications",
@@ -253,6 +254,7 @@ const studentRoutes = [
     path: "calendar",
     name: "student-calendar",
     component: StudentCalendar,
+    props: { isAdmin: false },
   },
   {
     path: "flightPlan",
