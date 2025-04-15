@@ -2,6 +2,8 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import studentServices from "../../services/studentServices";
+import strengthServices from "../../services/strengthServices";
+import majorServices from "../../services/majorServices";
 import { userStore } from "../../stores/userStore";
 import { storeToRefs } from "pinia";
 
@@ -12,8 +14,12 @@ const { user } = storeToRefs(userStoreInstance);
 const graduationDate = ref("");
 const semestersFromGrad = ref(0);
 const profileDescription = ref("");
+const majors = ref([]);
+const cliftonStrengths = ref([]);
 const errorMessage = ref("");
 const isLoading = ref(false);
+const majorOptions = ref([]);
+const cliftonStrengthsOptions = ref([]);
 
 const handleSubmit = async () => {
   try {
@@ -23,6 +29,8 @@ const handleSubmit = async () => {
       semestersFromGrad: semestersFromGrad.value,
       pointsAwarded: 0,
       pointsUsed: 0,
+      majors: majors.value,
+      cliftonStrengths: cliftonStrengths.value,
     };
 
     await studentServices.createStudent(studentData);
@@ -45,9 +53,20 @@ onMounted(async () => {
     if (response.data?.graduationDate && response.data?.semestersFromGrad) {
       router.push("/student/profile"); // Redirect if already completed onboarding
     }
+
+    // Fetch majors and strengths
+    const [majorsResponse, strengthsResponse] = await Promise.all([
+      majorServices.getAllMajors(),
+      strengthServices.getAllStrengths(),
+    ]);
+
+    majorOptions.value = majorsResponse.data.map((major) => major.name);
+    cliftonStrengthsOptions.value = strengthsResponse.data.map(
+      (strength) => strength.name
+    );
   } catch (error) {
     // If student doesn't exist, stay on the onboarding page
-    console.log("Student not found, showing onboarding page");
+    console.log("Error fetching data:", error);
   }
 });
 </script>
@@ -87,6 +106,34 @@ onMounted(async () => {
                 ]"
               ></v-text-field>
 
+              <v-select
+                v-model="majors"
+                :items="majorOptions"
+                label="Majors"
+                multiple
+                chips
+                class="mb-4"
+                required
+                :rules="[
+                  (v) => v.length > 0 || 'Please select at least one major',
+                ]"
+                hint="Select all that apply"
+              ></v-select>
+
+              <v-select
+                v-model="cliftonStrengths"
+                :items="cliftonStrengthsOptions"
+                label="Clifton Strengths"
+                multiple
+                chips
+                class="mb-4"
+                required
+                :rules="[
+                  (v) => v.length > 0 || 'Please select at least one strength',
+                ]"
+                hint="Select all that apply"
+              ></v-select>
+
               <v-text-field
                 v-model="profileDescription"
                 label="Profile Description"
@@ -109,7 +156,13 @@ onMounted(async () => {
                   rounded="xl"
                   size="large"
                   :loading="isLoading"
-                  :disabled="!graduationDate || !semestersFromGrad || isLoading"
+                  :disabled="
+                    !graduationDate ||
+                    !semestersFromGrad ||
+                    majors.length === 0 ||
+                    cliftonStrengths.length === 0 ||
+                    isLoading
+                  "
                 >
                   Complete Profile
                 </v-btn>
