@@ -67,7 +67,6 @@ onMounted(async () => {
 });
 
 const formattedDateTime = (item) => {
-  console.log(item);
   return moment(item).format("MM/DD/YYYY hh:mm A");
 };
 
