@@ -16,6 +16,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  status: {
+    type: String,
+    default: "primary",
+  },
 });
 
 const eventDate = computed(() => {
@@ -93,7 +97,7 @@ const showEventInfo = () => {
     @click="viewCard"
   >
     <v-row no-gutters>
-      <div class="h-fill left-accent my-2 ml-2 bg-primary"></div>
+      <div class="h-fill left-accent my-2 ml-2" :class="`bg-${status}`"></div>
       <v-col>
         <v-card-text>
           <p class="text-h6 text-truncate w-100">

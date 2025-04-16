@@ -15,6 +15,8 @@ import RewardPage from "../views/admin/reward/RewardPage.vue";
 import RewardAddEditPage from "../views/admin/reward/RewardAddEditPage.vue";
 import RewardRedemptionPage from "../views/admin/reward/RewardRedemptionPage.vue";
 import MaintenanceLandingPage from "../views/admin/MaintenanceLandingPage.vue";
+import MajorsPage from "../views/admin/major/MajorsPage.vue";
+import MajorAddEditPage from "../views/admin/major/MajorAddEditPage.vue";
 import Profile from "../views/Profile.vue";
 import Notifications from "../views/Notification.vue";
 
@@ -43,6 +45,7 @@ const adminRoutes = [
     path: "calendar",
     name: "admin-calendar",
     component: AdminCalendar,
+    props: { isAdmin: true },
   },
   {
     path: "notifications",
@@ -194,6 +197,25 @@ const adminFlightPlanRoutes = [
     component: AddFlightPlanItem,
   },
 ];
+const adminMajorRoutes = [
+  {
+    path: "maintenance/major",
+    name: "majors",
+    component: MajorsPage,
+  },
+  {
+    path: "maintenance/major/edit/:id",
+    name: "editMajor",
+    component: MajorAddEditPage,
+    props: { isAdd: false },
+  },
+  {
+    path: "maintenance/major/add",
+    name: "addMajor",
+    component: MajorAddEditPage,
+    props: { isAdd: true },
+  },
+];
 
 const adminMaintenanceRoutes = [
   {
@@ -218,6 +240,7 @@ const adminMaintenanceRoutes = [
   ...adminEventRoutes,
   ...adminBadgeRoutes,
   ...adminFlightPlanRoutes,
+  ...adminMajorRoutes,
 ];
 
 const facultyRoutes = [
@@ -253,6 +276,7 @@ const studentRoutes = [
     path: "calendar",
     name: "student-calendar",
     component: StudentCalendar,
+    props: { isAdmin: false },
   },
   {
     path: "flightPlan",

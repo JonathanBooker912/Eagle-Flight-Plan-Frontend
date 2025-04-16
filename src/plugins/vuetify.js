@@ -29,6 +29,7 @@ const vuetify = createVuetify({
           black: "#1A1A1A",
           white: "#E8E8E8",
           text: "#1A1A1A",
+          textInverted: "#E8E8E8",
         },
       },
       darkTheme: {
@@ -44,6 +45,7 @@ const vuetify = createVuetify({
           black: "#1A1A1A",
           white: "#E8E8E8",
           text: "#E8E8E8",
+          textInverted: "#1A1A1A",
         },
       },
     },
@@ -57,3 +59,4 @@ const vuetify = createVuetify({
 });
 
 export default vuetify;
+// new colors

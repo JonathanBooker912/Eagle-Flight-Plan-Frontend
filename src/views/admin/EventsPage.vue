@@ -2,7 +2,6 @@
 import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
-import dayjs from "dayjs";
 import EventServices from "../../services/eventServices.js";
 import StrengthServices from "../../services/strengthServices.js";
 import EventCard from "../../components/cards/EventCard.vue";
@@ -10,36 +9,24 @@ import CardTable from "../../components/CardTable.vue";
 import CardHeader from "../../components/CardHeader.vue";
 import DatePickerField from "../../components/DatePickerField.vue";
 import SortSelect from "../../components/SortSelect.vue";
-import { generateEventQRCodePDF } from "../../utils/pdfGenerator.js";
 import QRCodeGenerationModal from "../../components/modals/QRCodeGenerationModal.vue";
+import { useEventCheckIn } from "../../utils/useEventCheckin.js";
 
 // Constants
 const label = "Events";
+const router = useRouter();
+const display = useDisplay();
 
 const sortProperties = [
-  {
-    title: "Start Date",
-    value: "startTime",
-  },
-  {
-    title: "Name",
-    value: "name",
-  },
-  {
-    title: "Location",
-    value: "location",
-  },
+  { title: "Start Date", value: "startTime" },
+  { title: "Name", value: "name" },
+  { title: "Location", value: "location" },
 ];
 
-// Reactive states
-const router = useRouter();
-const events = ref([]);
+// Pagination / filtering / search
 const page = ref(1);
 const searchQuery = ref("");
 const count = ref(0);
-
-const strengths = ref([]);
-
 const showFilters = ref(false);
 const filters = ref({
   startDate: null,
@@ -47,23 +34,30 @@ const filters = ref({
   location: null,
   strengths: null,
 });
-
-const showInfo = ref(false);
-const eventToShow = ref({});
-
-// Token generation states
-const generatingToken = ref(false);
-const generatingPDF = ref(false);
-const generatedToken = ref(null);
-const showQRCodeModal = ref(false);
-const checkingToken = ref(false);
-
 const sortOptions = ref({
   sortAttribute: sortProperties[0].value,
   sortDirection: "asc",
 });
+const strengths = ref([]);
+const events = ref([]);
+const showQRCodeModal = ref(false);
 
-const display = useDisplay();
+// Info sidebar
+const showInfo = ref(false);
+
+// Composable for event check-in utilities
+const {
+  eventToShow,
+  setEvent,
+  generatedToken,
+  getCurrentToken,
+  generateToken: handleGenerateQRCode,
+  downloadQRCode,
+  generatingToken,
+  generatingPDF,
+  checkingToken,
+  isEventInFuture,
+} = useEventCheckIn();
 
 const numCardColumns = computed(() => {
   if (display.xxl.value) return 4;
@@ -71,20 +65,12 @@ const numCardColumns = computed(() => {
   if (display.lg.value) return showFilters.value || showInfo.value ? 3 : 4;
   if (display.md.value) return showFilters.value || showInfo.value ? 2 : 3;
   if (display.sm.value) return showFilters.value || showInfo.value ? 1 : 2;
-  return 1; // Default for xs
+  return 1;
 });
+
 const pageSize = computed(() => numCardColumns.value * 2);
 
-watch(showFilters, () => getEvents());
-watch(showInfo, () => getEvents());
-
-// Add this computed property after the other computed properties
-const isEventInFuture = computed(() => {
-  if (!eventToShow.value?.date) return false;
-  return dayjs(eventToShow.value.date).isAfter(dayjs());
-});
-
-// Fetch events
+// Fetch events and strengths
 const getEvents = async (pageNumber = page.value) => {
   try {
     const result = await EventServices.getAllEvents(
@@ -108,32 +94,32 @@ const getStrengths = () => {
 
 // Handlers
 const handleAdd = () => router.push({ name: "addEvent" });
+
 const handleEdit = (eventId) =>
   router.push({ name: "editEvent", params: { id: eventId } });
 
 const handleDelete = async (eventId) => {
   try {
     await EventServices.deleteEvent(eventId);
-    await getEvents(); // Re-fetch events after delete
+    await getEvents();
   } catch (error) {
-    console.error("Error deleting Event:", error);
+    console.error("Error deleting event:", error);
   }
 };
 
 const handleSearchChange = (input) => {
   searchQuery.value = input;
-  page.value = 1; // Reset to first page on search change
-  getEvents(page.value);
+  page.value = 1;
+  getEvents();
 };
 
 const handleChangeFilters = () => {
-  if (filters.value.strengths && filters.value.strengths.length > 0) {
-    filters.value.strengths = filters.value.strengths.map(
-      (strength) => strength.id,
-    );
+  if (filters.value.strengths?.length) {
+    filters.value.strengths = filters.value.strengths.map((s) => s.id);
   }
   getEvents();
 };
+
 const handleClearFilters = () => {
   filters.value = {
     startDate: null,
@@ -143,69 +129,31 @@ const handleClearFilters = () => {
   getEvents();
 };
 
-const getCurrentToken = async () => {
-  if (!eventToShow.value?.id) return;
-
-  checkingToken.value = true;
-  try {
-    const response = await EventServices.getCheckInToken(eventToShow.value.id);
-    generatedToken.value = response.data;
-  } catch (error) {
-    console.error("Error getting check-in token:", error);
-    generatedToken.value = null;
-  } finally {
-    checkingToken.value = false;
-  }
-};
-
 const handleShowInfo = async (eventId) => {
-  eventToShow.value = events.value.find((event) => event.id == eventId);
+  const selectedEvent = events.value.find((e) => e.id === eventId);
+  setEvent(selectedEvent);
   showInfo.value = true;
   await getCurrentToken();
 };
 
-const handleGenerateQRCode = async (expirationTimestamp) => {
-  generatingToken.value = true;
-  try {
-    const response = await EventServices.generateCheckInToken(
-      eventToShow.value.id,
-      expirationTimestamp,
-    );
-    generatedToken.value = response.data;
-  } catch (error) {
-    console.error("Error generating check-in token:", error);
-  } finally {
-    generatingToken.value = false;
-  }
-};
-
-const downloadQRCode = async () => {
-  if (!generatedToken.value) return;
-
-  generatingPDF.value = true;
-  try {
-    await generateEventQRCodePDF(eventToShow.value, generatedToken.value);
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-  } finally {
-    generatingPDF.value = false;
-  }
-};
-
 const handleAttendance = (eventId, eventName) => {
-  console.log(eventName);
   router.push({
     name: "attendanceEvent",
-    params: { id: eventId, eventName: eventName },
+    params: { id: eventId, eventName },
   });
 };
 
-// Initial fetch
+// Initial load
 onMounted(() => {
   getEvents();
   getStrengths();
 });
+
+// Refresh events on UI changes
+watch(showFilters, getEvents);
+watch(showInfo, getEvents);
 </script>
+
 <template>
   <v-container fluid>
     <CardHeader
