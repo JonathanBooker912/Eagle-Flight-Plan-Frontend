@@ -34,9 +34,9 @@ const getExperiences = async (pageNumber = page.value) => {
 };
 
 // Handlers
-const handleAdd = () => router.push({ name: "add" });
+const handleAdd = () => router.push({ name: "addExperience" });
 const handleEdit = (experienceId) =>
-  router.push({ name: "edit", params: { id: experienceId } });
+  router.push({ name: "editExperience", params: { id: experienceId } });
 
 const handleDelete = async (experienceId) => {
   try {
