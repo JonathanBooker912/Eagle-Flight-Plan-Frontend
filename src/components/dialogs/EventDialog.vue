@@ -2,6 +2,12 @@
 import { computed, watch, onMounted, ref } from "vue";
 import QRCodeGenerationModal from "../../components/modals/QRCodeGenerationModal.vue";
 import { useEventCheckIn } from "../../utils/useEventCheckin";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const props = defineProps({
   modelValue: Boolean,
@@ -12,13 +18,24 @@ const props = defineProps({
   isAdmin: Boolean,
 });
 
+const eventDate = computed(() => {
+  const dateString = dayjs(props.event.date).format("dddd, MMMM Do");
+  return dateString;
+});
+
+const eventTime = computed(() => {
+  const startTime = dayjs(props.event.startTime).format("h:mma");
+  const endTime = dayjs(props.event.endTime).format("h:mma");
+
+  return `${startTime} - ${endTime}`;
+});
+
 const emit = defineEmits([
   "update:modelValue",
   "record-attendance",
   "generate-qr",
   "register",
   "unregister",
-  "checkin",
 ]);
 
 // Composable for shared event logic
@@ -36,7 +53,6 @@ const {
   isEventInFuture,
   checkIfStudentIsRegistered,
   registered,
-  attending,
 } = useEventCheckIn();
 
 const showQRCodeModal = ref(false);
@@ -63,17 +79,78 @@ const unregister = () => {
   showSuccess("Unregistered successfully!");
 };
 
-const checkin = () => {
-  emit("checkin", props.event);
-  showSuccess("Checked in successfully!");
+const formatDateForGoogleCalendar = (date) =>
+  dayjs(date).tz("America/Chicago").format("YYYYMMDDTHHmmss");
+
+const addToGoogleCalendar = () => {
+  const title = encodeURIComponent(props.event.name);
+  const details = encodeURIComponent(props.event.description || "");
+  const location = encodeURIComponent(props.event.location || "");
+
+  const start = formatDateForGoogleCalendar(props.event.startTime);
+  const end = formatDateForGoogleCalendar(props.event.endTime);
+  const timezone = encodeURIComponent("America/Chicago");
+
+  const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}&ctz=${timezone}`;
+  window.open(url, "_blank");
 };
 
-const showSuccess = (msg) => {
+const addToOutlookCalendar = () => {
+  const title = encodeURIComponent(props.event.name);
+  const body = encodeURIComponent(props.event.description || "");
+  const location = encodeURIComponent(props.event.location || "");
+
+  const start = new Date(props.event.startTime).toISOString();
+  const end = new Date(props.event.endTime).toISOString();
+
+  const url = `https://outlook.office.com/calendar/0/deeplink/compose?subject=${title}&body=${body}&startdt=${start}&enddt=${end}&location=${location}`;
+  window.open(url, "_blank");
+};
+
+const downloadICS = () => {
+  const title = props.event.name;
+  const description = props.event.description || "";
+  const location = props.event.location || "";
+
+  const dtStart =
+    new Date(props.event.startTime)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0] + "Z";
+  const dtEnd =
+    new Date(props.event.endTime)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0] + "Z";
+
+  const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${title}
+DESCRIPTION:${description}
+LOCATION:${location}
+DTSTART:${dtStart}
+DTEND:${dtEnd}
+END:VEVENT
+END:VCALENDAR`;
+
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${title}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+const showSuccess = async (msg) => {
   successMessage.value = msg;
   setTimeout(() => {
     successMessage.value = "";
-    internalValue.value = false;
-  }, 2000);
+  }, 800);
+
+  await checkIfStudentIsRegistered();
 };
 
 // Watch for event prop changes
@@ -111,6 +188,15 @@ onMounted(() => {
         <br />
         <p><strong>Attendance:</strong> {{ event.attendanceType }}</p>
         <p><strong>Registration:</strong> {{ event.registration }}</p>
+        <p>
+          <strong> Location: </strong>
+          {{ props.event.location || "No Location" }}
+        </p>
+        <p>
+          <strong> Date: </strong>
+          {{ eventDate }}
+          {{ eventTime }}
+        </p>
 
         <v-fade-transition mode="out-in">
           <div v-if="successMessage">
@@ -120,41 +206,35 @@ onMounted(() => {
           </div>
           <div v-else>
             <template v-if="props.isAdmin">
-              <div class="button-row mt-5">
-                <v-btn
-                  color="primary"
-                  rounded="xl"
-                  :class="{
-                    'button-half': generatedToken?.token,
-                    'button-full': !generatedToken?.token && !isEventInFuture,
-                  }"
-                  @click="recordAttendance"
-                >
-                  Record Attendance
-                </v-btn>
-
-                <v-btn
-                  v-if="generatedToken?.token"
-                  color="primary"
-                  rounded="xl"
-                  class="button-half"
-                  :loading="generatingPDF"
-                  @click="downloadQRCode"
-                >
-                  Download QR Code PDF
-                </v-btn>
-                <v-btn
-                  v-if="!generatedToken?.token && isEventInFuture"
-                  color="primary"
-                  rounded="xl"
-                  class="button-half"
-                  :loading="generatingToken"
-                  :disabled="checkingToken"
-                  @click="showQRCodeModal = true"
-                >
-                  Generate Check-In Code
-                </v-btn>
-              </div>
+              <v-btn
+                color="primary"
+                rounded="xl"
+                class="button-full"
+                @click="recordAttendance"
+              >
+                Record Attendance
+              </v-btn>
+              <v-btn
+                v-if="generatedToken?.token"
+                color="primary"
+                rounded="xl"
+                class="button-full"
+                :loading="generatingPDF"
+                @click="downloadQRCode"
+              >
+                Download QR Code PDF
+              </v-btn>
+              <v-btn
+                v-if="!generatedToken?.token && isEventInFuture"
+                color="primary"
+                rounded="xl"
+                class="button-full"
+                :loading="generatingToken"
+                :disabled="checkingToken"
+                @click="showQRCodeModal = true"
+              >
+                Generate Check-In Code
+              </v-btn>
 
               <QRCodeGenerationModal
                 v-model:show="showQRCodeModal"
@@ -164,7 +244,13 @@ onMounted(() => {
             </template>
 
             <template v-else-if="!registered">
-              <v-btn color="primary mt-5" rounded="xl" block @click="register">
+              <v-btn
+                color="primary mt-5"
+                rounded="xl"
+                block
+                prepend-icon="mdi-account-check"
+                @click="register"
+              >
                 Register
               </v-btn>
             </template>
@@ -174,23 +260,40 @@ onMounted(() => {
                 <v-btn
                   color="danger"
                   rounded="xl"
-                  :class="attending ? 'button-full' : 'button-half'"
+                  class="button-full"
+                  prepend-icon="mdi-account-off"
                   @click="unregister"
                 >
                   Unregister
                 </v-btn>
-
-                <v-btn
-                  v-if="!attending"
-                  color="success"
-                  rounded="xl"
-                  class="button-half"
-                  @click="checkin"
-                >
-                  Check-In
-                </v-btn>
               </div>
             </template>
+
+            <v-menu v-if="props.isAdmin || registered">
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  v-bind="menuProps"
+                  color="primary"
+                  rounded="xl"
+                  class="button-full"
+                  prepend-icon="mdi-calendar-month"
+                >
+                  Add to Calendar
+                </v-btn>
+              </template>
+
+              <v-list color="backgroundDarken">
+                <v-list-item @click="addToGoogleCalendar">
+                  <v-list-item-title>Google Calendar</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="addToOutlookCalendar">
+                  <v-list-item-title>Outlook Calendar</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="downloadICS">
+                  <v-list-item-title>Download ICS File</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </div>
         </v-fade-transition>
       </v-card-text>
@@ -203,17 +306,8 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-.button-row {
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-}
-
-.button-half {
-  width: 50%;
-}
-
 .button-full {
   width: 100%;
+  margin-top: 3%;
 }
 </style>
