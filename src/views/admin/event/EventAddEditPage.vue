@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import eventServices from "../../../services/eventServices";
+import experienceServices from "../../../services/experienceServices";
 import {
   validateEndTime,
   validateTime,
@@ -23,6 +24,7 @@ const attendanceTypes = ref([]);
 const eventTypes = ref([]);
 const completionTypes = ref([]);
 const timeOptions = ref(generateTimeOptions());
+const experienceOptions = ref([]);
 
 const isAllDay = ref(false);
 
@@ -42,7 +44,6 @@ const onAllDayToggle = () => {
     formData.value.startTime = tempStartTime.value;
     formData.value.endTime = tempEndTime.value;
   }
-  console.log("All day toggled:", isAllDay.value);
 };
 
 const handleCancel = () => router.push({ name: "event" });
@@ -89,17 +90,22 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [completionTypesRes, attendanceTypesRes, registrationTypesRes] =
-      await Promise.all([
-        eventServices.getCompletionTypes(),
-        eventServices.getAttendanceTypes(),
-        eventServices.getRegistrationTypes(),
-      ]);
+    const [
+      completionTypesRes,
+      attendanceTypesRes,
+      registrationTypesRes,
+      experienceRes,
+    ] = await Promise.all([
+      eventServices.getCompletionTypes(),
+      eventServices.getAttendanceTypes(),
+      eventServices.getRegistrationTypes(),
+      experienceServices.getAllExperiences(),
+    ]);
 
     completionTypes.value = completionTypesRes.data;
     attendanceTypes.value = attendanceTypesRes.data;
     registrationTypes.value = registrationTypesRes.data;
-
+    experienceOptions.value = experienceRes.data.experiences;
     if (!props.isAdd) {
       formData.value = (await eventServices.getEvent(route.params.id)).data;
       formData.value.startTime = formatTime(new Date(formData.value.startTime));
@@ -109,9 +115,6 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-
-  console.log(formData.value.startTime);
-  console.log(formData.value.endTime);
 
   if (
     formData.value.startTime == "12:00 AM" &&
@@ -140,7 +143,10 @@ const validateEndTimeWrapper = (value) => {
     {{ props.isAdd ? "Add Event" : "Edit Event" }}
   </h1>
   <v-form ref="form" @submit.prevent>
-    <v-container class="bg-backgroundDarken rounded-t-xl">
+    <v-container
+      class="bg-backgroundDarken rounded-t-xl"
+      style="max-height: 90vh; overflow-y: auto"
+    >
       <v-text-field
         v-model="formData.name"
         variant="solo"
@@ -254,6 +260,17 @@ const validateEndTimeWrapper = (value) => {
         rounded="lg"
         label="Description"
       ></v-textarea>
+      <v-select
+        v-model="formData.experiences"
+        :items="experienceOptions"
+        item-title="name"
+        item-value="id"
+        label="Experience"
+        variant="solo"
+        return-object
+        multiple
+        chips
+      ></v-select>
 
       <v-row class="justify-center mb-1">
         <v-btn

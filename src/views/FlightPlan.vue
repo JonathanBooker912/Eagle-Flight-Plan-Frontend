@@ -111,8 +111,16 @@ const fetchFlightPlan = async () => {
     value: flightPlan.id,
   }));
 
-  selectedFlightPlan.value = flightPlans.value[0];
-  flightPlan.value = response.data[0];
+  // Use stored semester if available, otherwise use first one
+  if (flightPlanStore.selectedSemester) {
+    selectedFlightPlan.value = flightPlanStore.selectedSemester;
+    flightPlan.value = response.data.find(
+      (plan) => plan.id === flightPlanStore.selectedSemester.value,
+    );
+  } else {
+    selectedFlightPlan.value = flightPlans.value[0];
+    flightPlan.value = response.data[0];
+  }
 };
 
 const fetchFlightPlanAndItems = async () => {
