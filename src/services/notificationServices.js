@@ -9,4 +9,7 @@ export default {
   createNotification(notificationData) {
     return apiClient.post("/notification", notificationData);
   },
+  deleteNotification(id) {
+    return apiClient.delete(`/notification/${id}`);
+  },
 };

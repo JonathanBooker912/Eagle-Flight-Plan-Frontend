@@ -6,6 +6,8 @@ import apiClient from "../services/services";
 import moment from "moment";
 import { userStore } from "../stores/userStore";
 import { useNotificationStore } from "../stores/notificationStore";
+import { useSelectedNotificationsStore } from "../stores/selectedNotificationsStore";
+import ConfirmDialog from "../components/dialogs/ConfirmDialog.vue";
 
 const notifications = ref([]);
 const selectedNotif = ref({});
@@ -17,6 +19,8 @@ const totalPages = ref(1);
 const store = userStore();
 const notifStore = useNotificationStore();
 const isAdmin = ref(false);
+const selectedNotificationsStore = useSelectedNotificationsStore();
+const confirmDelete = ref(false);
 
 const getNotifications = async (page = 1) => {
   try {
@@ -88,23 +92,116 @@ const editItem = async (item) => {
   selectedNotif.value = item;
   showsidebar.value = true;
 };
+
+const handleCheckboxToggle = (notification) => {
+  if (
+    selectedNotificationsStore.selectedNotificationIds.includes(notification.id)
+  ) {
+    selectedNotificationsStore.removeNotification(notification.id);
+  } else {
+    selectedNotificationsStore.addNotification(notification.id);
+  }
+};
+
+const handleSelectAll = () => {
+  if (selectedNotificationsStore.selectedNotificationIds.length > 0) {
+    selectedNotificationsStore.clearSelection();
+  } else {
+    notifications.value.forEach((notification) => {
+      selectedNotificationsStore.addNotification(notification.id);
+    });
+  }
+};
+
+const handleBatchDelete = async () => {
+  if (!isAdmin.value) {
+    console.error("Only admins can delete notifications");
+    return;
+  }
+  try {
+    await Promise.all(
+      selectedNotificationsStore.selectedNotificationIds.map((id) =>
+        notificationServices.deleteNotification(id),
+      ),
+    );
+    selectedNotificationsStore.clearSelection();
+    await getNotifications(currentPage.value);
+    closeDialogs();
+  } catch (error) {
+    console.error("Error deleting notifications:", error);
+  }
+};
+
+const closeDialogs = () => {
+  confirmDelete.value = false;
+};
 </script>
 
 <template>
   <div class="container">
     <div class="notifContainer">
-      <h1>Notifications</h1>
+      <div class="d-flex align-center">
+        <h1>Notifications</h1>
+        <v-card
+          v-if="!noNotifications"
+          color="primary"
+          class="combined-button d-flex align-center rounded-lg px-2 py-1 ml-3"
+          @click.stop
+        >
+          <v-checkbox
+            hide-details
+            density="compact"
+            class="ma-0 pa-0"
+            :model-value="
+              selectedNotificationsStore.selectedNotificationIds.length > 0
+            "
+            color="white"
+            @click="handleSelectAll"
+          />
+        </v-card>
+        <v-btn
+          v-if="selectedNotificationsStore.selectedNotificationIds.length > 0"
+          color="danger"
+          class="rounded-lg ml-2"
+          size="small"
+          @click="confirmDelete = true"
+        >
+          <v-icon icon="mdi-delete" size="x-large" color="white" />
+        </v-btn>
+        <div
+          v-if="selectedNotificationsStore.selectedNotificationIds.length > 0"
+          class="selected-count align-center px-2 py-1 ml-2"
+        >
+          Selected:
+          {{ selectedNotificationsStore.selectedNotificationIds.length }}
+        </div>
+      </div>
       <div v-if="!noNotifications" id="notifList">
-        <NotificationCard
+        <div
           v-for="(item, index) in notifications"
           :key="index"
-          :to="{
-            name: isAdmin ? 'admin-notifications' : 'student-notifications',
-          }"
-          :notification="item"
-          :class="{ unread: !item.read, read: item.read }"
-          @click="editItem(item)"
-        />
+          class="d-flex align-center notification-item"
+        >
+          <v-checkbox
+            hide-details
+            density="compact"
+            class="ma-0 pa-0 mr-2"
+            :model-value="
+              selectedNotificationsStore.selectedNotificationIds.includes(
+                item.id,
+              )
+            "
+            @click="handleCheckboxToggle(item)"
+          />
+          <NotificationCard
+            :to="{
+              name: isAdmin ? 'admin-notifications' : 'student-notifications',
+            }"
+            :notification="item"
+            :class="{ unread: !item.read, read: item.read }"
+            @click="editItem(item)"
+          />
+        </div>
       </div>
       <div v-else class="no-notifications">
         <h3>No Notifications!</h3>
@@ -141,6 +238,14 @@ const editItem = async (item) => {
       :total-visible="5"
     ></v-pagination>
   </v-row>
+
+  <ConfirmDialog
+    v-model="confirmDelete"
+    title="Are you sure you want to delete the selected notifications?"
+    confirm-text="Delete"
+    confirm-color="danger"
+    @confirm="handleBatchDelete"
+  />
 </template>
 
 <style>
@@ -158,6 +263,14 @@ const editItem = async (item) => {
   padding-right: 2vw;
   overflow-y: auto;
   overflow-x: auto;
+}
+
+.notification-item {
+  width: 100%;
+}
+
+.notification-item .v-card {
+  flex: 1;
 }
 
 .no-notifications {
@@ -183,5 +296,11 @@ const editItem = async (item) => {
   top: 50px;
   right: 40px;
   z-index: 9999;
+}
+
+.selected-count {
+  background-color: var(--v-background-darken1);
+  border-radius: 4px;
+  color: var(--v-text-base);
 }
 </style>
