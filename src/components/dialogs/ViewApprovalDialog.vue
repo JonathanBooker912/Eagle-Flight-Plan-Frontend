@@ -141,7 +141,7 @@ watch(visible, async (newValue) => {
           </div>
           <div v-else>
             <v-row class="bg-background rounded-lg mb-1">
-              <p v-if="student?.user" class="text-subtitle-1 pa-2">
+              <p v-if="student?.user" class="text-h6 pa-2">
                 {{ student.user.fName }}
                 {{ student.user.lName }}
                 ({{ student.user.id }})
@@ -150,7 +150,7 @@ watch(visible, async (newValue) => {
             </v-row>
             <v-row class="bg-background rounded-lg mb-1">
               <v-col cols="12">
-                <p class="text-body-1">Description</p>
+                <p class="text-h6">Description</p>
               </v-col>
               <v-col cols="12">
                 <p class="text-body-2 ml-3">
@@ -160,7 +160,7 @@ watch(visible, async (newValue) => {
             </v-row>
             <v-row class="bg-background rounded-lg mb-1">
               <v-col cols="12">
-                <p class="text-body-1">Rationale</p>
+                <p class="text-h6">Rationale</p>
               </v-col>
               <v-col cols="12">
                 <p class="text-body-2 ml-3">
@@ -170,29 +170,26 @@ watch(visible, async (newValue) => {
             </v-row>
             <v-row class="bg-background rounded-lg mb-1">
               <v-col cols="12">
-                <p class="text-subtitle-1">Submissions</p>
+                <p class="text-h6">Submissions</p>
               </v-col>
             </v-row>
             <v-row
-              v-if="
-                flightPlanItem?.submission?.length === 1 &&
-                flightPlanItem?.submission[0].submissionType === 'text'
-              "
-              class="pa-4 bg-background rounded-lg text-body-1 mb-3"
-              style="white-space: pre-wrap"
-            >
-              {{ flightPlanItem?.submission[0].value }}
-            </v-row>
-            <v-row
               v-for="(submission, index) in submissions"
-              v-else-if="submissions.length > 0"
               :key="index"
               class="bg-background rounded-lg mb-1"
             >
-              <v-col class="d-flex justify-space-between align-center">
-                <span>File {{ index + 1 }}</span>
+              <div
+                v-if="submission.submissionType === 'text'"
+                class="my-4 ml-2 text-body-1"
+                style="white-space: pre-wrap"
+              >
+                Reflection: {{ submission.value }}
+              </div>
+
+              <v-col v-else class="d-flex justify-space-between align-center">
+                <span>File {{ index }}</span>
                 <v-btn
-                  variant="solo"
+                  variant="outlined"
                   density="comfortable"
                   @click="handleDownload(index)"
                 >
@@ -201,7 +198,10 @@ watch(visible, async (newValue) => {
               </v-col>
             </v-row>
 
-            <v-row v-else class="bg-background rounded-lg mb-3">
+            <v-row
+              v-if="submissions.length === 0"
+              class="bg-background rounded-lg mb-3"
+            >
               <v-col cols="12">
                 <p class="text-subtitle-1 pa-2 text-center">
                   No submission found

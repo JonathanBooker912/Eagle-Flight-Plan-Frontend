@@ -11,17 +11,12 @@ const emit = defineEmits(["submit"]);
 const dialogStore = studentApprovalDialogStore();
 const { visible, flightPlanItem } = storeToRefs(dialogStore);
 
-const type = ref("text");
 const optionalReviewers = ref([{ label: "None", value: null }]);
 const selectedOptionalReviewer = ref();
 const reflectionText = ref("");
 const files = ref();
 const successMessage = ref(""); // Track success message
 const errorMessage = ref("");
-
-const handleTypeToggle = () => {
-  type.value = type.value === "text" ? "file" : "text";
-};
 
 const fetchOptionalReviewers = async () => {
   try {
@@ -45,30 +40,13 @@ const handleCancel = () => {
 };
 
 const handleSubmit = async () => {
-  const submissionData = {
-    flightPlanItemId: flightPlanItem.value.id,
-    submissionType: type.value,
-  };
-
   try {
-    if (type.value === "text") {
-      await submissionServices.createSubmission({
-        ...submissionData,
-        value: reflectionText.value,
-      });
+    if (flightPlanItem.value.task.submissionType === "text") {
+      await submitReflection();
+    } else if (flightPlanItem.value.task.submissionType === "file") {
+      await submitFiles();
     } else {
-      await Promise.all(
-        files.value.map(async (file) => {
-          const { data } = await fileServices.uploadFile(
-            { file },
-            "submissions",
-          );
-          return submissionServices.createSubmission({
-            ...submissionData,
-            value: data.fileName,
-          });
-        }),
-      );
+      await Promise.all([submitFiles(), submitReflection()]);
     }
 
     await flightPlanItemServices.updateFlightPlanItem({
@@ -76,17 +54,48 @@ const handleSubmit = async () => {
       status: "Pending",
     });
     successMessage.value = "Submission successful!";
-
-    setTimeout(() => {
-      successMessage.value = "";
-      files.value = null;
-      reflectionText.value = "";
-      visible.value = false;
-      emit("submit");
-    }, 2000);
+    debounceSubmit();
   } catch (error) {
-    errorMessage.value = error.response.data.message;
+    errorMessage.value = error.response;
   }
+};
+
+const debounceSubmit = () => {
+  setTimeout(() => {
+    successMessage.value = "";
+    files.value = null;
+    reflectionText.value = "";
+    visible.value = false;
+    emit("submit");
+  }, 2000);
+};
+
+const submitFiles = async () => {
+  const submissionData = {
+    flightPlanItemId: flightPlanItem.value.id,
+    submissionType: "file",
+  };
+  await Promise.all(
+    files.value.map(async (file) => {
+      const { data } = await fileServices.uploadFile({ file }, "submissions");
+      return submissionServices.createSubmission({
+        ...submissionData,
+        value: data.fileName,
+      });
+    }),
+  );
+};
+
+const submitReflection = async () => {
+  const submissionData = {
+    flightPlanItemId: flightPlanItem.value.id,
+    submissionType: "text",
+  };
+
+  await submissionServices.createSubmission({
+    ...submissionData,
+    value: reflectionText.value,
+  });
 };
 
 onMounted(fetchOptionalReviewers);
@@ -98,21 +107,13 @@ onMounted(fetchOptionalReviewers);
       <v-card-title class="text-h4 d-flex justify-center align-center">
         <span class="flex-grow-1 text-center">
           {{ flightPlanItem.name }}
-          <v-btn
-            v-if="type === 'text'"
-            icon="mdi-upload"
-            variant="text"
-            class="ml-2"
-            @click="handleTypeToggle"
-          ></v-btn>
-          <v-btn
-            v-else
-            icon="mdi-file-document"
-            variant="text"
-            class="ml-2"
-            @click="handleTypeToggle"
-          ></v-btn>
         </span>
+        <v-icon
+          class="cursor-pointer"
+          size="extra-small"
+          @click="visible = false"
+          >mdi-close</v-icon
+        >
       </v-card-title>
       <v-card-text>
         <v-fade-transition mode="out-in">
@@ -123,22 +124,51 @@ onMounted(fetchOptionalReviewers);
           </div>
           <div v-else>
             <v-textarea
-              v-if="type === 'text'"
+              v-if="flightPlanItem.task.submissionType === 'text'"
               v-model="reflectionText"
               label="Reflection"
               variant="solo"
               rounded="xl"
               bg-color="background"
             ></v-textarea>
-
             <v-file-upload
-              v-if="type === 'file'"
+              v-else-if="flightPlanItem.task.submissionType === 'files'"
               v-model="files"
               label="Upload Files"
               multiple
               rounded="xl"
               color="background"
             ></v-file-upload>
+            <div v-else>
+              <v-expansion-panels class="mb-4 rounded-lg" color="background">
+                <v-expansion-panel class="mb-2">
+                  <v-expansion-panel-title>Reflection</v-expansion-panel-title>
+                  <v-expansion-panel-text class="bg-backgroundDarken">
+                    <v-textarea
+                      v-model="reflectionText"
+                      label="Reflection"
+                      variant="solo"
+                      rounded="xl"
+                      bg-color="background"
+                    ></v-textarea>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+              <v-expansion-panels class="mb-4 rounded-lg" color="background">
+                <v-expansion-panel class="mb-2">
+                  <v-expansion-panel-title>File Upload</v-expansion-panel-title>
+                  <v-expansion-panel-text class="bg-backgroundDarken">
+                    <v-file-upload
+                      v-model="files"
+                      label="Upload Files"
+                      multiple
+                      rounded="xl"
+                      color="background"
+                    ></v-file-upload>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </div>
 
             <div class="d-flex justify-center mt-4">
               <p class="mr-2 mt-1">(Optional) Request Reviewer</p>
