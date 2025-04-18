@@ -68,15 +68,14 @@ const recordAttendance = () => {
   emit("record-attendance", props.event);
   showSuccess("Attendance recorded!");
 };
-
-const register = () => {
-  emit("register", props.event);
-  showSuccess("Successfully registered!");
+const register = async () => {
+  await showSuccess("Successfully registered!");
+  emit("register", props.event); // emit after message
 };
 
-const unregister = () => {
-  emit("unregister", props.event);
-  showSuccess("Unregistered successfully!");
+const unregister = async () => {
+  await showSuccess("Unregistered successfully!");
+  emit("unregister", props.event); // emit after message
 };
 
 const formatDateForGoogleCalendar = (date) =>
@@ -146,9 +145,13 @@ END:VCALENDAR`;
 
 const showSuccess = async (msg) => {
   successMessage.value = msg;
-  setTimeout(() => {
-    successMessage.value = "";
-  }, 800);
+
+  await new Promise((resolve) =>
+    setTimeout(() => {
+      successMessage.value = "";
+      resolve();
+    }, 2000)
+  );
 
   await checkIfStudentIsRegistered();
 };
@@ -161,7 +164,7 @@ watch(
     await getCurrentToken();
     await checkIfStudentIsRegistered();
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 // Initial mount
