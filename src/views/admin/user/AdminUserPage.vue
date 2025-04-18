@@ -10,9 +10,8 @@ const users = ref([]);
 const page = ref(1);
 const count = ref(0);
 const searchQuery = ref("");
-const studentPopup = ref(false);
-const popUpId = ref(null);
-const popUpName = ref(null);
+const showInfo = ref(false);
+const userToShow = ref(null);
 
 const router = useRouter();
 
@@ -30,30 +29,28 @@ const handleSearchChange = (input) => {
   page.value = 1; // Reset to first page on search change
 };
 
-const handleCardClick = (id, user, isAdmin) => {
-  if (isAdmin) {
-    router.push({
-      name: "adminProfile",
-      params: { id },
-    });
-  } else {
-    studentPopup.value = true;
-    popUpName.value = user.fullName;
-    popUpId.value = user.student.id;
-  }
+const handleCardClick = (user) => {
+  console.log(user);
+  userToShow.value = user;
+  showInfo.value = true;
 };
 
-const handleDialogClick = (optionNumber) => {
-  optionNumber
-    ? router.push({
-        name: "adminProfile",
-        params: { id: popUpId.value },
-      })
-    : router.push({
-        name: "adminStudentFlightPlan",
-        params: { id: popUpId.value },
-      });
+const handleViewFlightPlan = () => {
+  router.push({
+    name: "adminStudentFlightPlan",
+    params: { id: userToShow.value.student.id },
+  });
 };
+
+const handleViewProfile = () => {
+  router.push({
+    name: "adminProfile",
+    params: { userId: userToShow.value.id },
+  });
+};
+
+const handleRedeemRewards = () => {};
+
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
 <template>
@@ -71,9 +68,12 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     <CardTable
       v-else
       :items="users"
-      :per-row-lg="4"
-      :per-row-md="3"
-      :per-row-sm="2"
+      :per-row-lg="showInfo ? 3 : 4"
+      :per-row-md="showInfo ? 2 : 3"
+      :per-row-sm="showInfo ? 1 : 2"
+      :show-info="showInfo"
+      :info-label="userToShow?.fullName"
+      @close-info="showInfo = false"
     >
       <template #item="{ item }">
         <UserCard
@@ -81,6 +81,37 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
           :user="item"
           @card-pressed="handleCardClick"
         ></UserCard>
+      </template>
+      <template #info>
+        <div class="d-flex flex-column" style="height: 90%">
+          <div>
+            <p>
+              Major:
+              {{ userToShow.student?.majors[0]?.name || "Undeclared" }}
+            </p>
+            <p>Role: {{ userToShow.roles[0]?.name || "Student" }}</p>
+          </div>
+          <v-spacer></v-spacer>
+          <div>
+            <v-btn
+              block
+              color="primary"
+              class="mb-2"
+              @click="handleViewFlightPlan"
+              >View Flight Plan</v-btn
+            >
+            <v-btn block color="primary" class="mb-2" @click="handleViewProfile"
+              >View Profile</v-btn
+            >
+            <v-btn
+              block
+              color="primary"
+              class="mb-2"
+              @click="handleRedeemRewards"
+              >Redeem Rewards</v-btn
+            >
+          </div>
+        </div>
       </template>
     </CardTable>
     <v-pagination
@@ -94,15 +125,4 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     >
     </v-pagination>
   </v-container>
-  <v-dialog v-model="studentPopup" width="50vw"
-    ><v-card color="backgroundDarken rounded-lg">
-      <v-card-text
-        ><v-btn block variant="tonal" class="ma-2" @click="handleDialogClick(1)"
-          >Profile</v-btn
-        ><v-btn block variant="tonal" class="ma-2" @click="handleDialogClick(0)"
-          >Flight Plan</v-btn
-        ></v-card-text
-      >
-    </v-card>
-  </v-dialog>
 </template>
