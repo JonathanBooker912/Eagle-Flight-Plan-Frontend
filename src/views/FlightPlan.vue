@@ -43,12 +43,12 @@ const downloadFlightPlanICS = async () => {
   const allFPIRes =
     await flightPlanItemServices.getAllFlightPlanItemsForFlightPlan(
       selectedFlightPlan.value.value,
-      { page: 1, pageSize: 1000 }, // or whatever upper bound fits your data
+      { page: 1, pageSize: 1000 } // or whatever upper bound fits your data
     );
   const allItems = allFPIRes.data.flightPlanItems;
 
   const registeredItems = allItems.filter(
-    (item) => item.eventId && item.status === "Registered",
+    (item) => item.eventId && item.status === "Registered"
   );
 
   let icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\n`;
@@ -134,12 +134,12 @@ const fetchStudent = async () => {
   if (props.isAdmin) {
     studentResponse = await studentServices.getStudent(route.params.id);
     const userResponse = await userServices.getOneUser(
-      studentResponse.data.userId,
+      studentResponse.data.userId
     );
     userName.value = userResponse.data.fullName;
   } else {
     studentResponse = await studentServices.getStudentForUserId(
-      user.value.userId,
+      user.value.userId
     );
   }
 
@@ -170,7 +170,7 @@ const fetchFlightPlan = async () => {
   if (flightPlanStore.selectedSemester) {
     selectedFlightPlan.value = flightPlanStore.selectedSemester;
     flightPlan.value = response.data.find(
-      (plan) => plan.id === flightPlanStore.selectedSemester.value,
+      (plan) => plan.id === flightPlanStore.selectedSemester.value
     );
   } else {
     selectedFlightPlan.value = flightPlans.value[0];
@@ -189,7 +189,7 @@ const fetchFlightPlanAndItems = async () => {
   const response =
     await flightPlanItemServices.getAllFlightPlanItemsForFlightPlan(
       selectedFlightPlan.value.value,
-      params,
+      params
     );
 
   flightPlanItems.value = response.data.flightPlanItems;
@@ -198,7 +198,7 @@ const fetchFlightPlanAndItems = async () => {
 
 const fetchFlightPlanProgress = async () => {
   const response = await flightPlanServices.getFlightPlanProgressForFlightPlan(
-    selectedFlightPlan.value.value,
+    selectedFlightPlan.value.value
   );
   progress.value = response.data.progress;
 };
@@ -292,8 +292,8 @@ watch(selectedFlightPlan, () => {
 
 const hasRegisteredEvents = computed(() =>
   flightPlanItems.value.some(
-    (item) => item.eventId && item.status === "Registered",
-  ),
+    (item) => item.eventId && item.status === "Registered"
+  )
 );
 
 watch([page, searchQuery], fetchFlightPlanAndItems);
