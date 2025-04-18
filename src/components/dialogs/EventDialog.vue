@@ -150,7 +150,7 @@ const showSuccess = async (msg) => {
     setTimeout(() => {
       successMessage.value = "";
       resolve();
-    }, 2000),
+    }, 2000)
   );
 
   await checkIfStudentIsRegistered();
@@ -164,7 +164,7 @@ watch(
     await getCurrentToken();
     await checkIfStudentIsRegistered();
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 // Initial mount
