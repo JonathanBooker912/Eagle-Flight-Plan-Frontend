@@ -96,10 +96,10 @@ const fetchStudentStatus = async () => {
       eventServices.getAttendingEventsForStudent(studentId.value),
     ]);
     registeredEventIds.value = new Set(
-      registeredRes.data.map((event) => event.id),
+      registeredRes.data.map((event) => event.id)
     );
     checkedInEventIds.value = new Set(
-      checkedInRes.data.map((event) => event.id),
+      checkedInRes.data.map((event) => event.id)
     );
   } catch (err) {
     console.error("Error fetching student status:", err);
@@ -203,7 +203,7 @@ watch(
       generateEventDots(updatedList);
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 function handleDayClick(day, event) {
@@ -226,11 +226,11 @@ function onDayClick(day, isCtrlPressed = false, isShiftPressed = false) {
     selectedDates.value = newDates;
   } else if (isCtrlPressed) {
     const exists = selectedDates.value.find(
-      (d) => d.toDateString() === clickedDate.toDateString(),
+      (d) => d.toDateString() === clickedDate.toDateString()
     );
     if (exists) {
       selectedDates.value = selectedDates.value.filter(
-        (d) => d.toDateString() !== clickedDate.toDateString(),
+        (d) => d.toDateString() !== clickedDate.toDateString()
       );
     } else {
       selectedDates.value.push(clickedDate);
