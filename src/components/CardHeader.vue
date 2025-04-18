@@ -4,10 +4,14 @@ const props = defineProps({
   label: { type: String, default: null },
   addButton: { type: Boolean, default: true },
   filterButton: { type: Boolean, default: true },
+  exportCalendarButton: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Emit event functions
-const emit = defineEmits(["changed", "add", "toggle-filters"]);
+const emit = defineEmits(["changed", "add", "toggle-filters", "export-ics"]);
 
 let timeout = null;
 
@@ -68,6 +72,21 @@ const handleToggleFilters = () => emit("toggle-filters");
           class="mr-1"
           @click="handleAdd"
         ></v-btn>
+      </div>
+
+      <!-- Export calendar dropdown styled like Filter & Sort -->
+      <div v-if="props.exportCalendarButton" class="mr-2">
+        <v-btn
+          v-bind="menuProps"
+          color="backgroundDarken"
+          rounded="xl"
+          variant="elevated"
+          class="export-btn"
+          prepend-icon="mdi-calendar-month"
+          @click="$emit('export-ics')"
+        >
+          Export to Calendar
+        </v-btn>
       </div>
 
       <!-- Filter & Sort button (desktop) -->
