@@ -73,7 +73,7 @@ const loadExperienceEvents = async () => {
   if (!props.flightPlanItem.experience?.id) return;
   try {
     const response = await eventServices.getEventsForExperience(
-      props.flightPlanItem.experience.id
+      props.flightPlanItem.experience.id,
     );
     eventOptions.value = response.data;
   } catch (err) {
@@ -94,7 +94,7 @@ onMounted(async () => {
   }
 });
 
-const handleRegisterClick = async (item) => {
+const handleRegisterClick = async () => {
   await loadExperienceEvents();
   showEventListDialog.value = true;
 };
@@ -108,9 +108,12 @@ const handleRegister = async (event) => {
   if (!studentId.value) return;
   try {
     await eventServices.registerStudents(event.id, [studentId.value]);
-    props.flightPlanItem.eventId = event.id;
-    props.flightPlanItem.status = "Registered";
-    await flightPlanItemServices.updateFlightPlanItem(props.flightPlanItem);
+    const updatedItem = {
+      ...props.flightPlanItem,
+      eventId: event.id,
+      status: "Registered",
+    };
+    await flightPlanItemServices.updateFlightPlanItem(updatedItem);
     await fetchStudentStatus();
     handleRefresh();
   } catch (err) {
@@ -123,9 +126,12 @@ const handleUnregister = async (event) => {
   if (!studentId.value) return;
   try {
     await eventServices.unregisterStudents(event.id, [studentId.value]);
-    props.flightPlanItem.status = "Incomplete";
-    props.flightPlanItem.eventId = null;
-    await flightPlanItemServices.updateFlightPlanItem(props.flightPlanItem);
+    const updatedItem = {
+      ...props.flightPlanItem,
+      eventId: null,
+      status: "Incomplete",
+    };
+    await flightPlanItemServices.updateFlightPlanItem(updatedItem);
     await fetchStudentStatus();
     handleRefresh();
   } catch (err) {
@@ -171,7 +177,7 @@ const handleClick = () => {
 
 const handleViewRegisteredEvent = async () => {
   const registeredEvent = eventOptions.value.find(
-    (event) => event.id === props.flightPlanItem.eventId
+    (event) => event.id === props.flightPlanItem.eventId,
   );
 
   if (registeredEvent) {
@@ -204,8 +210,8 @@ const handleViewRegisteredEvent = async () => {
         <v-col cols="11">
           <v-card-text class="text-no-wrap">
             <v-tooltip bottom>
-              <template #activator="{ props }">
-                <p v-bind="props" class="text-h6 mb-2 truncate-text">
+              <template #activator="{ props: tooltipProps }">
+                <p v-bind="tooltipProps" class="text-h6 mb-2 truncate-text">
                   {{ flightPlanItem.name }}
                 </p>
               </template>
@@ -290,7 +296,7 @@ const handleViewRegisteredEvent = async () => {
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
-                @click="handleRegisterClick(flightPlanItem)"
+                @click="handleRegisterClick"
               >
                 Register
                 <v-icon right class="pl-1">mdi-account-plus</v-icon>
