@@ -79,7 +79,7 @@ const loadExperienceEvents = async () => {
   if (!props.flightPlanItem.experience?.id) return;
   try {
     const response = await eventServices.getEventsForExperience(
-      props.flightPlanItem.experience.id,
+      props.flightPlanItem.experience.id
     );
     eventOptions.value = response.data;
   } catch (err) {
@@ -183,7 +183,7 @@ const handleClick = () => {
 
 const handleViewRegisteredEvent = async () => {
   const registeredEvent = eventOptions.value.find(
-    (event) => event.id === props.flightPlanItem.eventId,
+    (event) => event.id === props.flightPlanItem.eventId
   );
 
   if (registeredEvent) {
