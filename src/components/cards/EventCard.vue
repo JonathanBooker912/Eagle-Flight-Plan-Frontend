@@ -22,6 +22,7 @@ const props = defineProps({
   },
   statusLabel: {
     type: String,
+    default: "",
   },
 });
 

@@ -10,39 +10,56 @@ import flightPlanItemServices from "../../services/flightPlanItemServices";
 
 const props = defineProps({
   modelValue: Boolean,
-  experienceId: Number,
-  eventOptions: Array,
-  flightPlanItem: Object,
+  experienceId: {
+    type: Number,
+    default: null,
+  },
+  eventOptions: {
+    type: Array,
+    default: () => [],
+  },
+  flightPlanItem: {
+    type: Object,
+    default: () => ({}),
+  },
   flightPlanItems: {
     type: Array,
     default: () => [],
   },
 });
 
-const { checkIfStudentIsRegistered } = useEventCheckIn();
+const emit = defineEmits([
+  "update:modelValue",
+  "select",
+  "register",
+  "refresh",
+]);
 
+const { checkIfStudentIsRegistered } = useEventCheckIn();
 const store = userStore();
 const studentId = ref(null);
 const statusReady = ref(false);
-
 const registeredEventIds = ref(new Set());
 const checkedInEventIds = ref(new Set());
-
-const emit = defineEmits(["update:modelValue", "select"]);
-
 const internalValue = computed({
   get: () => props.modelValue,
   set: (val) => emit("update:modelValue", val),
 });
-
 const selectedEvent = ref(null);
 const successMessage = ref("");
+const fpisWithEvents = ref([]);
+const flightPlanItemCopy = ref({ ...props.flightPlanItem });
+
+watch(
+  () => props.flightPlanItem,
+  (newVal) => {
+    flightPlanItemCopy.value = { ...newVal };
+  },
+);
 
 const selectEvent = (event) => {
   selectedEvent.value = event;
 };
-
-const fpisWithEvents = ref([]);
 
 const fetchFlightPlanItemsWithEvents = async () => {
   if (!studentId.value || !props.flightPlanItem?.flightPlanId) return;
@@ -50,7 +67,7 @@ const fetchFlightPlanItemsWithEvents = async () => {
     const res =
       await flightPlanItemServices.getFlightPlanItemsWithEventsForStudent(
         studentId.value,
-        props.flightPlanItem.flightPlanId
+        props.flightPlanItem.flightPlanId,
       );
     fpisWithEvents.value = res.data;
   } catch (err) {
@@ -100,7 +117,7 @@ const fetchStudentStatus = async () => {
 const matchedFlightPlanItem = computed(() => {
   if (!selectedEvent.value || !fpisWithEvents.value.length) return null;
   return fpisWithEvents.value.find(
-    (item) => item.eventId === selectedEvent.value.id
+    (item) => item.eventId === selectedEvent.value.id,
   );
 });
 
@@ -129,21 +146,17 @@ const eventColors = computed(() => {
     const isRegistered = registeredEventIds.value.has(event.id);
     const isCheckedIn = checkedInEventIds.value.has(event.id);
     const isUsedInOtherFPI = fpisWithEvents.value.some(
-      (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id
+      (item) =>
+        item.eventId === event.id && item.id !== props.flightPlanItem.id,
     );
-
     if (isCheckedIn && !isUsedInOtherFPI) {
-      colorMap[event.id] = "success"; // ✅ Checked in & Eligible
+      colorMap[event.id] = "success";
     } else if (!isCheckedIn && !isUsedInOtherFPI && isRegistered) {
-      colorMap[event.id] = "warning"; // 🟪 Registered & Eligible
+      colorMap[event.id] = "warning";
     } else if (!isCheckedIn && !isUsedInOtherFPI && !isRegistered) {
-      colorMap[event.id] = "primary"; // 🟦 Eligible
-    } else if (isUsedInOtherFPI && isRegistered) {
-      colorMap[event.id] = "danger"; // ⚠️ Registered & Conflict
-    } else if (isCheckedIn && isUsedInOtherFPI) {
-      colorMap[event.id] = "danger"; // ❌ Conflict
+      colorMap[event.id] = "primary";
     } else {
-      colorMap[event.id] = "danger"; // fallback
+      colorMap[event.id] = "danger";
     }
   });
   return colorMap;
@@ -155,9 +168,9 @@ const eventStatusLabels = computed(() => {
     const isRegistered = registeredEventIds.value.has(event.id);
     const isCheckedIn = checkedInEventIds.value.has(event.id);
     const isUsedInOtherFPI = fpisWithEvents.value.some(
-      (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id
+      (item) =>
+        item.eventId === event.id && item.id !== props.flightPlanItem.id,
     );
-
     if (isCheckedIn && isUsedInOtherFPI) {
       labelMap[event.id] = "Conflict";
     } else if (isCheckedIn && !isUsedInOtherFPI) {
@@ -177,39 +190,37 @@ const getEventPriority = (event) => {
   const isRegistered = registeredEventIds.value.has(event.id);
   const isCheckedIn = checkedInEventIds.value.has(event.id);
   const isUsedInOtherFPI = fpisWithEvents.value.some(
-    (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id
+    (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id,
   );
-
-  if (isCheckedIn && !isUsedInOtherFPI) return 0; // 🥇 Checked in & Eligible
-  if (!isCheckedIn && !isUsedInOtherFPI && isRegistered) return 1; // 🥈 Registered & Eligible
-  if (!isCheckedIn && !isUsedInOtherFPI && !isRegistered) return 2; // 🥉 Eligible
-  if (isUsedInOtherFPI && isRegistered) return 3; // ❗ Registered & Conflict
-  if (isCheckedIn && isUsedInOtherFPI) return 4; // ❌ Conflict
-  return 5; // fallback for unknown cases
+  if (isCheckedIn && !isUsedInOtherFPI) return 0;
+  if (!isCheckedIn && !isUsedInOtherFPI && isRegistered) return 1;
+  if (!isCheckedIn && !isUsedInOtherFPI && !isRegistered) return 2;
+  if (isUsedInOtherFPI && isRegistered) return 3;
+  if (isCheckedIn && isUsedInOtherFPI) return 4;
+  return 5;
 };
 
 const sortedEventOptions = computed(() => {
   return [...props.eventOptions].sort(
-    (a, b) => getEventPriority(a) - getEventPriority(b)
+    (a, b) => getEventPriority(a) - getEventPriority(b),
   );
 });
 
 const fulfillExperience = async (event) => {
-  props.flightPlanItem.eventId = event.id;
-  props.flightPlanItem.status = "Registered";
-  await flightPlanItemServices.updateFlightPlanItem(props.flightPlanItem);
-  successMessage.value = "Successfully fullfilled!";
+  flightPlanItemCopy.value.eventId = event.id;
+  flightPlanItemCopy.value.status = "Registered";
+  await flightPlanItemServices.updateFlightPlanItem(flightPlanItemCopy.value);
+  successMessage.value = "Successfully fulfilled!";
   await delay(2000);
   successMessage.value = "";
   emit("refresh");
 };
 
 const completeExperience = async (event) => {
-  props.flightPlanItem.eventId = event.id;
-  props.flightPlanItem.status = "Complete";
-  var earnedPoints = props.flightPlanItem.experience.points;
-
-  await flightPlanItemServices.updateFlightPlanItem(props.flightPlanItem);
+  flightPlanItemCopy.value.eventId = event.id;
+  flightPlanItemCopy.value.status = "Complete";
+  var earnedPoints = flightPlanItemCopy.value.experience.points;
+  await flightPlanItemServices.updateFlightPlanItem(flightPlanItemCopy.value);
   await studentServices.updatePoints(studentId.value, earnedPoints);
   successMessage.value = "Successfully completed!";
   await delay(2000);
@@ -231,7 +242,6 @@ const completeExperience = async (event) => {
           </strong>
           Flight Plan Experience:
         </span>
-
         <v-icon class="cursor-pointer" @click="internalValue = false">
           mdi-close
         </v-icon>
@@ -241,7 +251,6 @@ const completeExperience = async (event) => {
 
       <v-card-text v-if="statusReady && eventOptions?.length > 0" class="pa-0">
         <v-row no-gutters style="height: 500px; overflow: hidden">
-          <!-- Left: Scrollable Event List -->
           <v-col
             cols="5"
             class="pa-4"
@@ -257,11 +266,9 @@ const completeExperience = async (event) => {
               :key="event.id || idx"
               :event="event"
               :view-only="true"
-              color="background"
               :status="eventColors[event.id] || 'primary'"
               :status-label="eventStatusLabels[event.id] || ''"
               :is-event-viewing="false"
-              @click="selectEvent(event)"
               :class="[
                 'event-card',
                 {
@@ -269,15 +276,16 @@ const completeExperience = async (event) => {
                   faded: selectedEvent && selectedEvent.id !== event.id,
                 },
               ]"
+              color="background"
+              @click="selectEvent(event)"
             />
           </v-col>
 
-          <!-- Right: Fixed Full-Height Event Details -->
           <v-col cols="7" class="pa-4 d-flex flex-column justify-start">
             <v-card
-              color="background"
-              class="pa-4 rounded-xl flex-grow-1"
               v-if="selectedEvent"
+              class="pa-4 rounded-xl flex-grow-1"
+              color="background"
             >
               <h3 class="text-h6">{{ selectedEvent.name }}</h3>
               <p>{{ selectedEvent.description }}</p>
@@ -309,13 +317,15 @@ const completeExperience = async (event) => {
               <div v-else>
                 <v-btn
                   v-if="!registeredEventIds.has(selectedEvent.id)"
-                  color="primary mt-4"
+                  :class="'mt-4'"
+                  color="primary"
                   rounded="xl"
                   block
                   @click="register"
                 >
                   Register
                 </v-btn>
+
                 <p
                   v-else-if="matchedFlightPlanItem"
                   class="mt-4 text-left text-medium-emphasis"
@@ -330,31 +340,33 @@ const completeExperience = async (event) => {
                     eventStatusLabels[selectedEvent.id] ===
                     'Checked in & Eligible'
                   "
-                  color="success mt-4"
+                  :class="'mt-4'"
+                  color="success"
                   rounded="xl"
                   block
                   @click="completeExperience(selectedEvent)"
                 >
                   <span class="font-weight-regular">
                     Complete
-                    <strong class="font-weight-bold mx-1">{{
-                      flightPlanItem.name
-                    }}</strong>
+                    <strong class="font-weight-bold mx-1">
+                      {{ flightPlanItem.name }}
+                    </strong>
                   </span>
                 </v-btn>
 
                 <v-btn
                   v-else
-                  color="primary mt-4"
+                  :class="'mt-4'"
+                  color="primary"
                   rounded="xl"
                   block
                   @click="fulfillExperience(selectedEvent)"
                 >
                   <span class="font-weight-regular">
                     Fulfill
-                    <strong class="font-weight-bold mx-1">{{
-                      flightPlanItem.name
-                    }}</strong>
+                    <strong class="font-weight-bold mx-1">
+                      {{ flightPlanItem.name }}
+                    </strong>
                   </span>
                 </v-btn>
               </div>
@@ -371,10 +383,10 @@ const completeExperience = async (event) => {
 
       <v-card-text v-else>
         <v-skeleton-loader
-          type="list-item"
-          class="my-2"
           v-for="i in 3"
           :key="i"
+          type="list-item"
+          class="my-2"
         />
       </v-card-text>
     </v-card>
