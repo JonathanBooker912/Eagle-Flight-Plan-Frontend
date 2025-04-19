@@ -49,7 +49,12 @@ const handleViewProfile = () => {
   });
 };
 
-const handleRedeemRewards = () => {};
+const handleRedeemRewards = () => {
+  router.push({
+    name: "redeemReward",
+    params: { studentId: userToShow.value.student.id },
+  });
+};
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
