@@ -160,7 +160,7 @@ const fetchFlightPlanItemStatuses = async () => {
 
 const fetchUnviewedBadges = async () => {
   const response = await badgeServices.getUnviewedBadges(student.id);
-  if (response.data.length > 0) {
+  if (response.data.length > 0 && !props.isAdmin) {
     unviewedBadges.value = response.data;
     badgeAwardsStore.toggleVisibility();
   }
