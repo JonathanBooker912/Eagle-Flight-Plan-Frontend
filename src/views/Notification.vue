@@ -220,7 +220,12 @@ const closeDialogs = () => {
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
-      <p>Sent By: {{ selectedNotif.user ? selectedNotif.user.fullName : "Eagle Flight Plan" }}</p>
+      <p>
+        Sent By:
+        {{
+          selectedNotif.user ? selectedNotif.user.fullName : "Eagle Flight Plan"
+        }}
+      </p>
       <p>Sent On: {{ formattedDateTime(selectedNotif.createdAt) }}</p>
       <p>
         ------------------------------------------------------------------------
