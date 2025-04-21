@@ -82,7 +82,7 @@ const fetchFlightPlan = async () => {
       selectedFlightPlan.value = flightPlans.value[0];
       flightPlanItems.value = response.data[0].flightPlanItems
         .filter((item) => item.status === "Incomplete")
-        .slice(0, 3);
+        .slice(0, 2);
       await fetchFlightPlanProgress();
     }
   } catch (err) {
@@ -110,7 +110,7 @@ const fetchFlightPlanProgress = async () => {
     if (selectedFlightPlanData) {
       flightPlanItems.value = selectedFlightPlanData.flightPlanItems
         .filter((item) => item.status === "Incomplete")
-        .slice(0, 3);
+        .slice(0, 2);
     }
 
     // Store the selected semester in the flight plan store
@@ -124,7 +124,7 @@ const getEvents = async () => {
   await eventServices
     .getAllEvents()
     .then((res) => {
-      events.value = res.data.events.slice(0, 3);
+      events.value = res.data.events.slice(0, 2);
       isLoaded.value = true;
     })
     .catch((err) => console.error(err));
@@ -291,7 +291,7 @@ onMounted(async () => {
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  height: 100%;
+  height: 62vh;
   padding: 10px 5px 5px 5px;
   border-radius: 25px;
 }
@@ -329,7 +329,7 @@ onMounted(async () => {
 
 .flightPlanItem {
   margin: 0px 10px 0px 10px;
-  height: 17vh;
+  height: 20vh;
   width: 100%;
 }
 
