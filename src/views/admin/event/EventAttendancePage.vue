@@ -23,22 +23,7 @@ const page = ref(1);
 const itemsPerPage = 5;
 const showImportDialog = ref(false);
 const csvFile = ref(null);
-const csvHeaders = ref([]);
 const csvData = ref([]);
-const mapping = ref({
-  attendeeId: "Attendee ID",
-  fName: "First Name",
-  lName: "Last Name",
-  email: "Email Address",
-  institution: "Institution",
-  registered: "Registered",
-  checkedIn: "Checked In",
-  username: "Username",
-  college: "Collge",
-  major: "Major",
-  schoolYear: "School Year",
-  totalCheckIns: "Total Check Ins",
-});
 
 const count = computed(() => Math.ceil(students.value.length / itemsPerPage));
 
