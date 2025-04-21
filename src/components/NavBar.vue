@@ -39,7 +39,6 @@ const admin = [
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
   { "route-name": "maintenance", "link-text": "Maintenance" },
-  { "route-name": "admin-search", "link-text": "Search" },
   { "route-name": "admin-approvals", "link-text": "Approvals" },
 ];
 
@@ -49,7 +48,6 @@ const student = [
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
   { "route-name": "student-notifications", "link-text": "Notifications" },
-  { "route-name": "student-search", "link-text": "Search" },
   { "route-name": "student-shop", "link-text": "Shop" },
 ];
 
@@ -88,7 +86,6 @@ const getIcon = (linkText) => {
     "Flight Plan": "mdi-airplane",
     Calendar: "mdi-calendar",
     Notifications: "mdi-bell",
-    Search: "mdi-magnify",
     Maintenance: "mdi-cog",
     Approvals: "mdi-check",
     Shop: "mdi-cart",
