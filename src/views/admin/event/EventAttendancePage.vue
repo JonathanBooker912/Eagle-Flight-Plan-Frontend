@@ -201,10 +201,20 @@ const submitImport = async () => {
             class="mt-4"
           />
           <div class="mt-5" style="display: flex; justify-content: center">
-            <v-btn class="mr-2" variant="outlined" rounded="xl" @click="showImportDialog = false">
+            <v-btn
+              class="mr-2"
+              variant="outlined"
+              rounded="xl"
+              @click="showImportDialog = false"
+            >
               Cancel
             </v-btn>
-            <v-btn rounded="xl" color="primary" @click="submitImport" :disabled="!csvData.length">
+            <v-btn
+              rounded="xl"
+              color="primary"
+              @click="submitImport"
+              :disabled="!csvData.length"
+            >
               Import
             </v-btn>
           </div>
