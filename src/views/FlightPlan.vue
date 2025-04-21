@@ -1,6 +1,6 @@
 <script setup>
     import { onMounted, ref, watch, computed } from "vue";
-    import { useRoute, useRouter } from "vue-router";
+    import { useRoute } from "vue-router";
     import CardHeader from "../components/CardHeader.vue";
     import CardTable from "../components/CardTable.vue";
     import flightPlanServices from "../services/flightPlanServices";
@@ -90,7 +90,6 @@
     let student = null;
 
     const route = useRoute();
-    const router = useRouter();
     const flightPlan = ref(null);
     const selectedFlightPlan = ref(null);
     const flightPlans = ref([]);
@@ -202,7 +201,6 @@
                 selectedFlightPlan.value.value,
                 params
             );
-
         flightPlanItems.value = response.data.flightPlanItems;
         count.value = response.data.count;
     };
@@ -274,7 +272,15 @@
         useStudentViewSubmissionDialogStore.toggleVisibility();
     };
 
-    const handleAddItems = () => {};
+    const handleAddItems = () => {
+        fetchFlightPlanAndItems();
+    };
+
+    const handleDelete = async (flightPlanItem) => {
+        await flightPlanItemServices.deleteFlightPlanItem(flightPlanItem.id);
+        await fetchFlightPlanAndItems();
+    };
+
     onMounted(async () => {
         if (selectedItem.value) {
             // Scroll to the selected item
@@ -377,8 +383,8 @@
             >
         </v-container>
         <CardHeader
-            :add-button="props.isAdmin"
             :export-calendar-button="hasRegisteredEvents"
+            :add-button="selectedFlightPlan == flightPlans[0] ? true : false"
             @add="handleAdd"
             @changed="handleSearchChange"
             @toggle-filters="showFilters = !showFilters"
@@ -403,8 +409,8 @@
                     :flight-plan-items="flightPlanItems"
                     @incomplete="handleIncompleteButtonClick"
                     @view="handlePendingButtonClick"
-                    @register="handleRegister"
-                />
+                    @delete="handleDelete"
+                ></FlightPlanItemCard>
             </template>
             <template #filters>
                 <v-select
@@ -441,7 +447,7 @@
     ></ViewSubmissionDialog>
     <ViewBadgeAwards :badges="unviewedBadges" />
     <AddFlightPlanItemToFlightPlan
-        v-if="props.isAdmin && flightPlan"
+        v-if="flightPlan"
         :student-id="student.id"
         @add-items="handleAddItems"
     />

@@ -20,6 +20,9 @@ export default {
     getFlightPlanItemStatuses() {
         return apiClient.get("/flightPlanItem/statuses");
     },
+    createFlightPlanItem(flightPlanItem) {
+        return apiClient.post("/flightPlanItem", flightPlanItem);
+    },
     updateFlightPlanItem(flightPlanItem) {
         return apiClient.put(
             `/flightPlanItem/${flightPlanItem.id}`,
@@ -41,12 +44,7 @@ export default {
     rejectFlightPlanItem(flightPlanItemId) {
         return apiClient.put(`/flightPlanItem/${flightPlanItemId}/reject`);
     },
-    getFlightPlanItemsWithEventsForStudent(studentId, flightPlanId) {
-        return apiClient.get(
-            `/flightPlanItem/student/${studentId}/flightplan/${flightPlanId}/with-events`
-        );
-    },
-    createFlightPlanItem(flightPlanItem) {
-        return apiClient.post("/flightPlanItem", flightPlanItem);
+    deleteFlightPlanItem(flightPlanItemId) {
+        return apiClient.delete(`/flightPlanItem/${flightPlanItemId}`);
     }
 };
