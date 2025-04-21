@@ -44,9 +44,9 @@ const showFilters = ref(false);
 const numCardColumns = computed(() => {
   if (display.xxl.value) return showFilters.value ? 3 : 4;
   if (display.xl.value) return showFilters.value ? 3 : 3;
-  if (display.lg.value) return showFilters.value ? 3 : 4;
-  if (display.md.value) return showFilters.value ? 2 : 3;
-  if (display.sm.value) return showFilters.value ? 1 : 2;
+  if (display.lg.value) return showFilters.value ? 2 : 3;
+  if (display.md.value) return showFilters.value ? 1 : 2;
+  if (display.sm.value) return 1;
   return 1;
 });
 const pageSize = computed(() => numCardColumns.value * 2);
