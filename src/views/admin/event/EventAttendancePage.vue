@@ -184,49 +184,31 @@ const submitImport = async () => {
       Import
     </v-btn>
 
-    <v-dialog v-model="showImportDialog" max-width="800">
-      <v-card>
-        <v-card-title>Import Attendance</v-card-title>
-        <v-card-text class="overflow-y-auto" style="max-height: 60vh">
+    <v-dialog v-model="showImportDialog" max-width="400">
+      <v-card color="backgroundDarken" class="rounded-lg">
+        <v-card-text>
+          <div style="text-align: center">
+            <h3>Import Attendance</h3>
+          </div>
           <v-file-input
             v-model="csvFile"
             accept=".csv"
             label="CSV File"
+            prepend-icon="mdi-file-document"
             @change="handleFileUpload"
+            variant="outlined"
+            density="comfortable"
+            class="mt-4"
           />
-
-          <v-divider class="my-4" />
-
-          <div v-if="csvData.length > 0">
-            <h3 class="mb-4">Preview</h3>
-            <v-table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email Address</th>
-                  <th>Checked In</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, index) in csvData.slice(0, 5)" :key="index">
-                  <td>{{ row["First Name"] }} {{ row["Last Name"] }}</td>
-                  <td>{{ row["Email Address"] }}</td>
-                  <td>{{ row["Checked In"] }}</td>
-                </tr>
-              </tbody>
-            </v-table>
+          <div class="mt-5" style="display: flex; justify-content: center">
+            <v-btn class="mr-2" variant="outlined" rounded="xl" @click="showImportDialog = false">
+              Cancel
+            </v-btn>
+            <v-btn rounded="xl" color="primary" @click="submitImport" :disabled="!csvData.length">
+              Import
+            </v-btn>
           </div>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            @click="submitImport"
-            :disabled="!csvData.length"
-            >Import</v-btn
-          >
-          <v-btn @click="showImportDialog = false">Cancel</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
 
