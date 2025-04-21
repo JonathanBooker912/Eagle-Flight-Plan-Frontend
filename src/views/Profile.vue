@@ -27,6 +27,9 @@ const badges = ref([]);
 const unviewedBadges = ref([]);
 const selectedUser = ref([]);
 const isAdmin = ref(false);
+const isOwnProfile = ref(false);
+const editDialog = ref(false);
+const editedDescription = ref("");
 
 // Add pagination variables
 const currentPage = ref(1);
@@ -37,6 +40,7 @@ const getUser = async (id) => {
   try {
     const res = await userServices.getOneUser(id); // PASS IN THE ID
     selectedUser.value = res.data; // Update links
+    editedDescription.value = res.data.profileDescription || "";
   } catch (err) {
     console.error("Error fetching user:", err); // Error handling
   }
@@ -105,6 +109,20 @@ const toFlightPlan = () => {
   router.push({ name: "student-flightPlan" });
 };
 
+const saveDescription = async () => {
+  try {
+    const updatedUser = {
+      ...selectedUser.value,
+      profileDescription: editedDescription.value,
+    };
+    await userServices.updateUser(updatedUser);
+    selectedUser.value = updatedUser;
+    editDialog.value = false;
+  } catch (err) {
+    console.error("Error updating user description:", err);
+  }
+};
+
 // Add watcher for pagination
 watch(currentPage, (newPage) => {
   getBadges(route.params.userId, newPage);
@@ -118,10 +136,16 @@ onMounted(async () => {
     await fetchUnviewedBadges();
   }
 
-  getLinks(passedId); // Fetch links on component mount
-  getStrengths(passedId);
-  getBadges(passedId);
-  getUser(passedId);
+  await getLinks(passedId); // Fetch links on component mount
+  await getStrengths(passedId);
+  await getBadges(passedId);
+  await getUser(passedId);
+
+  isOwnProfile.value = passedId == selectedUser.value.id;
+
+  console.log(passedId);
+  console.log(selectedUser.value);
+  console.log(isOwnProfile.value);
 });
 </script>
 
@@ -152,7 +176,10 @@ onMounted(async () => {
         </v-col>
 
         <v-col cols="4" class="d-flex flex-column justify-center">
-          <h3 style="text-align: left">About Me:</h3>
+          <div class="d-flex align-center">
+            <h3 style="text-align: left">About Me:</h3>
+            <v-icon v-if="isOwnProfile" class="ml-2" @click="editDialog = true">mdi-pencil</v-icon>
+          </div>
           <p style="text-align: left; display: flex; font-size: 18px">
             {{ selectedUser.profileDescription }}
           </p>
@@ -277,6 +304,30 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-row>
+
+  <v-dialog v-model="editDialog" max-width="500px">
+    <v-card>
+      <v-card-title>Edit Profile Description</v-card-title>
+      <v-card-text>
+        <v-textarea
+          v-model="editedDescription"
+          label="About Me"
+          rows="4"
+          variant="outlined"
+        ></v-textarea>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" variant="text" @click="editDialog = false">
+          Cancel
+        </v-btn>
+        <v-btn color="primary" variant="text" @click="saveDescription">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <ViewBadgeAwards :badges="unviewedBadges" />
 </template>
 
