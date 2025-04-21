@@ -82,7 +82,7 @@ const fetchFlightPlan = async () => {
       selectedFlightPlan.value = flightPlans.value[0];
       flightPlanItems.value = response.data[0].flightPlanItems
         .filter((item) => item.status === "Incomplete")
-        .slice(0, 2);
+        .slice(0, 3);
       await fetchFlightPlanProgress();
     }
   } catch (err) {
@@ -110,7 +110,7 @@ const fetchFlightPlanProgress = async () => {
     if (selectedFlightPlanData) {
       flightPlanItems.value = selectedFlightPlanData.flightPlanItems
         .filter((item) => item.status === "Incomplete")
-        .slice(0, 2);
+        .slice(0, 3);
     }
 
     // Store the selected semester in the flight plan store
@@ -124,7 +124,7 @@ const getEvents = async () => {
   await eventServices
     .getAllEvents()
     .then((res) => {
-      events.value = res.data.events.slice(0, 2);
+      events.value = res.data.events.slice(0, 3);
       isLoaded.value = true;
     })
     .catch((err) => console.error(err));
@@ -154,7 +154,7 @@ onMounted(async () => {
     <h1 class="mt-1">Welcome, {{ store.user.fullName }}!</h1>
     <v-row justify="center" class="mr-2">
       <v-col cols="12">
-        <v-card color="backgroundDarken">
+        <v-card color="backgroundDarken" style="border-radius: 25px">
           <v-card-text>
             <v-select
               v-model="selectedFlightPlan"
@@ -174,7 +174,7 @@ onMounted(async () => {
               color="primary"
               bg-color="backgroundLighten"
               height="20"
-              rounded
+              style="border-radius: 25px"
             >
               <strong>{{ progress }}%</strong>
             </v-progress-linear>
@@ -300,24 +300,14 @@ onMounted(async () => {
   padding-left: 0;
 }
 
-.scrollable-content {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 10px;
-}
-
-.see-more-btn {
-  margin-top: auto;
-  text-align: center;
-  width: 100%;
-}
-
 #notifList,
 #flightPlanList,
-#calendarList {
+#eventList {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-bottom: 10px;
+  padding-right: 5px;
 }
 
 .notification {
@@ -329,14 +319,18 @@ onMounted(async () => {
 
 .flightPlanItem {
   margin: 0px 10px 0px 10px;
-  height: 20vh;
   width: 100%;
 }
 
-.calendarItem {
+.event {
   padding: 0px 10px 0px 10px;
   margin: 10px 5px 10px 5px;
-  height: 8vh;
+  width: 100%;
+}
+
+.see-more-btn {
+  margin-top: auto;
+  text-align: center;
   width: 100%;
 }
 </style>
