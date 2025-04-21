@@ -36,7 +36,11 @@ const props = defineProps({
       />
 
       <div class="font-weight-bold mr-3">
-        {{ props.notification.user ? props.notification.user.fullName : 'Eagle Flight Plan' }}
+        {{
+          props.notification.user
+            ? props.notification.user.fullName
+            : "Eagle Flight Plan"
+        }}
       </div>
 
       <div class="mr-3">
