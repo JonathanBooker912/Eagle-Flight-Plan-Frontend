@@ -56,15 +56,16 @@ const route = useRoute();
 const userId = ref(null);
 const router = useRouter();
 const showLogoutDialog = ref(false);
+const isAdmin = ref(false);
 
 onMounted(async () => {
   const store = userStore();
 
-  const isAdmin = await store.isAdmin();
+  isAdmin.value = await store.isAdmin();
   const isFaculty = await store.isFaculty();
 
   // Set the initial role based on authentication and role checks
-  role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
+  role.value = isAdmin.value ? "admin" : isFaculty ? "faculty" : "student";
 
   // Get the user ID from the store
   userId.value = store.user.userId;
@@ -78,6 +79,16 @@ onMounted(async () => {
     role.value = "student";
   }
 });
+
+const toggleView = () => {
+  if (role.value === "admin") {
+    router.push({ name: "student" });
+    role.value = "student";
+  } else {
+    router.push({ name: "admin" });
+    role.value = "admin";
+  }
+};
 
 const getIcon = (linkText) => {
   const icons = {
@@ -163,6 +174,22 @@ const handleLogout = async () => {
         </div>
       </div>
       <div class="mt-auto">
+        <v-list-item v-if="isAdmin" class="bg-secondary" @click="toggleView">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
+              <div class="nav-item-content">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                  mdi-account-switch
+                </v-icon>
+                <span class="nav-text text-backgroundDarken">
+                  To {{ role === "admin" ? "Student" : "Admin" }}
+                </span>
+              </div>
+            </v-list-item-title>
+          </div>
+        </v-list-item>
         <v-list-item class="bg-secondary" @click="toggleTheme">
           <div>
             <v-list-item-title
@@ -233,6 +260,22 @@ const handleLogout = async () => {
         </div>
       </div>
       <div class="mt-auto">
+        <v-list-item v-if="isAdmin" class="bg-secondary" @click="toggleView">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
+              <div class="nav-item-content">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                  mdi-account-switch
+                </v-icon>
+                <span class="nav-text text-backgroundDarken">
+                  To {{ role === "admin" ? "Student" : "Admin" }}
+                </span>
+              </div>
+            </v-list-item-title>
+          </div>
+        </v-list-item>
         <v-list-item class="bg-secondary" @click="toggleTheme">
           <div>
             <v-list-item-title
