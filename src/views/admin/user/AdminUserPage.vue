@@ -63,6 +63,7 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     <CardHeader
       label="Users"
       :add-button="false"
+      :filter-button="false"
       @changed="handleSearchChange"
     ></CardHeader>
     <v-row v-if="users.length === 0" class="justify-center">
