@@ -7,7 +7,6 @@ const isAdmin = ref(false);
 
 onMounted(async () => {
   isAdmin.value = await store.isAdmin();
-  console.log(props.notification);
 });
 
 const props = defineProps({
@@ -37,7 +36,7 @@ const props = defineProps({
       />
 
       <div class="font-weight-bold mr-3">
-        {{ props.notification.user.fullName }}
+        {{ props.notification.user ? props.notification.user.fullName : 'Eagle Flight Plan' }}
       </div>
 
       <div class="mr-3">
