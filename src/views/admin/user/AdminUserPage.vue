@@ -49,7 +49,12 @@ const handleViewProfile = () => {
   });
 };
 
-const handleRedeemRewards = () => {};
+const handleRedeemRewards = () => {
+  router.push({
+    name: "redeemReward",
+    params: { studentId: userToShow.value.student.id },
+  });
+};
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
@@ -58,6 +63,7 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     <CardHeader
       label="Users"
       :add-button="false"
+      :filter-button="false"
       @changed="handleSearchChange"
     ></CardHeader>
     <v-row v-if="users.length === 0" class="justify-center">

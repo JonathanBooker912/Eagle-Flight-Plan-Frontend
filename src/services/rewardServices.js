@@ -3,7 +3,6 @@ import axios from "axios";
 import { getAuthHeader, jsonToFormData, getBaseURL } from "./serviceUtils.js";
 export default {
   getAllRewards(page, pageSize, searchQuery, filters = {}) {
-    console.log(searchQuery);
     return apiClient.get("/reward", {
       params: {
         page: page,
@@ -40,5 +39,11 @@ export default {
   },
   updateReward(rewardId, rewardData) {
     return apiClient.put(`/reward/${rewardId}`, rewardData);
+  },
+  redeemReward(rewardId, studentId, userId) {
+    return apiClient.post(`/reward/redeem/${rewardId}`, {
+      studentId,
+      userId,
+    });
   },
 };

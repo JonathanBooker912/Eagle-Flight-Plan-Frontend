@@ -113,7 +113,7 @@ const adminRewardRoutes = [
     props: { isAdd: true },
   },
   {
-    path: "maintenance/reward/redeem/:id",
+    path: "maintenance/reward/redeem/:studentId",
     name: "redeemReward",
     component: RewardRedemptionPage,
   },
