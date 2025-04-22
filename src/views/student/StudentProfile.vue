@@ -11,7 +11,7 @@ const student = ref(null);
 const checkStudentInfo = async () => {
   try {
     const response = await studentServices.getStudentForUserId(
-      user.value.userId
+      user.value.userId,
     );
     student.value = response.data;
   } catch (error) {
