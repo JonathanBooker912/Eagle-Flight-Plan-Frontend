@@ -1,12 +1,13 @@
 <script setup>
 import eventServices from "../../services/eventServices";
 import notificationServices from "../../services/notificationServices";
-import flightPlanServices from "../../services/flightPlanServices";
-import studentServices from "../../services/studentServices";
+//import flightPlanServices from "../../services/flightPlanServices";
+//import studentServices from "../../services/studentServices";
 import EventCard from "../../components/cards/EventCard.vue";
 import { userStore } from "../../stores/userStore";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useNotificationStore } from "../../stores/notificationStore";
+import { useTheme } from "vuetify";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -38,26 +39,49 @@ const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 
+const theme = useTheme();
+const isDark = computed(() => theme.global.current.value.dark);
+
+const getChartColors = () => {
+  if (isDark.value) {
+    return {
+      primary: "rgba(17, 138, 203, 1)", // primary
+      secondary: "rgba(213, 223, 231, 1)", // secondary
+      accent: "rgba(244, 236, 208, 1)", // accent
+      warning: "rgba(249, 198, 51, 1)", // warning
+    };
+  } else {
+    return {
+      primary: "rgba(17, 138, 203, 1)", // primary
+      secondary: "rgba(53, 56, 65, 1)", // secondary
+      accent: "rgba(244, 236, 208, 1)", // accent
+      warning: "rgba(249, 198, 51, 1)", // warning
+    };
+  }
+};
+
 // Chart data
 const engagementData = ref({
   labels: ["Freshman", "Sophomore", "Junior", "Senior"],
   datasets: [
     {
       label: "Completed Flight Plan Items",
-      data: [0, 0, 0, 0],
-      backgroundColor: [
-        "rgba(255, 99, 132, 0.5)",
-        "rgba(54, 162, 235, 0.5)",
-        "rgba(255, 206, 86, 0.5)",
-        "rgba(75, 192, 192, 0.5)",
-      ],
-      borderColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-      ],
-      borderWidth: 1,
+      data: [45, 65, 80, 90],
+      backgroundColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().secondary,
+        getChartColors().accent,
+        getChartColors().warning,
+      ]),
+      borderColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().secondary,
+        getChartColors().accent,
+        getChartColors().warning,
+      ]),
+      borderWidth: 2,
+      hoverOffset: 15,
+      weight: 1,
     },
   ],
 });
@@ -67,10 +91,20 @@ const onTrackData = ref({
   datasets: [
     {
       label: "Students On Track (%)",
-      data: [0, 0, 0, 0],
-      backgroundColor: "rgba(75, 192, 192, 0.5)",
-      borderColor: "rgba(75, 192, 192, 1)",
-      borderWidth: 1,
+      data: [60, 75, 85, 90],
+      backgroundColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().secondary,
+        getChartColors().accent,
+        getChartColors().warning,
+      ]),
+      borderColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().secondary,
+        getChartColors().accent,
+        getChartColors().warning,
+      ]),
+      borderWidth: 2,
     },
   ],
 });
@@ -81,10 +115,45 @@ const chartOptions = {
   plugins: {
     legend: {
       position: "top",
+      labels: {
+        color: "white",
+        font: {
+          size: 14,
+        },
+      },
     },
     title: {
       display: true,
       text: "Engagement by Classification",
+      color: "white",
+      font: {
+        size: 16,
+      },
+    },
+    tooltip: {
+      callbacks: {
+        label: function (context) {
+          const label = context.label || "";
+          const value = context.raw;
+          return `${label}: ${value}%`;
+        },
+      },
+    },
+  },
+  cutout: "60%", // Creates a donut chart effect
+  rotation: -45, // Rotates the chart for better visual effect
+  animation: {
+    animateScale: true,
+    animateRotate: true,
+  },
+  elements: {
+    arc: {
+      borderWidth: 2,
+      borderColor: "rgba(255, 255, 255, 0.3)",
+      shadowColor: "rgba(0, 0, 0, 0.5)",
+      shadowBlur: 10,
+      shadowOffsetX: 2,
+      shadowOffsetY: 2,
     },
   },
 };
@@ -95,10 +164,20 @@ const onTrackOptions = {
   plugins: {
     legend: {
       position: "top",
+      labels: {
+        color: "white",
+        font: {
+          size: 14,
+        },
+      },
     },
     title: {
       display: true,
       text: "Students On Track by Classification",
+      color: "white",
+      font: {
+        size: 16,
+      },
     },
     tooltip: {
       callbacks: {
@@ -117,11 +196,24 @@ const onTrackOptions = {
       title: {
         display: true,
         text: "Percentage",
+        color: "white",
       },
       ticks: {
+        color: "white",
         callback: function (value) {
           return value + "%";
         },
+      },
+      grid: {
+        color: "rgba(255, 255, 255, 0.1)",
+      },
+    },
+    x: {
+      ticks: {
+        color: "white",
+      },
+      grid: {
+        color: "rgba(255, 255, 255, 0.1)",
       },
     },
   },
@@ -153,101 +245,6 @@ const getNotifications = async (page = 1) => {
   }
 };
 
-const fetchEngagementData = async () => {
-  try {
-    const studentsResponse = await studentServices.getAllStudents();
-    console.log("Students Response:", studentsResponse);
-    const students = studentsResponse.data.rows || []; // Access the rows property
-
-    // Initialize counters for each classification
-    const classificationCounts = {
-      Freshman: 0,
-      Sophomore: 0,
-      Junior: 0,
-      Senior: 0,
-    };
-
-    // Count students in each classification based on semestersFromGrad
-    students.forEach((student) => {
-      console.log("Student:", student);
-      if (student.semestersFromGrad >= 8) classificationCounts.Freshman++;
-      else if (student.semestersFromGrad >= 6) classificationCounts.Sophomore++;
-      else if (student.semestersFromGrad >= 4) classificationCounts.Junior++;
-      else classificationCounts.Senior++;
-    });
-
-    console.log("Classification Counts:", classificationCounts);
-    // Update chart data
-    engagementData.value.datasets[0].data = Object.values(classificationCounts);
-    console.log("Updated Engagement Data:", engagementData.value);
-  } catch (err) {
-    console.error("Error fetching engagement data:", err);
-  }
-};
-
-const fetchOnTrackData = async () => {
-  try {
-    const studentsResponse = await studentServices.getAllStudents();
-    console.log("Students Response for On Track:", studentsResponse);
-    const students = studentsResponse.data.rows || []; // Access the rows property
-
-    // Initialize counters for each classification
-    const onTrackCounts = {
-      Freshman: { total: 0, onTrack: 0 },
-      Sophomore: { total: 0, onTrack: 0 },
-      Junior: { total: 0, onTrack: 0 },
-      Senior: { total: 0, onTrack: 0 },
-    };
-
-    // Process each student
-    for (const student of students) {
-      console.log("Processing Student:", student);
-      let classification = "Senior";
-      if (student.semestersFromGrad >= 8) classification = "Freshman";
-      else if (student.semestersFromGrad >= 6) classification = "Sophomore";
-      else if (student.semestersFromGrad >= 4) classification = "Junior";
-
-      onTrackCounts[classification].total++;
-
-      try {
-        const flightPlanResponse =
-          await flightPlanServices.getFlightPlanForStudent(student.id);
-        console.log("Flight Plan Response:", flightPlanResponse);
-        const flightPlans = flightPlanResponse.data;
-
-        if (flightPlans.length > 0) {
-          const progressResponse =
-            await flightPlanServices.getFlightPlanProgressForFlightPlan(
-              flightPlans[0].id,
-            );
-          console.log("Progress Response:", progressResponse);
-          const progress = progressResponse.data.progress;
-          console.log(`Student ${student.id} progress: ${progress}%`);
-          console.log("Full Progress Data:", progressResponse.data);
-          if (progress >= 70) {
-            // Consider 70% or above as on track
-            onTrackCounts[classification].onTrack++;
-          }
-        }
-      } catch (err) {
-        console.error(`Error processing student ${student.id}:`, err);
-      }
-    }
-
-    console.log("On Track Counts:", onTrackCounts);
-    // Calculate percentages and update chart data
-    onTrackData.value.datasets[0].data = Object.entries(onTrackCounts).map(
-      ([_, counts]) =>
-        counts.total > 0
-          ? Math.round((counts.onTrack / counts.total) * 100)
-          : 0,
-    );
-    console.log("Updated On Track Data:", onTrackData.value);
-  } catch (err) {
-    console.error("Error fetching on-track data:", err);
-  }
-};
-
 const openNotification = (x) => {
   notifStore.setActiveNotification(x);
 };
@@ -255,8 +252,6 @@ const openNotification = (x) => {
 onMounted(() => {
   getEvents();
   getNotifications();
-  fetchEngagementData();
-  fetchOnTrackData();
 });
 </script>
 
