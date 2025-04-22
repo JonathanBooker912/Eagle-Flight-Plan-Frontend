@@ -56,6 +56,18 @@ const handleRedeemRewards = () => {
   });
 };
 
+const handlePromoteToAdmin = async () => {
+  try {
+    await userServices.promoteToAdmin(userToShow.value.id);
+    // Refresh the user list to show updated role
+    await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
+    showInfo.value = false;
+  } catch (error) {
+    console.error("Error promoting user:", error);
+  }
+  location.reload();
+};
+
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
 <template>
@@ -115,6 +127,14 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               class="mb-2"
               @click="handleRedeemRewards"
               >Redeem Rewards</v-btn
+            >
+            <v-btn
+              v-if="userToShow.roles[0]?.name !== 'Admin'"
+              block
+              color="warning"
+              class="mb-2"
+              @click="handlePromoteToAdmin"
+              >Promote to Admin</v-btn
             >
           </div>
         </div>

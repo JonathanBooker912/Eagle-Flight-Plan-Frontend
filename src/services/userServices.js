@@ -33,4 +33,7 @@ export default {
   getUserByEmail(email) {
     return apiClient.get(`/user/email/${email}`);
   },
+  promoteToAdmin(id) {
+    return apiClient.post(`/user/${id}/promote`);
+  },
 };
