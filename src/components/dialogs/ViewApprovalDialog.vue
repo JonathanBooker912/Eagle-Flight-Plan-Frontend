@@ -24,7 +24,7 @@ const selectedFile = ref(null);
 
 const getStudentForFlightPlanId = async () => {
   const student = await studentServices.getStudentForFlightPlanId(
-    flightPlanItem.value.flightPlanId
+    flightPlanItem.value.flightPlanId,
   );
   return student.data;
 };
@@ -32,7 +32,7 @@ const getStudentForFlightPlanId = async () => {
 const getSubmissionsForFlightPlanItem = async () => {
   try {
     const response = await submissionServices.getSubmissionsForFlightPlanItem(
-      flightPlanItem.value.id
+      flightPlanItem.value.id,
     );
     submissions.value = response.data.submissions;
   } catch (error) {
