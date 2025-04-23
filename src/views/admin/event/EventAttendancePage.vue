@@ -29,7 +29,7 @@ const csvData = ref([]);
 const snackbar = ref({
   show: false,
   message: "",
-  color: "success"
+  color: "success",
 });
 
 const count = computed(() => Math.ceil(students.value.length / itemsPerPage));
@@ -85,7 +85,7 @@ const getData = async () => {
       recordedTime: student.recordedTime ?? null,
       attendedStatus: student.attendedStatus,
       eventId: eventId.value,
-      id: student.id // Add the student ID to the mapped data
+      id: student.id, // Add the student ID to the mapped data
     }));
 
     // Show success message if we have students
@@ -93,7 +93,7 @@ const getData = async () => {
       snackbar.value = {
         show: true,
         message: `Successfully loaded ${students.value.length} students`,
-        color: "success"
+        color: "success",
       };
     }
   } catch (error) {
@@ -101,7 +101,7 @@ const getData = async () => {
     snackbar.value = {
       show: true,
       message: "Error loading students. Please try again.",
-      color: "error"
+      color: "error",
     };
   }
 };
@@ -168,7 +168,7 @@ const submitImport = async () => {
           eventId: eventId.value,
           fullName: `${row["First Name"]} ${row["Last Name"]}`,
           fName: row["First Name"],
-          lName: row["Last Name"]
+          lName: row["Last Name"],
         };
       });
 
@@ -202,7 +202,7 @@ const submitImport = async () => {
               email: record.email,
               fName: record.fName,
               lName: record.lName,
-              fullName: record.fullName
+              fullName: record.fullName,
             });
             userId = newUserResponse.data.id;
 
@@ -213,20 +213,24 @@ const submitImport = async () => {
                 userId: userId,
                 graduationDate: new Date(new Date().getFullYear() + 4, 0, 1), // Default to 4 years from now
                 pointsAwarded: 0,
-                pointsUsed: 0
+                pointsUsed: 0,
               });
 
               console.log("Student creation response:", studentResponse);
 
               if (!studentResponse.data?.id) {
-                throw new Error("Failed to create student record - no student ID returned");
+                throw new Error(
+                  "Failed to create student record - no student ID returned",
+                );
               }
 
               // Add student ID to the record
               record.studentId = studentResponse.data.id;
             } catch (studentError) {
               console.error("Error creating student:", studentError);
-              throw new Error(`Failed to create student: ${studentError.message}`);
+              throw new Error(
+                `Failed to create student: ${studentError.message}`,
+              );
             }
           } else {
             throw error;
@@ -240,7 +244,7 @@ const submitImport = async () => {
         snackbar.value = {
           show: true,
           message: `Error processing user ${record.email}: ${error.message}`,
-          color: "error"
+          color: "error",
         };
         continue; // Skip this record but continue with others
       }
@@ -254,19 +258,19 @@ const submitImport = async () => {
     showImportDialog.value = false;
     csvFile.value = null;
     csvData.value = [];
-    
+
     // Show success message
     snackbar.value = {
       show: true,
       message: "Attendance imported successfully!",
-      color: "success"
+      color: "success",
     };
   } catch (error) {
     console.error("Import error:", error);
     snackbar.value = {
       show: true,
       message: `Import failed: ${error.message}`,
-      color: "error"
+      color: "error",
     };
   }
 };
