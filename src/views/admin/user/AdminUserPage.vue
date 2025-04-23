@@ -4,7 +4,8 @@ import CardHeader from "../../../components/CardHeader.vue";
 import UserCard from "../../../components/cards/UserCard.vue";
 import CardTable from "../../../components/CardTable.vue";
 import userServices from "../../../services/userServices";
-import { ref, watch } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
+import { userStore } from "../../../stores/userStore.js";
 
 const users = ref([]);
 const page = ref(1);
@@ -12,8 +13,26 @@ const count = ref(0);
 const searchQuery = ref("");
 const showInfo = ref(false);
 const userToShow = ref(null);
+const hasPermission4 = ref(false);
 
 const router = useRouter();
+const store = userStore();
+
+// Get current user's roles
+const currentUser = computed(() => store.user);
+
+const checkDirectorPermission = async () => {
+  console.log("Current user from store:", currentUser.value);
+  hasPermission4.value = await store.checkRole("director");
+};
+
+// Log current user on mount
+onMounted(async () => {
+  await store.setupStore();
+  await checkDirectorPermission();
+  console.log("Current logged in user:", currentUser.value);
+  console.log("Has permission 4:", hasPermission4.value);
+});
 
 const fetchUsers = async ({
   pageNumber = page.value,
@@ -54,6 +73,38 @@ const handleRedeemRewards = () => {
     name: "redeemReward",
     params: { studentId: userToShow.value.student.id },
   });
+};
+
+const isUserAdmin = (user) => {
+  return user.roles?.some((role) => role.id === 3);
+};
+
+const handlePromoteToAdmin = async () => {
+  try {
+    const updatedUser = {
+      ...userToShow.value,
+      roles: [...userToShow.value.roles, { id: 3, name: "Admin" }],
+    };
+    await userServices.updateUser(updatedUser);
+    // Refresh the page to show updated data
+    window.location.reload();
+  } catch (error) {
+    console.error("Error promoting user:", error);
+  }
+};
+
+const handleDemoteFromAdmin = async () => {
+  try {
+    const updatedUser = {
+      ...userToShow.value,
+      roles: userToShow.value.roles.filter((role) => role.id !== 3),
+    };
+    await userServices.updateUser(updatedUser);
+    // Refresh the page to show updated data
+    window.location.reload();
+  } catch (error) {
+    console.error("Error demoting user:", error);
+  }
 };
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
@@ -115,6 +166,22 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               class="mb-2"
               @click="handleRedeemRewards"
               >Redeem Rewards</v-btn
+            >
+            <v-btn
+              v-if="hasPermission4 && !isUserAdmin(userToShow)"
+              block
+              color="success"
+              class="mb-2"
+              @click="handlePromoteToAdmin"
+              >Promote to Admin</v-btn
+            >
+            <v-btn
+              v-if="hasPermission4 && isUserAdmin(userToShow)"
+              block
+              color="error"
+              class="mb-2"
+              @click="handleDemoteFromAdmin"
+              >Remove Admin Role</v-btn
             >
           </div>
         </div>
