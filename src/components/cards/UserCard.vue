@@ -19,7 +19,7 @@ onMounted(() => {
   <v-card
     color="backgroundDarken"
     class="cardContainer pa-0 ma-0"
-    @click="emit('cardPressed', props.user.id, props.user, isAdmin)"
+    @click="emit('cardPressed', props.user)"
   >
     <v-container class="pa-2">
       <v-row no-gutters style="align-self: stretch">
@@ -38,14 +38,8 @@ onMounted(() => {
             <p class="text-subtitle-1">
               {{ props.user.fName + " " + props.user.lName }}
             </p>
-            <p
-              v-if="
-                props.user.student &&
-                props.user.student.majors &&
-                props.user.student.majors.length > 0
-              "
-            >
-              {{ props.user.student.majors[0].name }}
+            <p>
+              {{ props.user.student?.majors[0]?.name || "Undeclared" }}
             </p>
           </v-card-text>
         </v-col>

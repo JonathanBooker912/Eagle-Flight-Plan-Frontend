@@ -22,20 +22,17 @@ import Notifications from "../views/Notification.vue";
 
 import AdminDashboard from "../views/admin/AdminDashboard.vue";
 import AdminCalendar from "../views/admin/AdminCalendar.vue";
-import AdminSearch from "../views/admin/AdminSearch.vue";
 import AdminUserPage from "../views/admin/user/AdminUserPage.vue";
 import Approvals from "../views/admin/Approvals.vue";
 
 import StudentDashboard from "../views/student/StudentDashboard.vue";
 import StudentCalendar from "../views/student/StudentCalendar.vue";
-import StudentSearch from "../views/student/StudentSearch.vue";
 import StudentEventCheckIn from "../views/student/StudentEventCheckIn.vue";
 import StudentShop from "../views/student/StudentShop.vue";
 
 import FacultyLanding from "../views/faculty/FacultyLanding.vue";
 import FacultyCalendar from "../views/faculty/FacultyCalendar.vue";
 import FacultyFlightPlan from "../views/faculty/FacultyFlightPlan.vue";
-import FacultySearch from "../views/faculty/FacultySearch.vue";
 import FlightPlan from "../views/FlightPlan.vue";
 import AddFlightPlanItem from "../views/admin/flightPlan/AddFlightPlanItem.vue";
 import EventAttendancePage from "../views/admin/event/EventAttendancePage.vue";
@@ -61,11 +58,6 @@ const adminRoutes = [
     path: "profile",
     name: "admin-profile",
     component: Profile,
-  },
-  {
-    path: "search",
-    name: "admin-search",
-    component: AdminSearch,
   },
   {
     path: "approvals",
@@ -113,7 +105,7 @@ const adminRewardRoutes = [
     props: { isAdd: true },
   },
   {
-    path: "maintenance/reward/redeem/:id",
+    path: "maintenance/reward/redeem/:studentId",
     name: "redeemReward",
     component: RewardRedemptionPage,
   },
@@ -264,11 +256,6 @@ const facultyRoutes = [
     name: "faculty-profile",
     component: Profile,
   },
-  {
-    path: "search",
-    name: "faculty-search",
-    component: FacultySearch,
-  },
 ];
 
 const studentRoutes = [
@@ -298,11 +285,6 @@ const studentRoutes = [
     path: "profile/:userId",
     name: "student-profile",
     component: Profile,
-  },
-  {
-    path: "search",
-    name: "student-search",
-    component: StudentSearch,
   },
   {
     path: "event/checkIn/:eventToken",

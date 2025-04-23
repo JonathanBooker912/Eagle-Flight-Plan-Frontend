@@ -75,17 +75,6 @@ const handleUnregister = async (event) => {
   }
 };
 
-const checkin = async (event) => {
-  if (!studentId.value) return;
-  try {
-    await eventServices.markAttendance(event.id, [studentId.value]);
-    await getEvents();
-    await fetchStudentStatus();
-  } catch (err) {
-    console.error("Check in error:", err);
-  }
-};
-
 const fetchStudentId = async () => {
   try {
     const userId = store.user?.userId;
@@ -290,7 +279,7 @@ function goToToday() {
 
 const getEventCardColor = (eventId) => {
   if (checkedInEventIds.value.has(eventId)) return "success";
-  if (registeredEventIds.value.has(eventId)) return "accent";
+  if (registeredEventIds.value.has(eventId)) return "warning";
   return "primary";
 };
 
@@ -438,7 +427,6 @@ function selectThisMonth() {
             @generate-qr="handleGenerateQRCode"
             @register="handleRegister"
             @unregister="handleUnregister"
-            @checkin="checkin"
           />
         </div>
 

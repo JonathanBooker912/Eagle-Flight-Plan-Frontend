@@ -97,19 +97,19 @@ onMounted(fetchOptionalReviewers);
     <v-card rounded="xl" color="backgroundDarken">
       <v-card-title class="text-h4 d-flex justify-center align-center">
         <span class="flex-grow-1 text-center">
-          Submit Reflection
+          {{ flightPlanItem.name }}
           <v-btn
             v-if="type === 'text'"
             icon="mdi-upload"
             variant="text"
-            class="ml-2 float-end"
+            class="ml-2"
             @click="handleTypeToggle"
           ></v-btn>
           <v-btn
             v-else
             icon="mdi-file-document"
             variant="text"
-            class="ml-2 float-end"
+            class="ml-2"
             @click="handleTypeToggle"
           ></v-btn>
         </span>
