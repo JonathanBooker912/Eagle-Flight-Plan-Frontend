@@ -18,7 +18,6 @@ const store = userStore();
 const route = useRoute();
 const router = useRouter();
 
-const user = store.user;
 const badgeAwardsStore = viewBadgeAwardsStore();
 const noBadges = ref(false);
 const noStrengths = ref(false);
