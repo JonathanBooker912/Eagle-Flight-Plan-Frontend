@@ -10,7 +10,6 @@ const form = ref(null);
 const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
-const taskTypes = ref([]);
 const completionTypes = ref([]);
 
 const route = useRoute();
@@ -38,17 +37,14 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, taskTypesRes, completionRes] =
-      await Promise.all([
-        taskServices.getCategories(),
-        taskServices.getSchedulingTypes(),
-        taskServices.getTaskTypes(),
-        taskServices.getCompletionTypes(),
-      ]);
+    const [categoriesRes, schedulingRes, completionRes] = await Promise.all([
+      taskServices.getCategories(),
+      taskServices.getSchedulingTypes(),
+      taskServices.getCompletionTypes(),
+    ]);
 
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
-    taskTypes.value = taskTypesRes.data;
     completionTypes.value = completionRes.data;
 
     if (!props.isAdd) {
@@ -72,28 +68,16 @@ onMounted(async () => {
         label="Name"
         :rules="[required]"
       ></v-text-field>
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-select
-            v-model="formData.category"
-            variant="solo"
-            rounded="lg"
-            label="Category"
-            :items="categories"
-            :rules="[required]"
-          ></v-select>
-        </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.taskType"
-            variant="solo"
-            rounded="lg"
-            label="Type"
-            :items="taskTypes"
-            :rules="[required]"
-          ></v-select>
-        </v-col>
-      </v-row>
+
+      <v-select
+        v-model="formData.category"
+        variant="solo"
+        rounded="lg"
+        label="Category"
+        :items="categories"
+        :rules="[required]"
+      ></v-select>
+
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
           <v-select
@@ -150,10 +134,6 @@ onMounted(async () => {
         label="Rationale"
         :rules="[required]"
       ></v-text-field>
-      <v-switch
-        v-model="formData.reflectionRequired"
-        label="Reflection Required"
-      ></v-switch>
       <v-row class="justify-center mb-1">
         <v-btn
           class="mr-2"

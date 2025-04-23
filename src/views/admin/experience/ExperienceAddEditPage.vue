@@ -11,7 +11,6 @@ const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
 const experienceTypes = ref([]);
-
 const route = useRoute();
 const router = useRouter();
 
@@ -50,8 +49,6 @@ onMounted(async () => {
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
     experienceTypes.value = experienceTypesRes.data;
-    // getFulfillingEvents.value = getFulfillingEventsRes.data;
-
     if (!props.isAdd) {
       formData.value = (
         await experienceServices.getExperience(route.params.id)
@@ -75,27 +72,46 @@ onMounted(async () => {
         label="Name"
         :rules="[required]"
       ></v-text-field>
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-select
+      <v-row dense>
+        <v-col :cols="6"
+          ><v-select
+            v-model="formData.category"
+            variant="solo"
+            rounded="lg"
+            label="Category"
+            :items="categories"
+            :rules="[required]"
+          ></v-select
+        ></v-col>
+        <v-col :cols="6"
+          ><v-select
+            v-model="formData.experienceType"
+            variant="solo"
+            rounded="lg"
+            label="Experience Type"
+            :items="experienceTypes"
+            :rules="[required]"
+          ></v-select
+        ></v-col>
+        <v-col :cols="6"
+          ><v-select
             v-model="formData.schedulingType"
             variant="solo"
             rounded="lg"
             label="Scheduling Type"
             :items="schedulingTypes"
             :rules="[required]"
-          ></v-select>
-        </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.experienceType"
+          ></v-select
+        ></v-col>
+        <v-col :cols="6"
+          ><v-text-field
+            v-model="formData.semestersFromGrad"
             variant="solo"
             rounded="lg"
-            label="Type"
-            :items="experienceTypes"
+            label="Semesters From Graduation"
             :rules="[required]"
-          ></v-select>
-        </v-col>
+          ></v-text-field
+        ></v-col>
       </v-row>
       <v-text-field
         v-model="formData.rationale"
@@ -104,21 +120,7 @@ onMounted(async () => {
         label="Rationale"
         :rules="[required]"
       ></v-text-field>
-      <v-select
-        v-model="formData.category"
-        variant="solo"
-        rounded="lg"
-        label="Category"
-        :items="categories"
-        :rules="[required]"
-      ></v-select>
-      <v-select
-        v-model="formData.fulfillingEvents"
-        variant="solo"
-        rounded="lg"
-        label="Fulfilling Events"
-        :items="fulfillingEvents"
-      ></v-select>
+
       <v-textarea
         v-model="formData.description"
         variant="solo"
