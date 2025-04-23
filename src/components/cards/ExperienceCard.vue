@@ -14,7 +14,7 @@ const emit = defineEmits(["edit", "delete"]);
         {{ props.experience.name }}
       </p>
       <p class="text-subtitle-1 font-weight-regular">
-        Type: {{ props.experience.completionType }}
+        Type: {{ props.experience.submissionType }}
       </p>
       <p class="text-subtitle-1 font-weight-regular">
         Scheduling Type: {{ props.experience.schedulingType }}

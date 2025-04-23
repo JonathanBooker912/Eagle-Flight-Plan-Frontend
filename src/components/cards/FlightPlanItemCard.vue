@@ -35,7 +35,7 @@ const selectedEvent = ref(null);
 const isSubmissionExperience = computed(
   () =>
     props.flightPlanItem.flightPlanItemType === "Experience" &&
-    props.flightPlanItem.experience?.completionType === "Submission"
+    props.flightPlanItem.experience?.submissionType !== "attendance"
 );
 
 const fetchStudentId = async () => {
@@ -286,7 +286,7 @@ const handleViewRegisteredEvent = async () => {
             <v-row
               v-if="
                 flightPlanItem.flightPlanItemType === 'Experience' &&
-                flightPlanItem.experience?.completionType === 'Attendance' &&
+                flightPlanItem.experience?.submissionType === 'attendance' &&
                 flightPlanItem.status === 'Incomplete' &&
                 isFlightPlanView
               "
@@ -331,7 +331,7 @@ const handleViewRegisteredEvent = async () => {
               v-if="
                 ['Pending', 'Registered'].includes(flightPlanItem.status) &&
                 flightPlanItem.flightPlanItemType === 'Experience' &&
-                flightPlanItem.experience?.completionType === 'Attendance'
+                flightPlanItem.experience?.submissionType === 'attendance'
               "
               justify="end"
             >
