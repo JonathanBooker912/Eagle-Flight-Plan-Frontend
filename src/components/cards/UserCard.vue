@@ -11,7 +11,9 @@ const isAdmin = computed(() => {
 });
 
 const isDirector = computed(() => {
-  return props.user.roles?.some((role) => role.name.toLowerCase() === "director");
+  return props.user.roles?.some(
+    (role) => role.name.toLowerCase() === "director",
+  );
 });
 
 const roleColor = computed(() => {
