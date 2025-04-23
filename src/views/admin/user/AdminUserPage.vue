@@ -22,7 +22,6 @@ const store = userStore();
 const currentUser = computed(() => store.user);
 
 const checkDirectorPermission = async () => {
-  console.log("Current user from store:", currentUser.value);
   hasPermission4.value = await store.checkRole("director");
 };
 
@@ -30,8 +29,6 @@ const checkDirectorPermission = async () => {
 onMounted(async () => {
   await store.setupStore();
   await checkDirectorPermission();
-  console.log("Current logged in user:", currentUser.value);
-  console.log("Has permission 4:", hasPermission4.value);
 });
 
 const fetchUsers = async ({
@@ -49,7 +46,6 @@ const handleSearchChange = (input) => {
 };
 
 const handleCardClick = (user) => {
-  console.log(user);
   userToShow.value = user;
   showInfo.value = true;
 };
@@ -78,26 +74,34 @@ const handleRedeemRewards = () => {
 const handlePromoteToAdmin = async () => {
   try {
     await userServices.promoteToAdmin(userToShow.value.id);
-    // Refresh the user list to show updated role
     await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
     showInfo.value = false;
+    location.reload();
   } catch (error) {
-    console.error("Error promoting user:", error);
+    alert(`Failed to promote user to admin: ${error.message}`);
   }
-  location.reload();
 };
 
 const handleDemoteFromAdmin = async () => {
   try {
     await userServices.demoteFromAdmin(userToShow.value.id);
-    // Refresh the user list to show updated role
     await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
     showInfo.value = false;
+    location.reload();
   } catch (error) {
-    console.error("Error demoting user:", error);
+    alert(`Failed to demote user from admin: ${error.message}`);
   }
-  location.reload();
 };
+
+const isAdmin = computed(() => {
+  return userToShow.value?.roles?.some(
+    (role) => role.name.toLowerCase() === "admin",
+  );
+});
+
+const isViewingSelf = computed(() => {
+  return userToShow.value?.id === currentUser.value?.id;
+});
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
@@ -138,7 +142,13 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               Major:
               {{ userToShow.student?.majors[0]?.name || "Undeclared" }}
             </p>
-            <p>Role: {{ userToShow.roles[0]?.name || "Student" }}</p>
+            <p>
+              Roles:
+              {{
+                userToShow.roles?.map((role) => role.name).join(", ") ||
+                "Student"
+              }}
+            </p>
           </div>
           <v-spacer></v-spacer>
           <div>
@@ -160,7 +170,7 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               >Redeem Rewards</v-btn
             >
             <v-btn
-              v-if="userToShow.roles[0]?.name !== 'Admin'"
+              v-if="hasPermission4 && !isAdmin && !isViewingSelf"
               block
               color="warning"
               class="mb-2"
@@ -168,12 +178,12 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               >Promote to Admin</v-btn
             >
             <v-btn
-              v-if="userToShow.roles[0]?.name === 'Admin'"
+              v-if="hasPermission4 && isAdmin && !isViewingSelf"
               block
               color="error"
               class="mb-2"
               @click="handleDemoteFromAdmin"
-              >Remove Admin Role</v-btn
+              >Demote to Student</v-btn
             >
           </div>
         </div>
