@@ -55,7 +55,7 @@ onMounted(async () => {
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
     submissionTypes.value = submissionTypesRes.data.map((type) =>
-      type === "both" ? "text & files" : type
+      type === "both" ? "text & files" : type,
     );
 
     if (!props.isAdd) {

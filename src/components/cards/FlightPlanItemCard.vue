@@ -8,10 +8,16 @@ import flightPlanItemServices from "../../services/flightPlanItemServices";
 import { userStore } from "../../stores/userStore";
 
 const props = defineProps({
-  flightPlanItem: Object,
+  flightPlanItem: {
+    type: Object,
+    default: () => ({}),
+  },
   isAdmin: Boolean,
   isFlightPlanView: Boolean,
-  flightPlanItems: Array,
+  flightPlanItems: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits([
@@ -35,7 +41,7 @@ const selectedEvent = ref(null);
 const isSubmissionExperience = computed(
   () =>
     props.flightPlanItem.flightPlanItemType === "Experience" &&
-    props.flightPlanItem.experience?.submissionType !== "attendance"
+    props.flightPlanItem.experience?.submissionType !== "attendance",
 );
 
 const fetchStudentId = async () => {
@@ -67,7 +73,7 @@ const loadExperienceEvents = async () => {
   if (!props.flightPlanItem.experience?.id) return;
   try {
     const response = await eventServices.getEventsForExperience(
-      props.flightPlanItem.experience.id
+      props.flightPlanItem.experience.id,
     );
     eventOptions.value = response.data;
   } catch (err) {
@@ -171,7 +177,7 @@ const handleClick = () => {
 
 const handleViewRegisteredEvent = async () => {
   const registeredEvent = eventOptions.value.find(
-    (event) => event.id === props.flightPlanItem.eventId
+    (event) => event.id === props.flightPlanItem.eventId,
   );
 
   if (registeredEvent) {
@@ -239,7 +245,7 @@ const handleViewRegisteredEvent = async () => {
             <v-row
               v-if="
                 ['Task', 'Experience'].includes(
-                  flightPlanItem.flightPlanItemType
+                  flightPlanItem.flightPlanItemType,
                 ) &&
                 flightPlanItem.status === 'Incomplete' &&
                 (flightPlanItem.flightPlanItemType === 'Task' ||
@@ -262,7 +268,7 @@ const handleViewRegisteredEvent = async () => {
             <v-row
               v-if="
                 ['Task', 'Experience'].includes(
-                  flightPlanItem.flightPlanItemType
+                  flightPlanItem.flightPlanItemType,
                 ) &&
                 flightPlanItem.status === 'Rejected' &&
                 (flightPlanItem.flightPlanItemType === 'Task' ||
@@ -307,7 +313,7 @@ const handleViewRegisteredEvent = async () => {
             <v-row
               v-if="
                 ['Task', 'Experience'].includes(
-                  flightPlanItem.flightPlanItemType
+                  flightPlanItem.flightPlanItemType,
                 ) &&
                 flightPlanItem.status === 'Pending' &&
                 (flightPlanItem.flightPlanItemType === 'Task' ||

@@ -54,7 +54,7 @@ watch(
   () => props.flightPlanItem,
   (newVal) => {
     flightPlanItemCopy.value = { ...newVal };
-  }
+  },
 );
 
 const selectEvent = (event) => {
@@ -67,7 +67,7 @@ const fetchFlightPlanItemsWithEvents = async () => {
     const res =
       await flightPlanItemServices.getFlightPlanItemsWithEventsForStudent(
         studentId.value,
-        props.flightPlanItem.flightPlanId
+        props.flightPlanItem.flightPlanId,
       );
     fpisWithEvents.value = res.data;
   } catch (err) {
@@ -117,7 +117,7 @@ const fetchStudentStatus = async () => {
 const matchedFlightPlanItem = computed(() => {
   if (!selectedEvent.value || !fpisWithEvents.value.length) return null;
   return fpisWithEvents.value.find(
-    (item) => item.eventId === selectedEvent.value.id
+    (item) => item.eventId === selectedEvent.value.id,
   );
 });
 
@@ -146,7 +146,8 @@ const eventColors = computed(() => {
     const isRegistered = registeredEventIds.value.has(event.id);
     const isCheckedIn = checkedInEventIds.value.has(event.id);
     const isUsedInOtherFPI = fpisWithEvents.value.some(
-      (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id
+      (item) =>
+        item.eventId === event.id && item.id !== props.flightPlanItem.id,
     );
     if (isCheckedIn && !isUsedInOtherFPI) {
       colorMap[event.id] = "success";
@@ -167,7 +168,8 @@ const eventStatusLabels = computed(() => {
     const isRegistered = registeredEventIds.value.has(event.id);
     const isCheckedIn = checkedInEventIds.value.has(event.id);
     const isUsedInOtherFPI = fpisWithEvents.value.some(
-      (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id
+      (item) =>
+        item.eventId === event.id && item.id !== props.flightPlanItem.id,
     );
     if (isCheckedIn && isUsedInOtherFPI) {
       labelMap[event.id] = "Conflict";
@@ -188,7 +190,7 @@ const getEventPriority = (event) => {
   const isRegistered = registeredEventIds.value.has(event.id);
   const isCheckedIn = checkedInEventIds.value.has(event.id);
   const isUsedInOtherFPI = fpisWithEvents.value.some(
-    (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id
+    (item) => item.eventId === event.id && item.id !== props.flightPlanItem.id,
   );
   if (isCheckedIn && !isUsedInOtherFPI) return 0;
   if (!isCheckedIn && !isUsedInOtherFPI && isRegistered) return 1;
@@ -200,7 +202,7 @@ const getEventPriority = (event) => {
 
 const sortedEventOptions = computed(() => {
   return [...props.eventOptions].sort(
-    (a, b) => getEventPriority(a) - getEventPriority(b)
+    (a, b) => getEventPriority(a) - getEventPriority(b),
   );
 });
 

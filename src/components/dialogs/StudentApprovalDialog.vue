@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { studentApprovalDialogStore } from "../../stores/studentApprovalDialogStore";
 import userServices from "../../services/userServices";
@@ -17,6 +17,16 @@ const reflectionText = ref("");
 const files = ref();
 const successMessage = ref(""); // Track success message
 const errorMessage = ref("");
+
+const submissionType = computed(() => {
+  console.log(flightPlanItem.value);
+
+  if (flightPlanItem.value.task) {
+    return flightPlanItem.value.task.submissionType;
+  } else {
+    return flightPlanItem.value.experience.submissionType;
+  }
+});
 
 const fetchOptionalReviewers = async () => {
   try {
@@ -45,10 +55,14 @@ const handleSubmit = async () => {
     return;
   }
 
+  console.log("submissionType");
+
   try {
-    if (flightPlanItem.value.task.submissionType === "text") {
+    console.log(submissionType.value);
+    if (submissionType.value === "text") {
+      console.log("TESTSTESTSETE");
       await submitReflection();
-    } else if (flightPlanItem.value.task.submissionType === "file") {
+    } else if (submissionType.value === "file") {
       await submitFiles();
     } else {
       const fileNames = await Promise.all(
@@ -116,16 +130,30 @@ const submitFiles = async () => {
 };
 
 const submitReflection = async () => {
+  console.log("submit reflection 1");
+
   const submissionData = {
     flightPlanItemId: flightPlanItem.value.id,
     submissionType: "text",
   };
+
+  console.log("submit reflection 2");
 
   await submissionServices.createSubmission({
     ...submissionData,
     value: reflectionText.value,
   });
 };
+
+watch(visible, () => {
+  if (!visible.value) {
+    files.value = null;
+    reflectionText.value = "";
+    selectedOptionalReviewer.value = null;
+    successMessage.value = "";
+    errorMessage.value = "";
+  }
+});
 
 onMounted(fetchOptionalReviewers);
 </script>
@@ -153,7 +181,7 @@ onMounted(fetchOptionalReviewers);
           </div>
           <div v-else>
             <v-textarea
-              v-if="flightPlanItem.task.submissionType === 'text'"
+              v-if="submissionType === 'text'"
               v-model="reflectionText"
               label="Reflection"
               variant="solo"
@@ -161,7 +189,7 @@ onMounted(fetchOptionalReviewers);
               bg-color="background"
             ></v-textarea>
             <v-file-upload
-              v-else-if="flightPlanItem.task.submissionType === 'files'"
+              v-else-if="submissionType === 'files'"
               v-model="files"
               label="Upload Files"
               multiple
