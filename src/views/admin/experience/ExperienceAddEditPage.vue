@@ -28,7 +28,7 @@ const handleSubmit = async () => {
     } else {
       await experienceServices.updateExperience(
         route.params.id,
-        formData.value
+        formData.value,
       );
     }
     router.push({ name: "experience" });
