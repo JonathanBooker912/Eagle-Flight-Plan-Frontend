@@ -16,8 +16,8 @@ export default {
   getSchedulingTypes() {
     return apiClient.get("/experience/types/schedulingTypes");
   },
-  getCompletionTypes() {
-    return apiClient.get("/experience/types/completionTypes");
+  getSubmissionTypes() {
+    return apiClient.get("/experience/types/submissionTypes");
   },
   getCategories() {
     return apiClient.get("/experience/types/categories");

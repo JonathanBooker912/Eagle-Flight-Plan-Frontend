@@ -11,7 +11,6 @@ const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
 const submissionTypes = ref([]);
-const completionTypes = ref([]);
 
 const route = useRoute();
 const router = useRouter();
@@ -38,18 +37,16 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, submissionTypesRes, completionRes] =
+    const [categoriesRes, schedulingRes, submissionTypesRes] =
       await Promise.all([
         taskServices.getCategories(),
         taskServices.getSchedulingTypes(),
         taskServices.getSubmissionTypes(),
-        taskServices.getCompletionTypes(),
       ]);
 
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
     submissionTypes.value = submissionTypesRes.data;
-    completionTypes.value = completionRes.data;
 
     if (!props.isAdd) {
       formData.value = (await taskServices.getTask(route.params.id)).data;
@@ -95,26 +92,14 @@ onMounted(async () => {
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-select
-            v-model="formData.completionType"
-            variant="solo"
-            rounded="lg"
-            label="Completion Type"
-            :items="completionTypes"
-            :rules="[required]"
-          ></v-select>
-        </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.schedulingType"
-            variant="solo"
-            rounded="lg"
-            label="Scheduling Type"
-            :items="schedulingTypes"
-            :rules="[required]"
-          ></v-select>
-        </v-col>
+        <v-select
+          v-model="formData.schedulingType"
+          variant="solo"
+          rounded="lg"
+          label="Scheduling Type"
+          :items="schedulingTypes"
+          :rules="[required]"
+        ></v-select>
       </v-row>
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
