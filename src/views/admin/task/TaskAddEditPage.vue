@@ -10,6 +10,7 @@ const form = ref(null);
 const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
+const submissionTypes = ref([]);
 const completionTypes = ref([]);
 
 const route = useRoute();
@@ -37,14 +38,17 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, completionRes] = await Promise.all([
-      taskServices.getCategories(),
-      taskServices.getSchedulingTypes(),
-      taskServices.getCompletionTypes(),
-    ]);
+    const [categoriesRes, schedulingRes, submissionTypesRes, completionRes] =
+      await Promise.all([
+        taskServices.getCategories(),
+        taskServices.getSchedulingTypes(),
+        taskServices.getSubmissionTypes(),
+        taskServices.getCompletionTypes(),
+      ]);
 
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
+    submissionTypes.value = submissionTypesRes.data;
     completionTypes.value = completionRes.data;
 
     if (!props.isAdd) {
@@ -68,16 +72,28 @@ onMounted(async () => {
         label="Name"
         :rules="[required]"
       ></v-text-field>
-
-      <v-select
-        v-model="formData.category"
-        variant="solo"
-        rounded="lg"
-        label="Category"
-        :items="categories"
-        :rules="[required]"
-      ></v-select>
-
+      <v-row no-gutters>
+        <v-col size="6" class="mr-4">
+          <v-select
+            v-model="formData.category"
+            variant="solo"
+            rounded="lg"
+            label="Category"
+            :items="categories"
+            :rules="[required]"
+          ></v-select>
+        </v-col>
+        <v-col size="6">
+          <v-select
+            v-model="formData.submissionType"
+            variant="solo"
+            rounded="lg"
+            label="Submission Type"
+            :items="submissionTypes"
+            :rules="[required]"
+          ></v-select>
+        </v-col>
+      </v-row>
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
           <v-select
@@ -103,16 +119,16 @@ onMounted(async () => {
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
           <v-text-field
-            v-model="formData.pointsEarned"
+            v-model="formData.points"
             variant="solo"
             rounded="lg"
-            label="Points Earned"
+            label="Points"
             :rules="[required, positiveNumber]"
           ></v-text-field>
         </v-col>
         <v-col size="6">
           <v-text-field
-            v-model="formData.semestersFromGraduation"
+            v-model="formData.semestersFromGrad"
             variant="solo"
             rounded="lg"
             label="Semesters from Graduation"

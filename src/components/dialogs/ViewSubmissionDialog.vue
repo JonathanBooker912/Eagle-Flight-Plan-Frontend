@@ -82,27 +82,23 @@ watch(visible, async () => {
             }}</v-alert>
           </div>
           <div v-else>
-            <v-container
-              v-if="
-                submissions.length === 1 &&
-                submissions[0].submissionType === 'text'
-              "
-              class="pa-4 bg-background rounded-lg"
-              style="white-space: pre-wrap"
-            >
-              {{ submissions[0].value }}
-            </v-container>
-
             <v-row
               v-for="(submission, index) in submissions"
-              v-else-if="submissions.length > 0"
               :key="index"
               class="bg-background rounded-lg mb-1"
             >
-              <v-col class="d-flex justify-space-between align-center">
-                <span>File {{ index + 1 }}</span>
+              <div
+                v-if="submission.submissionType === 'text'"
+                class="my-4 ml-2"
+                style="white-space: pre-wrap"
+              >
+                Reflection: {{ submission.value }}
+              </div>
+
+              <v-col v-else class="d-flex justify-space-between align-center">
+                <span>File {{ index }}</span>
                 <v-btn
-                  variant="solo"
+                  variant="outlined"
                   density="comfortable"
                   @click="handleDownload(index)"
                 >
@@ -111,7 +107,10 @@ watch(visible, async () => {
               </v-col>
             </v-row>
 
-            <v-alert v-else type="error" class="text-center"
+            <v-alert
+              v-if="submissions.length === 0"
+              type="error"
+              class="text-center"
               >No submission found!</v-alert
             >
 
