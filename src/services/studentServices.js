@@ -26,7 +26,7 @@ export default {
     return apiClient.delete(`/students/${id}`);
   },
   createStudent(item) {
-    return apiClient.post(`/student`, item);
+    return apiClient.post(`/students`, item);
   },
   updateStudent(item) {
     return apiClient.put(`/students/${item.id}`, item);
