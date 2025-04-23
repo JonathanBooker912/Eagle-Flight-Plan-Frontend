@@ -8,22 +8,10 @@ import flightPlanItemServices from "../../services/flightPlanItemServices";
 import { userStore } from "../../stores/userStore";
 
 const props = defineProps({
-  flightPlanItem: {
-    type: Object,
-    required: true,
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
-  isFlightPlanView: {
-    type: Boolean,
-    default: false,
-  },
-  flightPlanItems: {
-    type: Array,
-    required: true,
-  },
+  flightPlanItem: Object,
+  isAdmin: Boolean,
+  isFlightPlanView: Boolean,
+  flightPlanItems: Array,
 });
 
 const emit = defineEmits([
@@ -79,7 +67,7 @@ const loadExperienceEvents = async () => {
   if (!props.flightPlanItem.experience?.id) return;
   try {
     const response = await eventServices.getEventsForExperience(
-      props.flightPlanItem.experience.id,
+      props.flightPlanItem.experience.id
     );
     eventOptions.value = response.data;
   } catch (err) {
@@ -183,7 +171,7 @@ const handleClick = () => {
 
 const handleViewRegisteredEvent = async () => {
   const registeredEvent = eventOptions.value.find(
-    (event) => event.id === props.flightPlanItem.eventId,
+    (event) => event.id === props.flightPlanItem.eventId
   );
 
   if (registeredEvent) {
