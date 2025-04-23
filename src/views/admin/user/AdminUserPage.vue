@@ -75,36 +75,28 @@ const handleRedeemRewards = () => {
   });
 };
 
-const isUserAdmin = (user) => {
-  return user.roles?.some((role) => role.id === 3);
-};
-
 const handlePromoteToAdmin = async () => {
   try {
-    const updatedUser = {
-      ...userToShow.value,
-      roles: [...userToShow.value.roles, { id: 3, name: "Admin" }],
-    };
-    await userServices.updateUser(updatedUser);
-    // Refresh the page to show updated data
-    window.location.reload();
+    await userServices.promoteToAdmin(userToShow.value.id);
+    // Refresh the user list to show updated role
+    await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
+    showInfo.value = false;
   } catch (error) {
     console.error("Error promoting user:", error);
   }
+  location.reload();
 };
 
 const handleDemoteFromAdmin = async () => {
   try {
-    const updatedUser = {
-      ...userToShow.value,
-      roles: userToShow.value.roles.filter((role) => role.id !== 3),
-    };
-    await userServices.updateUser(updatedUser);
-    // Refresh the page to show updated data
-    window.location.reload();
+    await userServices.demoteFromAdmin(userToShow.value.id);
+    // Refresh the user list to show updated role
+    await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
+    showInfo.value = false;
   } catch (error) {
     console.error("Error demoting user:", error);
   }
+  location.reload();
 };
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
@@ -168,15 +160,15 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               >Redeem Rewards</v-btn
             >
             <v-btn
-              v-if="hasPermission4 && !isUserAdmin(userToShow)"
+              v-if="userToShow.roles[0]?.name !== 'Admin'"
               block
-              color="success"
+              color="warning"
               class="mb-2"
               @click="handlePromoteToAdmin"
               >Promote to Admin</v-btn
             >
             <v-btn
-              v-if="hasPermission4 && isUserAdmin(userToShow)"
+              v-if="userToShow.roles[0]?.name === 'Admin'"
               block
               color="error"
               class="mb-2"
