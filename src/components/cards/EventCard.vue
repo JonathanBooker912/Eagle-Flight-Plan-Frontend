@@ -2,10 +2,12 @@
 import { computed } from "vue";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { userStore } from "../../stores/userStore";
 
 dayjs.extend(advancedFormat);
 
 const emit = defineEmits(["edit", "delete", "show-info"]);
+const store = userStore();
 
 const props = defineProps({
   event: {
@@ -83,7 +85,7 @@ const resolvedStatusLabel = computed(() => {
           <p class="text-subtitle-1 font-weight-regular">
             {{ eventTime }}
           </p>
-          <p class="text-subtitle-2 font-weight-medium">
+          <p v-if="!store.isAdmin" class="text-subtitle-2 font-weight-medium">
             Status: {{ resolvedStatusLabel }}
           </p>
         </v-card-text>
