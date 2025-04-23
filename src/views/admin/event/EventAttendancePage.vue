@@ -195,10 +195,10 @@ const submitImport = async () => {
             accept=".csv"
             label="CSV File"
             prepend-icon="mdi-file-document"
-            @change="handleFileUpload"
             variant="outlined"
             density="comfortable"
             class="mt-4"
+            @change="handleFileUpload"
           />
           <div class="mt-5" style="display: flex; justify-content: center">
             <v-btn
@@ -212,8 +212,8 @@ const submitImport = async () => {
             <v-btn
               rounded="xl"
               color="primary"
-              @click="submitImport"
               :disabled="!csvData.length"
+              @click="submitImport"
             >
               Import
             </v-btn>
