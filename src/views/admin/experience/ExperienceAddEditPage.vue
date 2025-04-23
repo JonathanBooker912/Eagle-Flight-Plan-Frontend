@@ -28,7 +28,7 @@ const handleSubmit = async () => {
     } else {
       await experienceServices.updateExperience(
         route.params.id,
-        formData.value,
+        formData.value
       );
     }
     router.push({ name: "experience" });
@@ -120,7 +120,14 @@ onMounted(async () => {
         label="Rationale"
         :rules="[required]"
       ></v-text-field>
-
+      <v-select
+        v-model="formData.category"
+        variant="solo"
+        rounded="lg"
+        label="Category"
+        :items="categories"
+        :rules="[required]"
+      ></v-select>
       <v-textarea
         v-model="formData.description"
         variant="solo"
@@ -128,10 +135,6 @@ onMounted(async () => {
         label="Description"
         :rules="[required]"
       ></v-textarea>
-      <v-switch
-        v-model="formData.reflectionRequired"
-        label="Reflection Required"
-      ></v-switch>
       <v-row class="justify-center mb-1">
         <v-btn
           class="mr-2"
