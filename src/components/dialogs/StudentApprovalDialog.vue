@@ -40,13 +40,42 @@ const handleCancel = () => {
 };
 
 const handleSubmit = async () => {
+  if (!files.value && !reflectionText.value) {
+    errorMessage.value = "Please upload a file or write a reflection";
+    return;
+  }
+
   try {
     if (flightPlanItem.value.task.submissionType === "text") {
       await submitReflection();
     } else if (flightPlanItem.value.task.submissionType === "file") {
       await submitFiles();
     } else {
-      await Promise.all([submitFiles(), submitReflection()]);
+      const fileNames = await Promise.all(
+        files.value.map(async (file) => {
+          const { data } = await fileServices.uploadFile(
+            { file },
+            "submissions",
+          );
+          return data.fileName;
+        }),
+      );
+
+      let submissions = fileNames.map((fileName) => ({
+        flightPlanItemId: flightPlanItem.value.id,
+        submissionType: "file",
+        value: fileName,
+      }));
+
+      if (reflectionText.value) {
+        submissions.push({
+          flightPlanItemId: flightPlanItem.value.id,
+          submissionType: "text",
+          value: reflectionText.value,
+        });
+      }
+
+      await submissionServices.createSubmissions(submissions);
     }
 
     await flightPlanItemServices.updateFlightPlanItem({
@@ -118,7 +147,7 @@ onMounted(fetchOptionalReviewers);
       <v-card-text>
         <v-fade-transition mode="out-in">
           <div v-if="successMessage">
-            <v-alert type="success" variant="tonal">{{
+            <v-alert type="success" variant="tonal" closable>{{
               successMessage
             }}</v-alert>
           </div>
@@ -186,7 +215,7 @@ onMounted(fetchOptionalReviewers);
               </div>
             </div>
             <div v-if="errorMessage">
-              <v-alert type="danger" variant="tonal">{{
+              <v-alert type="danger" variant="tonal" closable>{{
                 errorMessage
               }}</v-alert>
             </div>
