@@ -26,9 +26,25 @@ export default {
     return apiClient.delete(`/students/${id}`);
   },
   createStudent(item) {
-    return apiClient.post(`/student`, item);
+    return apiClient.post(`/students`, item);
   },
   updateStudent(item) {
     return apiClient.put(`/students/${item.id}`, item);
+  },
+  addMajor(studentId, majorId) {
+    return apiClient.put(`/students/${studentId}/majors`, { majorId });
+  },
+  removeMajor(studentId, majorId) {
+    return apiClient.delete(`/students/${studentId}/majors`, {
+      data: { majorId },
+    });
+  },
+  addStrength(studentId, strengthId) {
+    return apiClient.put(`/students/${studentId}/strengths`, { strengthId });
+  },
+  removeStrength(studentId, strengthId) {
+    return apiClient.delete(`/students/${studentId}/strengths`, {
+      data: { strengthId },
+    });
   },
 };

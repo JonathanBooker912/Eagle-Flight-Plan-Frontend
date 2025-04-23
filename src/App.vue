@@ -5,7 +5,9 @@ import NavBar from "./components/NavBar.vue";
 <template>
   <v-app>
     <v-row no-gutters class="flex-nowrap">
-      <NavBar v-if="$route.path !== '/'" />
+      <NavBar
+        v-if="$route.path !== '/' && $route.path !== '/student/onboarding'"
+      />
       <v-col>
         <v-main
           color="background"
