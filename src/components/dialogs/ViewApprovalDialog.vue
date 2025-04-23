@@ -17,6 +17,10 @@ const rejectMessage = ref("");
 const rejectReason = ref("");
 const approveMessage = ref("");
 const submissions = ref([]);
+const previewDialog = ref(false);
+const previewFile = ref(null);
+const previewUrl = ref("");
+
 const getStudentForFlightPlanId = async () => {
   const student = await studentServices.getStudentForFlightPlanId(
     flightPlanItem.value.flightPlanId,
@@ -48,6 +52,23 @@ const handleDownload = (index) => {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+};
+
+const handlePreview = (index) => {
+  const { fileName, value } = submissions.value[index];
+  const file = new Blob([new Uint8Array(value.data.data)], {
+    type: value.mimeType,
+  });
+  previewUrl.value = URL.createObjectURL(file);
+  previewFile.value = fileName;
+  previewDialog.value = true;
+};
+
+const closePreview = () => {
+  previewDialog.value = false;
+  URL.revokeObjectURL(previewUrl.value);
+  previewUrl.value = "";
+  previewFile.value = null;
 };
 
 const handleReject = async () => {
@@ -191,13 +212,23 @@ watch(visible, async (newValue) => {
             >
               <v-col class="d-flex justify-space-between align-center">
                 <span>File {{ index + 1 }}</span>
-                <v-btn
-                  variant="solo"
-                  density="comfortable"
-                  @click="handleDownload(index)"
-                >
-                  <v-icon icon="mdi-download"></v-icon>
-                </v-btn>
+                <div>
+                  <v-btn
+                    variant="solo"
+                    density="comfortable"
+                    class="mr-2"
+                    @click="handlePreview(index)"
+                  >
+                    <v-icon icon="mdi-eye"></v-icon>
+                  </v-btn>
+                  <v-btn
+                    variant="solo"
+                    density="comfortable"
+                    @click="handleDownload(index)"
+                  >
+                    <v-icon icon="mdi-download"></v-icon>
+                  </v-btn>
+                </div>
               </v-col>
             </v-row>
 
@@ -272,6 +303,47 @@ watch(visible, async (newValue) => {
             </v-row>
           </div>
         </v-fade-transition>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="previewDialog" max-width="800px">
+    <v-card>
+      <v-card-title class="d-flex justify-space-between align-center">
+        <span>{{ previewFile }}</span>
+        <v-icon class="cursor-pointer" @click="closePreview">mdi-close</v-icon>
+      </v-card-title>
+      <v-card-text>
+        <v-container v-if="previewUrl">
+          <iframe
+            v-if="previewFile.endsWith('.pdf')"
+            :src="previewUrl"
+            width="100%"
+            height="600px"
+            frameborder="0"
+          ></iframe>
+          <img
+            v-else-if="previewFile.match(/\.(jpg|jpeg|png|gif)$/i)"
+            :src="previewUrl"
+            style="max-width: 100%; max-height: 600px"
+          />
+          <video
+            v-else-if="previewFile.match(/\.(mp4|webm|ogg)$/i)"
+            :src="previewUrl"
+            controls
+            style="max-width: 100%; max-height: 600px"
+          ></video>
+          <audio
+            v-else-if="previewFile.match(/\.(mp3|wav|ogg)$/i)"
+            :src="previewUrl"
+            controls
+            style="width: 100%"
+          ></audio>
+          <div v-else class="text-center pa-4">
+            <p>Preview not available for this file type</p>
+            <v-btn color="primary" @click="closePreview">Close</v-btn>
+          </div>
+        </v-container>
       </v-card-text>
     </v-card>
   </v-dialog>
