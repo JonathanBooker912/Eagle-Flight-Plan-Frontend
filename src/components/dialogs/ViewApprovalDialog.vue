@@ -18,7 +18,8 @@ const rejectMessage = ref("");
 const rejectReason = ref("");
 const approveMessage = ref("");
 const submissions = ref([]);
-const selectedFileIndex = ref(0);
+const selectedSubmissionIndex = ref(0);
+const selectedSubmissionType = ref("text");
 const selectedFile = ref(null);
 
 const getStudentForFlightPlanId = async () => {
@@ -96,9 +97,20 @@ const handleApprove = async () => {
   }
 };
 
+const getSubmission = () => {
+  const selectedSubmission = submissions.value[selectedSubmissionIndex.value];
+  if (selectedSubmission.submissionType === "text") {
+    selectedSubmissionType.value = "text";
+  } else if (selectedSubmission.submissionType === "file") {
+    selectedSubmissionType.value = "file";
+    getFile();
+  }
+};
+
 const getFile = () => {
   try {
-    const { fileName, value } = submissions.value[selectedFileIndex.value];
+    const { fileName, value } =
+      submissions.value[selectedSubmissionIndex.value];
     const file = new File([new Uint8Array(value.data.data)], fileName, {
       type: value.mimeType,
     });
@@ -116,12 +128,12 @@ watch(visible, async (newValue) => {
   } else {
     student.value = await getStudentForFlightPlanId();
     await getSubmissionsForFlightPlanItem();
-    getFile();
+    getSubmission();
   }
 });
 
-watch(selectedFileIndex, () => {
-  getFile();
+watch(selectedSubmissionIndex, () => {
+  getSubmission();
 });
 </script>
 <template>
@@ -141,62 +153,59 @@ watch(selectedFileIndex, () => {
       <v-card-text height="100%">
         <v-fade-transition mode="out-in">
           <div v-if="approveMessage">
-            <v-alert type="success" variant="tonal">{{
+            <v-alert type="success" variant="tonal" closable>{{
               approveMessage
             }}</v-alert>
           </div>
           <div v-else>
             <v-row
-              v-if="
-                flightPlanItem?.submission?.length === 1 &&
-                flightPlanItem?.submission[0].submissionType === 'text'
-              "
-              class="pa-4 bg-background rounded-lg text-body-1 mb-3"
-              style="white-space: pre-wrap"
-            >
-              {{ flightPlanItem?.submission[0].value }}
-            </v-row>
-            <v-row
-              v-else-if="submissions.length > 0"
+              v-if="submissions.length > 0"
               class="bg-background rounded-lg mb-1"
             >
-              <v-col :cols="12" class="d-flex justify-center align-center">
+              <v-col
+                v-if="selectedSubmissionType === 'file'"
+                :cols="12"
+                class="d-flex justify-center align-center"
+              >
                 <VueFilesPreview
                   :file="selectedFile"
                   style="max-height: 60vh"
                 ></VueFilesPreview>
+              </v-col>
+              <v-col
+                v-if="selectedSubmissionType === 'text'"
+                :cols="12"
+                class="pa-4 bg-background rounded-lg"
+                style="white-space: pre-wrap"
+              >
+                {{ submissions[selectedSubmissionIndex].value }}
               </v-col>
               <v-col :cols="12" class="d-flex justify-center align-center">
                 <v-btn
                   class="rounded-xl mr-6"
                   color="text"
                   variant="outlined"
-                  :disabled="selectedFileIndex === 0"
-                  @click="selectedFileIndex--"
+                  :disabled="selectedSubmissionIndex === 0"
+                  @click="selectedSubmissionIndex--"
                   >Prev</v-btn
                 >
                 <p class="mr-6">
-                  {{ selectedFileIndex + 1 }} /
+                  {{ selectedSubmissionIndex + 1 }} /
                   {{ submissions.length }}
                 </p>
                 <v-btn
                   class="rounded-xl"
                   color="text"
                   variant="outlined"
-                  :disabled="selectedFileIndex === submissions.length - 1"
-                  @click="selectedFileIndex++"
+                  :disabled="selectedSubmissionIndex === submissions.length - 1"
+                  @click="selectedSubmissionIndex++"
                   >Next</v-btn
                 >
               </v-col>
             </v-row>
-
-            <v-row v-else class="bg-background rounded-lg mb-3">
-              <v-col cols="12">
-                <p class="text-subtitle-1 pa-2 text-center">
-                  No submission found
-                </p>
-              </v-col>
-            </v-row>
+            <v-alert v-else type="error" class="text-center"
+              >No submission found!</v-alert
+            >
             <v-row class="bg-background rounded-lg mb-1">
               <v-col cols="12">
                 <p class="text-body-1">Description</p>
@@ -238,7 +247,7 @@ watch(selectedFileIndex, () => {
       <v-card-text>
         <v-fade-transition mode="out-in">
           <div v-if="rejectMessage">
-            <v-alert type="success" variant="tonal">{{
+            <v-alert type="success" variant="tonal" closable>{{
               rejectMessage
             }}</v-alert>
           </div>

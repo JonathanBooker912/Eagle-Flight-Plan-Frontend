@@ -12,8 +12,9 @@ const { visible, flightPlanItem } = storeToRefs(dialogStore);
 
 const submissions = ref([]);
 const successMessage = ref("");
-const selectedFileIndex = ref(0);
+const selectedSubmissionIndex = ref(0);
 const selectedFile = ref(null);
+const selectedSubmissionType = ref("text");
 
 const getSubmissionsForFlightPlanItem = async () => {
   try {
@@ -48,9 +49,20 @@ const handleDiscardSubmission = async () => {
   }
 };
 
+const getSubmission = () => {
+  const selectedSubmission = submissions.value[selectedSubmissionIndex.value];
+  if (selectedSubmission.submissionType === "text") {
+    selectedSubmissionType.value = "text";
+  } else if (selectedSubmission.submissionType === "file") {
+    selectedSubmissionType.value = "file";
+    getFile();
+  }
+};
+
 const getFile = () => {
   try {
-    const { fileName, value } = submissions.value[selectedFileIndex.value];
+    const { fileName, value } =
+      submissions.value[selectedSubmissionIndex.value];
     const file = new File([new Uint8Array(value.data.data)], fileName, {
       type: value.mimeType,
     });
@@ -61,14 +73,14 @@ const getFile = () => {
   }
 };
 
-watch(selectedFileIndex, () => {
-  getFile();
+watch(selectedSubmissionIndex, () => {
+  getSubmission();
 });
 
 watch(visible, async () => {
   if (visible.value) {
     await getSubmissionsForFlightPlanItem();
-    getFile();
+    getSubmission();
   }
 });
 </script>
@@ -90,50 +102,51 @@ watch(visible, async () => {
             }}</v-alert>
           </div>
           <div v-else>
-            <v-container
-              v-if="
-                submissions.length === 1 &&
-                submissions[0].submissionType === 'text'
-              "
-              class="pa-4 bg-background rounded-lg"
-              style="white-space: pre-wrap"
-            >
-              {{ submissions[0].value }}
-            </v-container>
             <v-row
-              v-else-if="submissions.length > 0"
+              v-if="submissions.length > 0"
               class="bg-background rounded-lg mb-1"
             >
-              <v-col :cols="12" class="d-flex justify-center align-center">
+              <v-col
+                v-if="selectedSubmissionType === 'file'"
+                :cols="12"
+                class="d-flex justify-center align-center"
+              >
                 <VueFilesPreview
                   :file="selectedFile"
                   style="max-height: 60vh"
                 ></VueFilesPreview>
+              </v-col>
+              <v-col
+                v-if="selectedSubmissionType === 'text'"
+                :cols="12"
+                class="pa-4 bg-background rounded-lg"
+                style="white-space: pre-wrap"
+              >
+                {{ submissions[selectedSubmissionIndex].value }}
               </v-col>
               <v-col :cols="12" class="d-flex justify-center align-center">
                 <v-btn
                   class="rounded-xl mr-6"
                   color="text"
                   variant="outlined"
-                  :disabled="selectedFileIndex === 0"
-                  @click="selectedFileIndex--"
+                  :disabled="selectedSubmissionIndex === 0"
+                  @click="selectedSubmissionIndex--"
                   >Prev</v-btn
                 >
                 <p class="mr-6">
-                  {{ selectedFileIndex + 1 }} /
+                  {{ selectedSubmissionIndex + 1 }} /
                   {{ submissions.length }}
                 </p>
                 <v-btn
                   class="rounded-xl"
                   color="text"
                   variant="outlined"
-                  :disabled="selectedFileIndex === submissions.length - 1"
-                  @click="selectedFileIndex++"
+                  :disabled="selectedSubmissionIndex === submissions.length - 1"
+                  @click="selectedSubmissionIndex++"
                   >Next</v-btn
                 >
               </v-col>
             </v-row>
-
             <v-alert v-else type="error" class="text-center"
               >No submission found!</v-alert
             >
