@@ -1,18 +1,32 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 const props = defineProps({
   user: { type: Object, required: true },
 });
 const emit = defineEmits(["cardPressed"]);
 const initials = ref("");
-const isAdmin = ref(false);
+
+const isAdmin = computed(() => {
+  return props.user.roles?.some(
+    (role) => role.name.toLowerCase() === "admin",
+  );
+});
+
+const isDirector = computed(() => {
+  return props.user.roles?.some(
+    (role) => role.name.toLowerCase() === "director",
+  );
+});
+
+const roleColor = computed(() => {
+  if (isDirector.value) return "success";
+  if (isAdmin.value) return "warning";
+  return "info";
+});
 
 onMounted(() => {
   initials.value =
     props.user.fName[0].toUpperCase() + props.user.lName[0].toUpperCase();
-  isAdmin.value = props.user.roles?.some(
-    (role) => role.name.toLowerCase() == "admin",
-  );
 });
 </script>
 <template>
@@ -24,7 +38,7 @@ onMounted(() => {
     <v-container class="pa-2">
       <v-row no-gutters style="align-self: stretch">
         <v-sheet
-          :color="isAdmin ? 'warning' : 'info'"
+          :color="roleColor"
           class="accentChip mr-2"
           width="25"
         ></v-sheet>
