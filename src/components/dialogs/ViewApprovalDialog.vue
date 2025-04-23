@@ -24,7 +24,7 @@ const selectedFile = ref(null);
 
 const getStudentForFlightPlanId = async () => {
   const student = await studentServices.getStudentForFlightPlanId(
-    flightPlanItem.value.flightPlanId,
+    flightPlanItem.value.flightPlanId
   );
   return student.data;
 };
@@ -32,7 +32,7 @@ const getStudentForFlightPlanId = async () => {
 const getSubmissionsForFlightPlanItem = async () => {
   try {
     const response = await submissionServices.getSubmissionsForFlightPlanItem(
-      flightPlanItem.value.id,
+      flightPlanItem.value.id
     );
     submissions.value = response.data.submissions;
   } catch (error) {
@@ -72,18 +72,22 @@ const handleApprove = async () => {
 
     await flightPlanItemServices.approveFlightPlanItem(flightPlanItem.value.id);
 
+    var points;
+    if (flightPlanItem.value.flightPlanItemType === "Experience") {
+      points = flightPlanItem.value.experience.points;
+    } else {
+      points = flightPlanItem.value.task.points;
+    }
+
     if (student?.user?.id) {
       await notificationServices.createNotification({
         header: "Flight plan item approved",
-        description: `${flightPlanItem.value.name} has been approved and you have received ${flightPlanItem.value.task.points} points`,
+        description: `${flightPlanItem.value.name} has been approved and you have received ${points} points`,
         read: false,
         userId: student.user.id,
         sentBy: 1, // Sent by the system
       });
-      await studentServices.updatePoints(
-        student.id,
-        flightPlanItem.value.task.points,
-      );
+      await studentServices.updatePoints(student.id, points);
     }
 
     approveMessage.value = "Flight plan item approved";

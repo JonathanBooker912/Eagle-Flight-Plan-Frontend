@@ -10,7 +10,7 @@ const form = ref(null);
 const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
-const experienceTypes = ref([]);
+const completionTypes = ref([]);
 const route = useRoute();
 const router = useRouter();
 
@@ -39,16 +39,16 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, experienceTypesRes] =
+    const [categoriesRes, schedulingRes, completionTypesRes] =
       await Promise.all([
         experienceServices.getCategories(),
         experienceServices.getSchedulingTypes(),
-        experienceServices.getExperienceTypes(),
+        experienceServices.getCompletionTypes(),
       ]);
 
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
-    experienceTypes.value = experienceTypesRes.data;
+    completionTypes.value = completionTypesRes.data;
     if (!props.isAdd) {
       formData.value = (
         await experienceServices.getExperience(route.params.id)
@@ -85,11 +85,11 @@ onMounted(async () => {
         ></v-col>
         <v-col :cols="6"
           ><v-select
-            v-model="formData.experienceType"
+            v-model="formData.completionType"
             variant="solo"
             rounded="lg"
-            label="Experience Type"
-            :items="experienceTypes"
+            label="Completion Type"
+            :items="completionTypes"
             :rules="[required]"
           ></v-select
         ></v-col>

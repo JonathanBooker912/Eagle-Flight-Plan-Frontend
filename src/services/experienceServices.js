@@ -16,16 +16,12 @@ export default {
   getSchedulingTypes() {
     return apiClient.get("/experience/types/schedulingTypes");
   },
-  getExperienceTypes() {
-    return apiClient.get("/experience/types/experienceTypes");
+  getCompletionTypes() {
+    return apiClient.get("/experience/types/completionTypes");
   },
-  // getFulfillingEvents(){
-  //   return apiClient.get("/experience/types/fulfillingEvents");
-  // },
   getCategories() {
     return apiClient.get("/experience/types/categories");
   },
-
   createExperience(experienceData) {
     return apiClient.post("/experience", experienceData);
   },
