@@ -223,7 +223,6 @@ const getEvents = async () => {
     .then((res) => {
       events.value = res.data.events;
       isLoaded.value = true;
-      console.log("Events data:", events.value);
     })
     .catch((err) => console.error(err));
 };
