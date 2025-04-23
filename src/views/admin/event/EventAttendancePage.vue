@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
+import Papa from "papaparse";
 
 import eventServices from "../../../services/eventServices";
 import CardHeader from "../../../components/CardHeader.vue";
@@ -20,6 +21,9 @@ const searchQuery = ref("");
 const students = ref([]);
 const page = ref(1);
 const itemsPerPage = 5;
+const showImportDialog = ref(false);
+const csvFile = ref(null);
+const csvData = ref([]);
 
 const count = computed(() => Math.ceil(students.value.length / itemsPerPage));
 
@@ -87,6 +91,85 @@ const handleSearchChange = (input) => {
   page.value = 1;
   getRegisteredStudents(page.value);
 };
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    Papa.parse(file, {
+      header: true,
+      complete: (results) => {
+        // Validate required headers
+        const requiredHeaders = [
+          "First Name",
+          "Last Name",
+          "Email Address",
+          "Checked In",
+        ];
+        const missingHeaders = requiredHeaders.filter(
+          (header) => !results.meta.fields.includes(header),
+        );
+
+        if (missingHeaders.length > 0) {
+          alert(`Missing required headers: ${missingHeaders.join(", ")}`);
+          return;
+        }
+
+        csvData.value = results.data;
+      },
+    });
+  }
+};
+
+const handleImport = () => {
+  showImportDialog.value = true;
+};
+
+const submitImport = async () => {
+  try {
+    // Transform and validate data
+    const transformedData = csvData.value
+      .filter((row) => row["Checked In"]) // Only include rows with a Checked In value
+      .map((row) => {
+        if (!row["First Name"] || !row["Last Name"] || !row["Email Address"]) {
+          throw new Error(
+            `Missing required fields for row: ${JSON.stringify(row)}`,
+          );
+        }
+
+        return {
+          email: row["Email Address"],
+          checkedIn: row["Checked In"],
+          eventId: eventId.value,
+        };
+      });
+
+    if (transformedData.length === 0) {
+      throw new Error(
+        "No valid records to import. Please ensure at least one record has a Checked In value.",
+      );
+    }
+
+    // Remove duplicates by keeping only the first occurrence of each email
+    const uniqueData = transformedData.reduce((acc, current) => {
+      const exists = acc.find((item) => item.email === current.email);
+      if (!exists) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+
+    // Send to backend
+    await eventServices.importAttendance(uniqueData);
+
+    // Refresh the data and close dialog
+    await getData();
+    showImportDialog.value = false;
+    csvFile.value = null;
+    csvData.value = [];
+  } catch (error) {
+    console.error("Import error:", error);
+  }
+};
 </script>
 
 <template>
@@ -97,6 +180,48 @@ const handleSearchChange = (input) => {
       :filter-button="false"
       @changed="handleSearchChange"
     />
+    <v-btn color="primary" prepend-icon="mdi-import" @click="handleImport">
+      Import
+    </v-btn>
+
+    <v-dialog v-model="showImportDialog" max-width="400">
+      <v-card color="backgroundDarken" class="rounded-lg">
+        <v-card-text>
+          <div style="text-align: center">
+            <h3>Import Attendance</h3>
+          </div>
+          <v-file-input
+            v-model="csvFile"
+            accept=".csv"
+            label="CSV File"
+            prepend-icon="mdi-file-document"
+            @change="handleFileUpload"
+            variant="outlined"
+            density="comfortable"
+            class="mt-4"
+          />
+          <div class="mt-5" style="display: flex; justify-content: center">
+            <v-btn
+              class="mr-2"
+              variant="outlined"
+              rounded="xl"
+              @click="showImportDialog = false"
+            >
+              Cancel
+            </v-btn>
+            <v-btn
+              rounded="xl"
+              color="primary"
+              @click="submitImport"
+              :disabled="!csvData.length"
+            >
+              Import
+            </v-btn>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
     <ListTable :items="pagedStudents" :show-filters="showFilters">
       <template #header>
         <ListTableHeader
