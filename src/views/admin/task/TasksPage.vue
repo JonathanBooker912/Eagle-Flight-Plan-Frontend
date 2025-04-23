@@ -37,13 +37,11 @@ const count = ref(0);
 const strengths = ref([]);
 const categories = ref([]);
 const schedulingTypes = ref([]);
-const taskTypes = ref([]);
 const completionTypes = ref([]);
 
 const showFilters = ref(false);
 const filters = ref({
   category: null,
-  taskType: null,
   schedulingType: null,
   completionType: null,
   semestersFromGraduation: null,
@@ -131,17 +129,14 @@ watch(showFilters, () => getTasks());
 onMounted(async () => {
   getTasks();
   getStrengths();
-  const [categoriesRes, schedulingRes, taskTypesRes, completionRes] =
-    await Promise.all([
-      taskServices.getCategories(),
-      taskServices.getSchedulingTypes(),
-      taskServices.getTaskTypes(),
-      taskServices.getCompletionTypes(),
-    ]);
+  const [categoriesRes, schedulingRes, completionRes] = await Promise.all([
+    taskServices.getCategories(),
+    taskServices.getSchedulingTypes(),
+    taskServices.getCompletionTypes(),
+  ]);
 
   categories.value = categoriesRes.data;
   schedulingTypes.value = schedulingRes.data;
-  taskTypes.value = taskTypesRes.data;
   completionTypes.value = completionRes.data;
 });
 </script>
@@ -185,11 +180,6 @@ onMounted(async () => {
           v-model="filters.category"
           label="Category"
           :items="categories"
-        ></v-select>
-        <v-select
-          v-model="filters.taskType"
-          label="Task Type"
-          :items="taskTypes"
         ></v-select>
         <v-select
           v-model="filters.schedulingType"
