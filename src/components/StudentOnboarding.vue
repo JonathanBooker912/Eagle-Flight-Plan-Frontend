@@ -154,6 +154,9 @@ onMounted(async () => {
               class="mb-4"
               return-object
               required
+              :rules="[
+                (v) => v.length <= 5 || 'You can only select up to 5 strengths',
+              ]"
               hint="Select all that apply"
             ></v-select>
 
