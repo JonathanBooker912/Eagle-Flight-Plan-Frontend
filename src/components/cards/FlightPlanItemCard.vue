@@ -44,6 +44,12 @@ const showEventDialog = ref(false);
 const eventOptions = ref([]);
 const selectedEvent = ref(null);
 
+const isSubmissionExperience = computed(
+  () =>
+    props.flightPlanItem.flightPlanItemType === "Experience" &&
+    props.flightPlanItem.experience?.completionType === "Submission"
+);
+
 const fetchStudentId = async () => {
   try {
     const userId = store.user?.userId;
@@ -73,7 +79,7 @@ const loadExperienceEvents = async () => {
   if (!props.flightPlanItem.experience?.id) return;
   try {
     const response = await eventServices.getEventsForExperience(
-      props.flightPlanItem.experience.id,
+      props.flightPlanItem.experience.id
     );
     eventOptions.value = response.data;
   } catch (err) {
@@ -177,7 +183,7 @@ const handleClick = () => {
 
 const handleViewRegisteredEvent = async () => {
   const registeredEvent = eventOptions.value.find(
-    (event) => event.id === props.flightPlanItem.eventId,
+    (event) => event.id === props.flightPlanItem.eventId
   );
 
   if (registeredEvent) {
@@ -227,7 +233,6 @@ const handleViewRegisteredEvent = async () => {
                     : flightPlanItem.status
               }}
             </p>
-
             <p
               :class="[
                 'mb-3',
@@ -241,12 +246,16 @@ const handleViewRegisteredEvent = async () => {
             </p>
           </v-card-text>
 
-          <div v-if="!props.isAdmin">
-            <!-- Incomplete Task -->
+          <div v-if="!isAdmin">
+            <!-- Submission logic for Task and Experience -->
             <v-row
               v-if="
+                ['Task', 'Experience'].includes(
+                  flightPlanItem.flightPlanItemType
+                ) &&
                 flightPlanItem.status === 'Incomplete' &&
-                flightPlanItem.flightPlanItemType === 'Task' &&
+                (flightPlanItem.flightPlanItemType === 'Task' ||
+                  isSubmissionExperience) &&
                 isFlightPlanView
               "
               justify="end"
@@ -255,18 +264,21 @@ const handleViewRegisteredEvent = async () => {
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
-                @click="emit('incomplete', props.flightPlanItem)"
+                @click="emit('incomplete', flightPlanItem)"
               >
                 Incomplete
                 <v-icon right class="pl-1">mdi-upload</v-icon>
               </v-btn>
             </v-row>
 
-            <!-- Rejected Task -->
             <v-row
               v-if="
+                ['Task', 'Experience'].includes(
+                  flightPlanItem.flightPlanItemType
+                ) &&
                 flightPlanItem.status === 'Rejected' &&
-                flightPlanItem.flightPlanItemType === 'Task' &&
+                (flightPlanItem.flightPlanItemType === 'Task' ||
+                  isSubmissionExperience) &&
                 isFlightPlanView
               "
               justify="end"
@@ -275,20 +287,20 @@ const handleViewRegisteredEvent = async () => {
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
-                @click="emit('incomplete', props.flightPlanItem)"
+                @click="emit('incomplete', flightPlanItem)"
               >
                 Rejected
                 <v-icon right class="pl-1">mdi-upload</v-icon>
               </v-btn>
             </v-row>
 
-            <!-- Register for Experience -->
+            <!-- Attendance-based Experience Registration -->
             <v-row
               v-if="
-                flightPlanItem.status === 'Incomplete' &&
                 flightPlanItem.flightPlanItemType === 'Experience' &&
-                isFlightPlanView &&
-                !isRegisteredForExperience
+                flightPlanItem.experience?.completionType === 'Attendance' &&
+                flightPlanItem.status === 'Incomplete' &&
+                isFlightPlanView
               "
               justify="end"
             >
@@ -303,18 +315,22 @@ const handleViewRegisteredEvent = async () => {
               </v-btn>
             </v-row>
 
-            <!-- Pending Task -->
+            <!-- View Submission -->
             <v-row
-              v-else-if="
+              v-if="
+                ['Task', 'Experience'].includes(
+                  flightPlanItem.flightPlanItemType
+                ) &&
                 flightPlanItem.status === 'Pending' &&
-                flightPlanItem.flightPlanItemType === 'Task'
+                (flightPlanItem.flightPlanItemType === 'Task' ||
+                  isSubmissionExperience)
               "
               justify="end"
             >
               <v-btn
                 class="mr-4 mb-3"
-                rounded="xl"
                 variant="outlined"
+                rounded="xl"
                 @click="emit('view', flightPlanItem)"
               >
                 View Submission
@@ -322,18 +338,19 @@ const handleViewRegisteredEvent = async () => {
               </v-btn>
             </v-row>
 
-            <!-- Pending or Registered Experience -->
+            <!-- Registered/Pending Attendance Event View -->
             <v-row
-              v-else-if="
+              v-if="
                 ['Pending', 'Registered'].includes(flightPlanItem.status) &&
-                flightPlanItem.flightPlanItemType === 'Experience'
+                flightPlanItem.flightPlanItemType === 'Experience' &&
+                flightPlanItem.experience?.completionType === 'Attendance'
               "
               justify="end"
             >
               <v-btn
                 class="mr-4 mb-3"
-                rounded="xl"
                 variant="outlined"
+                rounded="xl"
                 @click="handleViewRegisteredEvent"
               >
                 View Registered Event
@@ -351,7 +368,7 @@ const handleViewRegisteredEvent = async () => {
     :experience-id="flightPlanItem.id"
     :event-options="eventOptions"
     :flight-plan-item="flightPlanItem"
-    :flight-plan-items="props.flightPlanItems"
+    :flight-plan-items="flightPlanItems"
     @register="handleRegister"
     @unregister="handleUnregister"
     @refresh="handleRefresh"

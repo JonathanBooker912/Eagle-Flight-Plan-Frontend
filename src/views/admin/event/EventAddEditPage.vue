@@ -21,8 +21,6 @@ const formData = ref({});
 const selectedDate = ref();
 const registrationTypes = ref([]);
 const attendanceTypes = ref([]);
-const eventTypes = ref([]);
-const completionTypes = ref([]);
 const timeOptions = ref(generateTimeOptions());
 const experienceOptions = ref([]);
 
@@ -66,7 +64,7 @@ const handleSubmit = async () => {
     console.error(
       "Invalid time values:",
       formData.value.startTime,
-      formData.value.endTime,
+      formData.value.endTime
     );
     return;
   }
@@ -90,19 +88,13 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [
-      completionTypesRes,
-      attendanceTypesRes,
-      registrationTypesRes,
-      experienceRes,
-    ] = await Promise.all([
-      eventServices.getCompletionTypes(),
-      eventServices.getAttendanceTypes(),
-      eventServices.getRegistrationTypes(),
-      experienceServices.getAllExperiences(),
-    ]);
+    const [attendanceTypesRes, registrationTypesRes, experienceRes] =
+      await Promise.all([
+        eventServices.getAttendanceTypes(),
+        eventServices.getRegistrationTypes(),
+        experienceServices.getAllExperiences(),
+      ]);
 
-    completionTypes.value = completionTypesRes.data;
     attendanceTypes.value = attendanceTypesRes.data;
     registrationTypes.value = registrationTypesRes.data;
     experienceOptions.value = experienceRes.data.experiences;
@@ -129,7 +121,7 @@ const filteredEndTimeOptions = computed(() => {
   if (!formData.value.startTime) return timeOptions.value;
   const start = parseTimeString(formData.value.startTime, "01/01/2000");
   return timeOptions.value.filter(
-    (time) => parseTimeString(time, "01/01/2000") > start,
+    (time) => parseTimeString(time, "01/01/2000") > start
   );
 });
 
@@ -205,54 +197,25 @@ const validateEndTimeWrapper = (value) => {
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-select
-            v-model="formData.registration"
-            variant="solo"
-            rounded="lg"
-            clearable
-            label="Registration Type"
-            :items="registrationTypes"
-            :rules="[required]"
-          />
-        </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.eventType"
-            variant="solo"
-            rounded="lg"
-            clearable
-            label="Event Type"
-            :items="eventTypes"
-          />
-        </v-col>
-      </v-row>
+      <v-select
+        v-model="formData.registration"
+        variant="solo"
+        rounded="lg"
+        clearable
+        label="Registration Type"
+        :items="registrationTypes"
+        :rules="[required]"
+      />
 
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-select
-            v-model="formData.completionType"
-            variant="solo"
-            rounded="lg"
-            clearable
-            label="Completion Type"
-            :items="completionTypes"
-            :rules="[required]"
-          />
-        </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.attendanceType"
-            variant="solo"
-            rounded="lg"
-            clearable
-            label="Attendance Type"
-            :items="attendanceTypes"
-            :rules="[required]"
-          />
-        </v-col>
-      </v-row>
+      <v-select
+        v-model="formData.attendanceType"
+        variant="solo"
+        rounded="lg"
+        clearable
+        label="Attendance Type"
+        :items="attendanceTypes"
+        :rules="[required]"
+      />
 
       <v-textarea
         v-model="formData.description"
@@ -260,7 +223,7 @@ const validateEndTimeWrapper = (value) => {
         rounded="lg"
         label="Description"
       ></v-textarea>
-      <v-select
+      <v-autocomplete
         v-model="formData.experiences"
         :items="experienceOptions"
         item-title="name"
@@ -270,7 +233,7 @@ const validateEndTimeWrapper = (value) => {
         return-object
         multiple
         chips
-      ></v-select>
+      ></v-autocomplete>
 
       <v-row class="justify-center mb-1">
         <v-btn
