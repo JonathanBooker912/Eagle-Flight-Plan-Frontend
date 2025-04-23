@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { studentApprovalDialogStore } from "../../stores/studentApprovalDialogStore";
 import userServices from "../../services/userServices";
 import submissionServices from "../../services/submissionServices";
 import flightPlanItemServices from "../../services/flightPlanItemServices";
 import fileServices from "../../services/fileServices";
+import notificationServices from "../../services/notificationServices";
 
 const emit = defineEmits(["submit"]);
 const dialogStore = studentApprovalDialogStore();
@@ -71,10 +72,16 @@ const handleSubmit = async () => {
       );
     }
 
-    await flightPlanItemServices.updateFlightPlanItem({
-      ...flightPlanItem.value,
-      status: "Pending",
-    });
+    if (selectedOptionalReviewer.value) {
+      await notificationServices.createNotification({
+        header: "Flight plan item pending review",
+        description: `The Flight Plan Item ${flightPlanItem.value.name} is pending review.`,
+        read: false,
+        userId: selectedOptionalReviewer.value,
+        sentBy: 1, // Sent by the system
+      });
+    }
+
     successMessage.value = "Submission successful!";
 
     setTimeout(() => {
@@ -90,6 +97,16 @@ const handleSubmit = async () => {
 };
 
 onMounted(fetchOptionalReviewers);
+
+watch(visible, async (newValue) => {
+  if (!newValue) {
+    selectedOptionalReviewer.value = null;
+    reflectionText.value = "";
+    files.value = null;
+    successMessage.value = "";
+    errorMessage.value = "";
+  }
+});
 </script>
 
 <template>
