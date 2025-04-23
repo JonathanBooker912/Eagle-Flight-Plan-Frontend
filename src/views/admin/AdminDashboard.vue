@@ -1,8 +1,6 @@
 <script setup>
 import eventServices from "../../services/eventServices";
 import notificationServices from "../../services/notificationServices";
-//import flightPlanServices from "../../services/flightPlanServices";
-//import studentServices from "../../services/studentServices";
 import EventCard from "../../components/cards/EventCard.vue";
 import { userStore } from "../../stores/userStore";
 import { onMounted, ref, computed } from "vue";
