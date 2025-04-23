@@ -5,6 +5,8 @@ import linkServices from "../services/linkServices";
 import strengthServices from "../services/strengthServices";
 import badgeServices from "../services/badgeServices";
 import userServices from "../services/userServices";
+import studentServices from "../services/studentServices";
+import majorServices from "../services/majorServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
@@ -26,6 +28,8 @@ const strengths = ref([]);
 const badges = ref([]);
 const unviewedBadges = ref([]);
 const selectedUser = ref([]);
+const selectedStudent = ref([]);
+const selectedMajor = ref([]);
 const isAdmin = ref(false);
 
 // Add pagination variables
@@ -105,6 +109,28 @@ const toFlightPlan = () => {
   router.push({ name: "student-flightPlan" });
 };
 
+const getMajor = async (majorId) => {
+  try {
+    const res = await majorServices.getMajor(majorId);
+    selectedMajor.value = res.data;
+    console.log(selectedMajor.value);
+  } catch (err) {
+    console.error("Error fetching major:", err);
+  }
+};
+
+const getStudent = async (userId) => {
+  try {
+    const res = await studentServices.getStudentForUserId(userId);
+    selectedStudent.value = res.data;
+    if (selectedStudent.value.id) {
+      await getMajor(selectedStudent.value.id);
+    }
+  } catch (err) {
+    console.error("Error fetching student:", err);
+  }
+};
+
 // Add watcher for pagination
 watch(currentPage, (newPage) => {
   getBadges(route.params.userId, newPage);
@@ -118,10 +144,11 @@ onMounted(async () => {
     await fetchUnviewedBadges();
   }
 
-  getLinks(passedId); // Fetch links on component mount
+  getLinks(passedId);
   getStrengths(passedId);
   getBadges(passedId);
   getUser(passedId);
+  getStudent(passedId);
 });
 </script>
 
@@ -147,7 +174,6 @@ onMounted(async () => {
             <p class="text-h6 font-weight-bold">
               {{ selectedUser.fullName }}
             </p>
-            <p class="text-subtitle-1">{{ user.major }}</p>
           </div>
         </v-col>
 
@@ -158,6 +184,7 @@ onMounted(async () => {
           </p>
         </v-col>
         <v-col class="v-col-2 d-flex flex-column justify-center text-right">
+          <p style="font-size: 16px; text-align: right !important">Major</p>
           <p style="font-size: 16px; text-align: right !important">Email</p>
           <p
             v-for="(link, index) in links.slice(0, 3)"
@@ -168,6 +195,7 @@ onMounted(async () => {
           </p>
         </v-col>
         <v-col cols="3" class="d-flex flex-column justify-center text-left">
+          <p class="text-subtitle-1">{{ selectedMajor.name }}</p>
           <a style="text-align: left !important">
             {{ selectedUser.email }}
           </a>
