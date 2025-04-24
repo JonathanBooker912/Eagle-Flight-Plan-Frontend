@@ -113,8 +113,10 @@ const getStudent = async (userId) => {
     selectedStudent.value = res.data;
     if (selectedStudent.value.id) {
       // Get majors from the student response
+      console.log('Student data:', selectedStudent.value);
       if (selectedStudent.value.majors) {
         selectedMajor.value = selectedStudent.value.majors;
+        console.log('Majors:', selectedMajor.value);
       }
     }
   } catch (err) {
