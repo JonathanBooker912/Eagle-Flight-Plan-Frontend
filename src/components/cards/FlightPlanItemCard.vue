@@ -127,6 +127,7 @@ const handleRegister = async (event) => {
     };
     await flightPlanItemServices.updateFlightPlanItem(updatedItem);
     await fetchStudentStatus();
+
     handleRefresh();
   } catch (err) {
     console.error("Registration error:", err);

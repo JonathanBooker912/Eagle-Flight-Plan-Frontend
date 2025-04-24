@@ -398,6 +398,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           :is-flight-plan-view="!props.isAdmin"
           :flight-plan-items="flightPlanItems"
           @incomplete="handleIncompleteButtonClick"
+          @register="handleRegister"
           @view="handlePendingButtonClick"
           @delete="handleDelete"
         ></FlightPlanItemCard>

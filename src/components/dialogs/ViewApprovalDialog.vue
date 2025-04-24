@@ -69,8 +69,6 @@ const handleReject = async () => {
 
 const handleApprove = async () => {
   try {
-    const student = await getStudentForFlightPlanId();
-
     await flightPlanItemServices.approveFlightPlanItem(flightPlanItem.value.id);
 
     approveMessage.value = "Flight plan item approved";

@@ -66,9 +66,6 @@ export default {
   },
 
   markAttendance(eventId, studentIds) {
-    console.log("Event ID:", eventId);
-    console.log("Student IDs:", studentIds);
-
     return apiClient.post(`/event/${eventId}/attend`, { studentIds });
   },
 
