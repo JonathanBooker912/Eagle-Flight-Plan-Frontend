@@ -54,9 +54,9 @@ const isSubmissionExperience = computed(
 
 const isOptional = computed(() => {
   if (props.flightPlanItem.flightPlanItemType === "Experience") {
-    return props.flightPlanItem.experience?.submissionType === "optional";
+    return props.flightPlanItem.experience?.schedulingType === "optional";
   } else {
-    return props.flightPlanItem.task?.submissionType === "optional";
+    return props.flightPlanItem.task?.schedulingType === "optional";
   }
 });
 
@@ -269,7 +269,7 @@ const handleViewRegisteredEvent = async () => {
             </p>
           </v-card-text>
 
-          <div v-if="!isAdmin">
+          <div v-if="!isAdmin && !isFlightPlanView">
             <v-row justify="end">
               <!-- Submission logic for Task and Experience -->
               <v-btn
@@ -279,8 +279,7 @@ const handleViewRegisteredEvent = async () => {
                   ) &&
                   flightPlanItem.status === 'Incomplete' &&
                   (flightPlanItem.flightPlanItemType === 'Task' ||
-                    isSubmissionExperience) &&
-                  isFlightPlanView
+                    isSubmissionExperience)
                 "
                 class="mr-4 mb-3"
                 variant="outlined"
@@ -297,8 +296,7 @@ const handleViewRegisteredEvent = async () => {
                   ) &&
                   flightPlanItem.status === 'Rejected' &&
                   (flightPlanItem.flightPlanItemType === 'Task' ||
-                    isSubmissionExperience) &&
-                  isFlightPlanView
+                    isSubmissionExperience)
                 "
                 class="mr-4 mb-3"
                 variant="outlined"
@@ -314,8 +312,7 @@ const handleViewRegisteredEvent = async () => {
                 v-if="
                   flightPlanItem.flightPlanItemType === 'Experience' &&
                   flightPlanItem.experience?.submissionType === 'attendance' &&
-                  flightPlanItem.status === 'Incomplete' &&
-                  isFlightPlanView
+                  flightPlanItem.status === 'Incomplete'
                 "
                 class="mr-4 mb-3"
                 variant="outlined"
@@ -360,7 +357,11 @@ const handleViewRegisteredEvent = async () => {
                 <v-icon right class="pl-1">mdi-calendar</v-icon>
               </v-btn>
               <v-btn
-                v-if="!isAdmin && isOptional"
+                v-if="
+                  !isAdmin &&
+                  isOptional &&
+                  !['Complete'].includes(flightPlanItem.status)
+                "
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"

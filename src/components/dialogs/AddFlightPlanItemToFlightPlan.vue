@@ -182,7 +182,7 @@ watch(visible, async () => {
                 <v-list-item>
                   <FlightPlanItemCard
                     :flight-plan-item="item"
-                    :is-view-only="true"
+                    :is-flight-plan-view="true"
                     @click="handleCardClick(item)"
                   />
                 </v-list-item>
@@ -211,7 +211,7 @@ watch(visible, async () => {
                 <v-list-item>
                   <FlightPlanItemCard
                     :flight-plan-item="item"
-                    :is-view-only="true"
+                    :is-flight-plan-view="true"
                     @click="handleCardClick(item)"
                   />
                 </v-list-item>
@@ -269,7 +269,7 @@ watch(visible, async () => {
                 <v-col :cols="6">
                   <FlightPlanItemCard
                     :flight-plan-item="item"
-                    :is-view-only="true"
+                    :is-flight-plan-view="true"
                   />
                 </v-col>
                 <v-col :cols="3" />
