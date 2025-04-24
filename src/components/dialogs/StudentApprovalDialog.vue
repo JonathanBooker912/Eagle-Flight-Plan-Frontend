@@ -4,7 +4,6 @@ import { storeToRefs } from "pinia";
 import { studentApprovalDialogStore } from "../../stores/studentApprovalDialogStore";
 import userServices from "../../services/userServices";
 import submissionServices from "../../services/submissionServices";
-import flightPlanItemServices from "../../services/flightPlanItemServices";
 import fileServices from "../../services/fileServices";
 
 const emit = defineEmits(["submit"]);
@@ -50,54 +49,75 @@ const handleCancel = () => {
 };
 
 const handleSubmit = async () => {
-  if (!files.value && !reflectionText.value) {
+  // Validate input
+  const noFiles = !files.value || files.value.length === 0;
+  const noText =
+    !reflectionText.value || reflectionText.value.trim().length === 0;
+
+  if (noFiles && noText) {
     errorMessage.value = "Please upload a file or write a reflection";
     return;
   }
 
   try {
-    if (submissionType.value === "text") {
-      await submitReflection();
-    } else if (submissionType.value === "file") {
-      await submitFiles();
-    } else {
-      let submissions = [];
-      if (files.value.length > 0) {
-        const fileNames = await Promise.all(
-          files.value.map(async (file) => {
-            const { data } = await fileServices.uploadFile(
-              { file },
-              "submissions",
-            );
-            return data.fileName;
-          }),
-        );
-        submissions = fileNames.map((fileName) => ({
-          flightPlanItemId: flightPlanItem.value.id,
-          submissionType: "file",
-          value: fileName,
-        }));
-      }
+    switch (submissionType.value) {
+      case "text":
+        if (noText) {
+          errorMessage.value = "Please write a reflection";
+          return;
+        }
+        await submitReflection();
+        break;
 
-      if (reflectionText.value) {
-        submissions.push({
-          flightPlanItemId: flightPlanItem.value.id,
-          submissionType: "text",
-          value: reflectionText.value,
-        });
-      }
+      case "file":
+        if (noFiles) {
+          errorMessage.value = "Please upload a file";
+          return;
+        }
+        await submitFiles();
+        break;
 
-      await submissionServices.createSubmissions(submissions);
+      default:
+        // Mixed or other types
+        /* eslint-disable no-case-declarations*/
+        const submissions = [];
+        if (!noFiles) {
+          const fileNames = await Promise.all(
+            files.value.map(async (file) => {
+              const { data } = await fileServices.uploadFile(
+                { file },
+                "submissions",
+              );
+              return data.fileName;
+            }),
+          );
+
+          fileNames.forEach((fileName) => {
+            submissions.push({
+              flightPlanItemId: flightPlanItem.value.id,
+              submissionType: "file",
+              value: fileName,
+            });
+          });
+        }
+
+        if (!noText) {
+          submissions.push({
+            flightPlanItemId: flightPlanItem.value.id,
+            submissionType: "text",
+            value: reflectionText.value,
+          });
+        }
+
+        await submissionServices.createSubmissions(submissions);
+        break;
     }
 
-    await flightPlanItemServices.updateFlightPlanItem({
-      ...flightPlanItem.value,
-      status: "Pending",
-    });
     successMessage.value = "Submission successful!";
     debounceSubmit();
   } catch (error) {
-    errorMessage.value = error.response.data.message;
+    errorMessage.value =
+      error.response?.data?.message || "An unexpected error occurred.";
   }
 };
 

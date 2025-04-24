@@ -237,11 +237,13 @@ const handleAdd = () => {
 
 const handleRegister = () => {
   page.value = 1;
-  fetchFlightPlanAndItems(),
-    fetchFlightPlanProgress(),
-    fetchFlightPlanItemStatuses(),
-    fetchFlightPlanItemTypes(),
-    fetchUnviewedBadges();
+  fetchStudent();
+  fetchFlightPlan();
+  fetchFlightPlanAndItems();
+  fetchFlightPlanProgress();
+  fetchFlightPlanItemStatuses();
+  fetchFlightPlanItemTypes();
+  fetchUnviewedBadges();
 };
 
 const handleChangeFilters = () => {

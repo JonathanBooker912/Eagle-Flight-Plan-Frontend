@@ -17,10 +17,7 @@ const emit = defineEmits(["edit", "delete"]);
         Category: {{ props.task.category }}
       </p>
       <p class="text-subtitle-1 font-weight-regular">
-        Type: {{ props.task.taskType }}
-      </p>
-      <p class="text-subtitle-1 font-weight-regular">
-        Completion Type: {{ props.task.completionType }}
+        Completion Type: {{ props.task.submissionType }}
       </p></v-card-text
     >
     <v-row class="ma-2 float-right">

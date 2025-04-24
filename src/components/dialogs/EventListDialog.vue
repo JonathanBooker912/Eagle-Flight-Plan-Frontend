@@ -293,16 +293,21 @@ const completeExperience = async (event) => {
                 <strong>Location:</strong>
                 {{ selectedEvent.location || "No Location" }}
               </p>
-              <p><strong>Date:</strong> {{ formatDate(selectedEvent.date) }}</p>
+              <p>
+                <strong>Date:</strong>
+                {{ formatDate(selectedEvent.date) }}
+              </p>
               <p>
                 <strong>Time:</strong>
                 {{ formatTime(selectedEvent.startTime, selectedEvent.endTime) }}
               </p>
               <p>
-                <strong>Attendance:</strong> {{ selectedEvent.attendanceType }}
+                <strong>Attendance:</strong>
+                {{ selectedEvent.attendanceType }}
               </p>
               <p>
-                <strong>Registration:</strong> {{ selectedEvent.registration }}
+                <strong>Registration:</strong>
+                {{ selectedEvent.registration }}
               </p>
 
               <div v-if="successMessage">
@@ -331,8 +336,8 @@ const completeExperience = async (event) => {
                   class="mt-4 text-left text-medium-emphasis"
                 >
                   Event fulfilling
-                  <strong>{{ matchedFlightPlanItem.name }}</strong> Flight Plan
-                  Experience
+                  <strong>{{ matchedFlightPlanItem.name }}</strong>
+                  Flight Plan Experience
                 </p>
 
                 <v-btn

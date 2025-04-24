@@ -80,6 +80,7 @@ const getBadges = async (id, page = 1) => {
       pageSize.value,
     ); // API call
     badges.value = res.data.badges; // Update badges
+    console.log(badges.value);
 
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page;

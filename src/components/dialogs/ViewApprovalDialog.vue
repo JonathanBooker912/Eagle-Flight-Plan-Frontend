@@ -22,6 +22,7 @@ const submissions = ref([]);
 const selectedSubmissionIndex = ref(0);
 const selectedSubmissionType = ref("text");
 const selectedFile = ref(null);
+const approveDisabled = ref(false);
 
 const getStudentForFlightPlanId = async () => {
   const student = await studentServices.getStudentForFlightPlanId(
@@ -69,12 +70,14 @@ const handleReject = async () => {
 
 const handleApprove = async () => {
   try {
+    approveDisabled.value = true;
     await flightPlanItemServices.approveFlightPlanItem(flightPlanItem.value.id);
 
     approveMessage.value = "Flight plan item approved";
     setTimeout(() => {
       approveMessage.value = "";
       visible.value = false;
+      approveDisabled.value = false;
       emit("approve");
     }, 2000);
   } catch (error) {
@@ -216,6 +219,7 @@ watch(selectedSubmissionIndex, () => {
               <v-btn
                 class="rounded-xl mr-3"
                 color="primary"
+                :disabled="approveDisabled"
                 @click="handleApprove"
                 >Approve</v-btn
               >
