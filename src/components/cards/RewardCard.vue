@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
+import { loadImage } from "../componentUtilities";
 import defaultImage from "/defaultRewardImage.png";
-
+import fileServices from "../../services/fileServices";
 // Props and Emits
 const props = defineProps({
   reward: { type: Object, required: true },
@@ -15,20 +16,17 @@ const emit = defineEmits(["edit", "delete", "shop", "show", "redeem"]);
 // State
 const imageSrc = ref("");
 
+const fetchImage = async () => {
+  const response = await fileServices.getFileForName(props.reward.imageName);
+  if (!response.data.image) return;
+  imageSrc.value = loadImage(response.data.image.data);
+};
+
 // Computed Properties
 const canRedeem = computed(() => props.studentPoints >= props.reward.points);
 
-// Methods
-const loadImage = (image) => {
-  if (!image?.data) return;
-
-  const byteArray = new Uint8Array(image.data);
-  const blob = new Blob([byteArray], { type: image.type });
-  imageSrc.value = URL.createObjectURL(blob);
-};
-
 // Lifecycle Hooks
-onMounted(() => loadImage(props.reward.image));
+onMounted(() => fetchImage());
 onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
 </script>
 
@@ -37,10 +35,17 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
     <v-card-text>
       <!-- Image Section -->
       <v-img
-        class="image mb-3"
-        :src="imageSrc || defaultImage"
-        :alt="imageSrc ? 'Uploaded Image' : 'Generic Merchandise Image'"
-      />
+        v-if="imageSrc"
+        class="image"
+        :src="imageSrc"
+        alt="Uploaded Image"
+      ></v-img>
+      <v-img
+        v-else
+        class="image"
+        :src="defaultImage"
+        alt="Generic Merchandise Image"
+      ></v-img>
 
       <!-- Title Section -->
       <p class="text-h5 text-center my-2">
@@ -69,13 +74,6 @@ onUnmounted(() => URL.revokeObjectURL(imageSrc.value));
           </v-btn>
 
           <template v-else>
-            <v-btn
-              color="primary"
-              class="mr-2 rounded-lg"
-              @click="emit('shop', props.reward.id)"
-            >
-              <v-icon icon="mdi-shopping" color="text" size="x-large" />
-            </v-btn>
             <v-btn
               color="warning"
               class="mr-2 rounded-lg"
