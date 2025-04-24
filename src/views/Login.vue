@@ -17,7 +17,6 @@ const showOnboarding = ref(false);
 
 const handleLoginSuccess = async (userData) => {
   try {
-    console.log(userData);
     // Skip onboarding for admin users
     if (await store.isAdmin()) {
       const redirect = await loginRedirect();
@@ -27,7 +26,6 @@ const handleLoginSuccess = async (userData) => {
 
     // Check if student exists and has completed onboarding
     const response = await studentServices.getStudentForUserId(userData.userId);
-    console.log(response);
     if (!response.data?.graduationDate || !response.data?.semestersFromGrad) {
       showOnboarding.value = true;
     } else {

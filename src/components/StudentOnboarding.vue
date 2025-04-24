@@ -6,6 +6,7 @@ import strengthServices from "../services/strengthServices";
 import majorServices from "../services/majorServices";
 import semesterServices from "../services/semesterServices";
 import userServices from "../services/userServices";
+import flightPlanServices from "../services/flightPlanServices";
 import { userStore } from "../stores/userStore";
 import { storeToRefs } from "pinia";
 
@@ -36,8 +37,6 @@ const handleSubmit = async () => {
       pointsUsed: 0,
     };
 
-    console.log("Student Data:", studentData); // Add logging to debug
-
     // Create or get existing student
     const student = await studentServices.createStudent(studentData);
 
@@ -49,7 +48,6 @@ const handleSubmit = async () => {
 
     // Add majors
     majors.value.forEach(async (major) => {
-      console.log("Adding major:", major);
       await studentServices.addMajor(student.data.id, major.id);
     });
 
@@ -58,8 +56,12 @@ const handleSubmit = async () => {
       await studentServices.addStrength(student.data.id, strength.id);
     });
 
+    // Generate flight plan
+    await flightPlanServices.generateFlightPlan(student.data.id);
+
     router.push("/student"); // Redirect to profile after successful submission
   } catch (error) {
+    console.log(error);
     errorMessage.value =
       error.response?.data?.message ||
       "An error occurred while saving student information";
