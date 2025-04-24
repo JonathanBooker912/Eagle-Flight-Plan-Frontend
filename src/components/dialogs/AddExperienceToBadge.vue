@@ -41,7 +41,7 @@ onMounted(async () => {
         >Add Experience Rule to Badge</v-card-title
       >
       <v-card-text>
-        <v-select
+        <v-autocomplete
           v-model="selectedExperience"
           :items="experiences"
           item-title="name"
@@ -49,7 +49,7 @@ onMounted(async () => {
           label="Experience"
           variant="solo"
           :rules="[required]"
-        ></v-select>
+        ></v-autocomplete>
         <v-text-field
           v-model="quantity"
           type="number"

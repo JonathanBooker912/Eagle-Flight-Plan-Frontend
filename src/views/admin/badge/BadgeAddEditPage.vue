@@ -1,11 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import {
-  required,
-  positiveNumber,
-  fileTypeRule,
-} from "../../../utils/formValidators";
+import { required, fileTypeRule } from "../../../utils/formValidators";
 import badgeServices from "../../../services/badgeServices";
 import fileServices from "../../../services/fileServices";
 import { addTaskToBadgeStore } from "../../../stores/addTaskToBadgeStore";
@@ -73,6 +69,8 @@ const removeExperience = (experience) => {
 
 const handleSubmit = async () => {
   const isValid = (await form.value?.validate())?.valid;
+
+  formData.value.ruleType = selectedRule.value;
 
   if (selectedRule.value === "Task and Experience Defined") {
     if (ruleTasks.value.length === 0 && ruleExperiences.value.length === 0) {
@@ -218,26 +216,6 @@ onMounted(async () => {
         label="Name"
         :rules="[required]"
       ></v-text-field>
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-text-field
-            v-model="formData.points"
-            variant="solo"
-            rounded="lg"
-            label="Points"
-            :rules="[required, positiveNumber]"
-          ></v-text-field>
-        </v-col>
-        <v-col size="6">
-          <v-text-field
-            v-model="formData.badgeType"
-            variant="solo"
-            rounded="lg"
-            label="Type"
-            :rules="[required]"
-          ></v-text-field>
-        </v-col>
-      </v-row>
       <v-textarea
         v-model="formData.description"
         variant="solo"

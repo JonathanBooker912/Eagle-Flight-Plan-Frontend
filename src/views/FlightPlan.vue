@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import CardHeader from "../components/CardHeader.vue";
 import CardTable from "../components/CardTable.vue";
 import flightPlanServices from "../services/flightPlanServices";
@@ -19,6 +19,8 @@ import { useFlightPlanStore } from "../stores/flightPlanStore";
 import badgeServices from "../services/badgeServices";
 import ViewBadgeAwards from "../components/dialogs/ViewBadgeAwards.vue";
 import { viewBadgeAwardsStore } from "../stores/viewBadgeAwardsStore";
+import { addFlightPlanItemToFlightPlanStore } from "../stores/addFlightPlanItemToFlightPlanStore";
+import AddFlightPlanItemToFlightPlan from "../components/dialogs/AddFlightPlanItemToFlightPlan.vue";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -72,7 +74,9 @@ const downloadFlightPlanICS = async () => {
 
   icsContent += `END:VCALENDAR`;
 
-  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const blob = new Blob([icsContent], {
+    type: "text/calendar;charset=utf-8",
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -85,7 +89,6 @@ const downloadFlightPlanICS = async () => {
 let student = null;
 
 const route = useRoute();
-const router = useRouter();
 const flightPlan = ref(null);
 const selectedFlightPlan = ref(null);
 const flightPlans = ref([]);
@@ -99,6 +102,9 @@ const flightPlanItemStatuses = ref([]);
 const points = ref(0);
 const userName = ref(null);
 const unviewedBadges = ref([]);
+
+const useAddFlightPlanItemToFlightPlanStore =
+  addFlightPlanItemToFlightPlanStore();
 const useStudentApprovalDialogStore = studentApprovalDialogStore();
 const useStudentViewSubmissionDialogStore = studentViewSubmissionDialogStore();
 const useUserStore = userStore();
@@ -191,7 +197,6 @@ const fetchFlightPlanAndItems = async () => {
       selectedFlightPlan.value.value,
       params,
     );
-
   flightPlanItems.value = response.data.flightPlanItems;
   count.value = response.data.count;
 };
@@ -227,16 +232,18 @@ const handleSearchChange = (input) => {
 };
 
 const handleAdd = () => {
-  router.push({ name: "addItemToFlightPlan" });
+  useAddFlightPlanItemToFlightPlanStore.toggleVisibility();
 };
 
 const handleRegister = () => {
   page.value = 1;
-  fetchFlightPlanAndItems(),
-    fetchFlightPlanProgress(),
-    fetchFlightPlanItemStatuses(),
-    fetchFlightPlanItemTypes(),
-    fetchUnviewedBadges();
+  fetchStudent();
+  fetchFlightPlan();
+  fetchFlightPlanAndItems();
+  fetchFlightPlanProgress();
+  fetchFlightPlanItemStatuses();
+  fetchFlightPlanItemTypes();
+  fetchUnviewedBadges();
 };
 
 const handleChangeFilters = () => {
@@ -259,6 +266,15 @@ const handleIncompleteButtonClick = (flightPlanItem) => {
 const handlePendingButtonClick = (flightPlanItem) => {
   useStudentViewSubmissionDialogStore.setFlightPlanItem(flightPlanItem);
   useStudentViewSubmissionDialogStore.toggleVisibility();
+};
+
+const handleAddItems = () => {
+  fetchFlightPlanAndItems();
+};
+
+const handleDelete = async (flightPlanItem) => {
+  await flightPlanItemServices.deleteFlightPlanItem(flightPlanItem.id);
+  await fetchFlightPlanAndItems();
 };
 
 onMounted(async () => {
@@ -359,8 +375,8 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       >
     </v-container>
     <CardHeader
-      :add-button="props.isAdmin"
       :export-calendar-button="hasRegisteredEvents"
+      :add-button="selectedFlightPlan == flightPlans[0] ? true : false"
       @add="handleAdd"
       @changed="handleSearchChange"
       @toggle-filters="showFilters = !showFilters"
@@ -384,9 +400,10 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           :is-flight-plan-view="!props.isAdmin"
           :flight-plan-items="flightPlanItems"
           @incomplete="handleIncompleteButtonClick"
-          @view="handlePendingButtonClick"
           @register="handleRegister"
-        />
+          @view="handlePendingButtonClick"
+          @delete="handleDelete"
+        ></FlightPlanItemCard>
       </template>
       <template #filters>
         <v-select
@@ -422,4 +439,9 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
     @discard="fetchFlightPlanAndItems"
   ></ViewSubmissionDialog>
   <ViewBadgeAwards :badges="unviewedBadges" />
+  <AddFlightPlanItemToFlightPlan
+    v-if="flightPlan"
+    :student-id="student.id"
+    @add-items="handleAddItems"
+  />
 </template>

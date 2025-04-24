@@ -31,4 +31,11 @@ export default {
   deleteExperience(experienceId) {
     return apiClient.delete(`/experience/${experienceId}`);
   },
+  getAllOptionalExperiencesForStudent(studentId, searchQuery) {
+    return apiClient.get(`/experience/optional/${studentId}`, {
+      params: {
+        searchQuery: searchQuery,
+      },
+    });
+  },
 };

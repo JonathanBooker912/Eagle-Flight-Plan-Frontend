@@ -14,11 +14,19 @@ export default {
       },
     });
   },
+  getFlightPlanItemsWithEventsForStudent(studentId, flightPlanId) {
+    return apiClient.get(
+      `/flightPlanItem/student/${studentId}/flightplan/${flightPlanId}/with-events`,
+    );
+  },
   getFlightPlanItemTypes() {
     return apiClient.get("/flightPlanItem/types");
   },
   getFlightPlanItemStatuses() {
     return apiClient.get("/flightPlanItem/statuses");
+  },
+  createFlightPlanItem(flightPlanItem) {
+    return apiClient.post("/flightPlanItem", flightPlanItem);
   },
   updateFlightPlanItem(flightPlanItem) {
     return apiClient.put(
@@ -41,9 +49,7 @@ export default {
   rejectFlightPlanItem(flightPlanItemId) {
     return apiClient.put(`/flightPlanItem/${flightPlanItemId}/reject`);
   },
-  getFlightPlanItemsWithEventsForStudent(studentId, flightPlanId) {
-    return apiClient.get(
-      `/flightPlanItem/student/${studentId}/flightplan/${flightPlanId}/with-events`,
-    );
+  deleteFlightPlanItem(flightPlanItemId) {
+    return apiClient.delete(`/flightPlanItem/${flightPlanItemId}`);
   },
 };

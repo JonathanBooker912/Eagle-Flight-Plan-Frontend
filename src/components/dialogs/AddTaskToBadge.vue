@@ -39,7 +39,7 @@ onMounted(async () => {
     <v-card class="rounded-lg bg-backgroundDarken">
       <v-card-title class="text-center">Add Task Rule to Badge</v-card-title>
       <v-card-text>
-        <v-select
+        <v-autocomplete
           v-model="selectedTask"
           :items="tasks"
           item-title="name"
@@ -47,7 +47,7 @@ onMounted(async () => {
           label="Task"
           variant="solo"
           :rules="[required]"
-        ></v-select>
+        ></v-autocomplete>
         <v-text-field
           v-model="quantity"
           type="number"

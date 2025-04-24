@@ -38,4 +38,11 @@ export default {
   deleteTask(taskId) {
     return apiClient.delete(`/task/${taskId}`);
   },
+  getAllOptionalTasksForStudent(studentId, searchQuery) {
+    return apiClient.get(`/task/optional/${studentId}`, {
+      params: {
+        searchQuery: searchQuery,
+      },
+    });
+  },
 };

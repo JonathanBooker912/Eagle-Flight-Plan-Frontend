@@ -6,6 +6,7 @@ import eventServices from "../../services/eventServices";
 import studentServices from "../../services/studentServices";
 import flightPlanItemServices from "../../services/flightPlanItemServices";
 import { userStore } from "../../stores/userStore";
+import { useDisplay } from "vuetify";
 
 const props = defineProps({
   flightPlanItem: {
@@ -25,6 +26,7 @@ const emit = defineEmits([
   "view",
   "register",
   "sign-in",
+  "delete",
   "click",
 ]);
 
@@ -38,11 +40,21 @@ const showEventDialog = ref(false);
 const eventOptions = ref([]);
 const selectedEvent = ref(null);
 
+const { lgAndUp } = useDisplay();
+
 const isSubmissionExperience = computed(
   () =>
     props.flightPlanItem.flightPlanItemType === "Experience" &&
     props.flightPlanItem.experience?.submissionType !== "attendance",
 );
+
+const isOptional = computed(() => {
+  if (props.flightPlanItem.flightPlanItemType === "Experience") {
+    return props.flightPlanItem.experience?.submissionType === "optional";
+  } else {
+    return props.flightPlanItem.task?.submissionType === "optional";
+  }
+});
 
 const fetchStudentId = async () => {
   try {
@@ -115,6 +127,7 @@ const handleRegister = async (event) => {
     };
     await flightPlanItemServices.updateFlightPlanItem(updatedItem);
     await fetchStudentStatus();
+
     handleRefresh();
   } catch (err) {
     console.error("Registration error:", err);
@@ -171,8 +184,20 @@ const points = computed(() => {
   }[props.flightPlanItem.flightPlanItemType];
 });
 
+const chipSize = computed(() => {
+  return lgAndUp.value ? 1 : 2;
+});
+
+const contextSize = computed(() => {
+  return lgAndUp.value ? 11 : 10;
+});
+
 const handleClick = () => {
   emit("click");
+};
+
+const handleDelete = () => {
+  emit("delete", props.flightPlanItem);
 };
 
 const handleViewRegisteredEvent = async () => {
@@ -203,11 +228,11 @@ const handleViewRegisteredEvent = async () => {
   >
     <v-container class="pa-2">
       <v-row no-gutters>
-        <v-col cols="1">
+        <v-col :cols="chipSize">
           <v-sheet :color="color" class="accentChip mr-2 h-100"></v-sheet>
         </v-col>
 
-        <v-col cols="11">
+        <v-col :cols="contextSize">
           <v-card-text class="text-no-wrap">
             <v-tooltip bottom>
               <template #activator="{ props: tooltipProps }">
@@ -241,20 +266,18 @@ const handleViewRegisteredEvent = async () => {
           </v-card-text>
 
           <div v-if="!isAdmin">
-            <!-- Submission logic for Task and Experience -->
-            <v-row
-              v-if="
-                ['Task', 'Experience'].includes(
-                  flightPlanItem.flightPlanItemType,
-                ) &&
-                flightPlanItem.status === 'Incomplete' &&
-                (flightPlanItem.flightPlanItemType === 'Task' ||
-                  isSubmissionExperience) &&
-                isFlightPlanView
-              "
-              justify="end"
-            >
+            <v-row justify="end">
+              <!-- Submission logic for Task and Experience -->
               <v-btn
+                v-if="
+                  ['Task', 'Experience'].includes(
+                    flightPlanItem.flightPlanItemType,
+                  ) &&
+                  flightPlanItem.status === 'Incomplete' &&
+                  (flightPlanItem.flightPlanItemType === 'Task' ||
+                    isSubmissionExperience) &&
+                  isFlightPlanView
+                "
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
@@ -263,21 +286,16 @@ const handleViewRegisteredEvent = async () => {
                 Incomplete
                 <v-icon right class="pl-1">mdi-upload</v-icon>
               </v-btn>
-            </v-row>
-
-            <v-row
-              v-if="
-                ['Task', 'Experience'].includes(
-                  flightPlanItem.flightPlanItemType,
-                ) &&
-                flightPlanItem.status === 'Rejected' &&
-                (flightPlanItem.flightPlanItemType === 'Task' ||
-                  isSubmissionExperience) &&
-                isFlightPlanView
-              "
-              justify="end"
-            >
               <v-btn
+                v-if="
+                  ['Task', 'Experience'].includes(
+                    flightPlanItem.flightPlanItemType,
+                  ) &&
+                  flightPlanItem.status === 'Rejected' &&
+                  (flightPlanItem.flightPlanItemType === 'Task' ||
+                    isSubmissionExperience) &&
+                  isFlightPlanView
+                "
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
@@ -286,19 +304,15 @@ const handleViewRegisteredEvent = async () => {
                 Rejected
                 <v-icon right class="pl-1">mdi-upload</v-icon>
               </v-btn>
-            </v-row>
 
-            <!-- Attendance-based Experience Registration -->
-            <v-row
-              v-if="
-                flightPlanItem.flightPlanItemType === 'Experience' &&
-                flightPlanItem.experience?.submissionType === 'attendance' &&
-                flightPlanItem.status === 'Incomplete' &&
-                isFlightPlanView
-              "
-              justify="end"
-            >
+              <!-- Attendance-based Experience Registration -->
               <v-btn
+                v-if="
+                  flightPlanItem.flightPlanItemType === 'Experience' &&
+                  flightPlanItem.experience?.submissionType === 'attendance' &&
+                  flightPlanItem.status === 'Incomplete' &&
+                  isFlightPlanView
+                "
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
@@ -307,21 +321,17 @@ const handleViewRegisteredEvent = async () => {
                 Register
                 <v-icon right class="pl-1">mdi-account-plus</v-icon>
               </v-btn>
-            </v-row>
 
-            <!-- View Submission -->
-            <v-row
-              v-if="
-                ['Task', 'Experience'].includes(
-                  flightPlanItem.flightPlanItemType,
-                ) &&
-                flightPlanItem.status === 'Pending' &&
-                (flightPlanItem.flightPlanItemType === 'Task' ||
-                  isSubmissionExperience)
-              "
-              justify="end"
-            >
+              <!-- View Submission -->
               <v-btn
+                v-if="
+                  ['Task', 'Experience'].includes(
+                    flightPlanItem.flightPlanItemType,
+                  ) &&
+                  flightPlanItem.status === 'Pending' &&
+                  (flightPlanItem.flightPlanItemType === 'Task' ||
+                    isSubmissionExperience)
+                "
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
@@ -330,18 +340,13 @@ const handleViewRegisteredEvent = async () => {
                 View Submission
                 <v-icon right class="pl-1">mdi-eye</v-icon>
               </v-btn>
-            </v-row>
-
-            <!-- Registered/Pending Attendance Event View -->
-            <v-row
-              v-if="
-                ['Pending', 'Registered'].includes(flightPlanItem.status) &&
-                flightPlanItem.flightPlanItemType === 'Experience' &&
-                flightPlanItem.experience?.submissionType === 'attendance'
-              "
-              justify="end"
-            >
+              <!-- Registered/Pending Attendance Event View -->
               <v-btn
+                v-if="
+                  ['Pending', 'Registered'].includes(flightPlanItem.status) &&
+                  flightPlanItem.flightPlanItemType === 'Experience' &&
+                  flightPlanItem.experience?.submissionType === 'attendance'
+                "
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
@@ -350,6 +355,14 @@ const handleViewRegisteredEvent = async () => {
                 View Registered Event
                 <v-icon right class="pl-1">mdi-calendar</v-icon>
               </v-btn>
+              <v-btn
+                v-if="!isAdmin && isOptional"
+                class="mr-4 mb-3"
+                variant="outlined"
+                rounded="xl"
+                @click="handleDelete"
+                ><v-icon>mdi-delete</v-icon></v-btn
+              >
             </v-row>
           </div>
         </v-col>
