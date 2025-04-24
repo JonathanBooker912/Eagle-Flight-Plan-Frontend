@@ -5,6 +5,7 @@ import linkServices from "../services/linkServices";
 import strengthServices from "../services/strengthServices";
 import badgeServices from "../services/badgeServices";
 import userServices from "../services/userServices";
+import studentServices from "../services/studentServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
@@ -16,7 +17,6 @@ const store = userStore();
 const route = useRoute();
 const router = useRouter();
 
-const user = store.user;
 const badgeAwardsStore = viewBadgeAwardsStore();
 const noBadges = ref(false);
 const noStrengths = ref(false);
@@ -26,6 +26,8 @@ const strengths = ref([]);
 const badges = ref([]);
 const unviewedBadges = ref([]);
 const selectedUser = ref([]);
+const selectedStudent = ref([]);
+const selectedMajor = ref([]);
 const isAdmin = ref(false);
 const isOwnProfile = ref(false);
 const editDialog = ref(false);
@@ -175,6 +177,23 @@ const openEditLinkDialog = (index = -1) => {
   editLinkDialog.value = true;
 };
 
+const getStudent = async (userId) => {
+  try {
+    const res = await studentServices.getStudentForUserId(userId);
+    selectedStudent.value = res.data;
+    if (selectedStudent.value.id) {
+      // Get majors from the student response
+      console.log('Student data:', selectedStudent.value);
+      if (selectedStudent.value.majors) {
+        selectedMajor.value = selectedStudent.value.majors;
+        console.log('Majors:', selectedMajor.value);
+      }
+    }
+  } catch (err) {
+    console.error("Error fetching student:", err);
+  }
+};
+
 // Add watcher for pagination
 watch(currentPage, (newPage) => {
   getBadges(route.params.userId, newPage);
@@ -188,16 +207,12 @@ onMounted(async () => {
     await fetchUnviewedBadges();
   }
 
-  await getLinks(passedId); // Fetch links on component mount
-  await getStrengths(passedId);
-  await getBadges(passedId);
-  await getUser(passedId);
-
   isOwnProfile.value = passedId == store.user.userId;
-
-  console.log(passedId);
-  console.log(selectedUser.value);
-  console.log(isOwnProfile.value);
+  getLinks(passedId);
+  getStrengths(passedId);
+  getBadges(passedId);
+  getUser(passedId);
+  getStudent(passedId);
 });
 </script>
 
@@ -223,7 +238,6 @@ onMounted(async () => {
             <p class="text-h6 font-weight-bold">
               {{ selectedUser.fullName }}
             </p>
-            <p class="text-subtitle-1">{{ user.major }}</p>
           </div>
         </v-col>
 
@@ -340,12 +354,13 @@ onMounted(async () => {
           <v-row
             v-if="strengths && strengths.length > 0"
             class="strengths-list"
+            style="margin: 0; padding: 0"
           >
             <v-col
               v-for="(item, index) in strengths.slice(0, 5)"
               :key="index"
               cols="12"
-              style="padding: 0px 10px"
+              style="padding: 0; margin: 0"
             >
               <StrengthCard :strength="item" />
             </v-col>
@@ -471,5 +486,14 @@ onMounted(async () => {
 
 .v-icon {
   color: var(--v-primary-base);
+
+  .strengths-list {
+  margin: 0;
+  padding: 0;
+}
+
+.strengths-list .v-col {
+  margin: 0;
+  padding: 0;
 }
 </style>

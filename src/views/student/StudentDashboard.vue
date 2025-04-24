@@ -154,7 +154,7 @@ onMounted(async () => {
     <h1 class="mt-1">Welcome, {{ store.user.fullName }}!</h1>
     <v-row justify="center" class="mr-2">
       <v-col cols="12">
-        <v-card color="backgroundDarken">
+        <v-card color="backgroundDarken" style="border-radius: 25px">
           <v-card-text>
             <v-select
               v-model="selectedFlightPlan"
@@ -174,7 +174,7 @@ onMounted(async () => {
               color="primary"
               bg-color="backgroundLighten"
               height="20"
-              rounded
+              style="border-radius: 25px"
             >
               <strong>{{ progress }}%</strong>
             </v-progress-linear>
@@ -291,7 +291,7 @@ onMounted(async () => {
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  height: 100%;
+  height: 62vh;
   padding: 10px 5px 5px 5px;
   border-radius: 25px;
 }
@@ -300,24 +300,14 @@ onMounted(async () => {
   padding-left: 0;
 }
 
-.scrollable-content {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 10px;
-}
-
-.see-more-btn {
-  margin-top: auto;
-  text-align: center;
-  width: 100%;
-}
-
 #notifList,
 #flightPlanList,
-#calendarList {
+#eventList {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-bottom: 10px;
+  padding-right: 5px;
 }
 
 .notification {
@@ -329,14 +319,17 @@ onMounted(async () => {
 
 .flightPlanItem {
   margin: 0px 10px 0px 10px;
-  height: 17vh;
   width: 100%;
 }
 
-.calendarItem {
-  padding: 0px 10px 0px 10px;
+.event {
   margin: 10px 5px 10px 5px;
-  height: 8vh;
+  width: 100%;
+}
+
+.see-more-btn {
+  margin-top: auto;
+  text-align: center;
   width: 100%;
 }
 </style>

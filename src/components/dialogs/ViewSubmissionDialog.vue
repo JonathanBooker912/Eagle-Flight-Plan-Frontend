@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { studentViewSubmissionDialogStore } from "../../stores/studentViewSubmissionDialogStore";
 import submissionServices from "../../services/submissionServices";
 import flightPlanItemServices from "../../services/flightPlanItemServices";
+import { VueFilesPreview } from "vue-files-preview";
 
 const emit = defineEmits(["discard"]);
 const dialogStore = studentViewSubmissionDialogStore();
@@ -11,6 +12,9 @@ const { visible, flightPlanItem } = storeToRefs(dialogStore);
 
 const submissions = ref([]);
 const successMessage = ref("");
+const selectedSubmissionIndex = ref(0);
+const selectedFile = ref(null);
+const selectedSubmissionType = ref("text");
 
 const getSubmissionsForFlightPlanItem = async () => {
   try {
@@ -21,21 +25,6 @@ const getSubmissionsForFlightPlanItem = async () => {
   } catch (error) {
     console.error("Error fetching submissions:", error);
   }
-};
-
-const handleDownload = (index) => {
-  const { fileName, value } = submissions.value[index];
-  const file = new Blob([new Uint8Array(value.data.data)], {
-    type: value.mimeType,
-  });
-  const url = URL.createObjectURL(file);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 };
 
 const handleDiscardSubmission = async () => {
@@ -60,8 +49,39 @@ const handleDiscardSubmission = async () => {
   }
 };
 
+const getSubmission = () => {
+  const selectedSubmission = submissions.value[selectedSubmissionIndex.value];
+  if (selectedSubmission.submissionType === "text") {
+    selectedSubmissionType.value = "text";
+  } else if (selectedSubmission.submissionType === "file") {
+    selectedSubmissionType.value = "file";
+    getFile();
+  }
+};
+
+const getFile = () => {
+  try {
+    const { fileName, value } =
+      submissions.value[selectedSubmissionIndex.value];
+    const file = new File([new Uint8Array(value.data.data)], fileName, {
+      type: value.mimeType,
+    });
+
+    selectedFile.value = file;
+  } catch (error) {
+    console.error("Error getting file:", error);
+  }
+};
+
+watch(selectedSubmissionIndex, () => {
+  getSubmission();
+});
+
 watch(visible, async () => {
-  if (visible.value) await getSubmissionsForFlightPlanItem();
+  if (visible.value) {
+    await getSubmissionsForFlightPlanItem();
+    getSubmission();
+  }
 });
 </script>
 
@@ -82,35 +102,51 @@ watch(visible, async () => {
             }}</v-alert>
           </div>
           <div v-else>
-            <v-container
-              v-if="
-                submissions.length === 1 &&
-                submissions[0].submissionType === 'text'
-              "
-              class="pa-4 bg-background rounded-lg"
-              style="white-space: pre-wrap"
-            >
-              {{ submissions[0].value }}
-            </v-container>
-
             <v-row
-              v-for="(submission, index) in submissions"
-              v-else-if="submissions.length > 0"
-              :key="index"
+              v-if="submissions.length > 0"
               class="bg-background rounded-lg mb-1"
             >
-              <v-col class="d-flex justify-space-between align-center">
-                <span>File {{ index + 1 }}</span>
+              <v-col
+                v-if="selectedSubmissionType === 'file'"
+                :cols="12"
+                class="d-flex justify-center align-center"
+              >
+                <VueFilesPreview
+                  :file="selectedFile"
+                  style="max-height: 60vh"
+                ></VueFilesPreview>
+              </v-col>
+              <v-col
+                v-if="selectedSubmissionType === 'text'"
+                :cols="12"
+                class="pa-4 bg-background rounded-lg"
+                style="white-space: pre-wrap"
+              >
+                {{ submissions[selectedSubmissionIndex].value }}
+              </v-col>
+              <v-col :cols="12" class="d-flex justify-center align-center">
                 <v-btn
-                  variant="solo"
-                  density="comfortable"
-                  @click="handleDownload(index)"
+                  class="rounded-xl mr-6"
+                  color="text"
+                  variant="outlined"
+                  :disabled="selectedSubmissionIndex === 0"
+                  @click="selectedSubmissionIndex--"
+                  >Prev</v-btn
                 >
-                  <v-icon icon="mdi-download"></v-icon>
-                </v-btn>
+                <p class="mr-6">
+                  {{ selectedSubmissionIndex + 1 }} /
+                  {{ submissions.length }}
+                </p>
+                <v-btn
+                  class="rounded-xl"
+                  color="text"
+                  variant="outlined"
+                  :disabled="selectedSubmissionIndex === submissions.length - 1"
+                  @click="selectedSubmissionIndex++"
+                  >Next</v-btn
+                >
               </v-col>
             </v-row>
-
             <v-alert v-else type="error" class="text-center"
               >No submission found!</v-alert
             >

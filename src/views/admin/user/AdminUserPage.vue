@@ -4,7 +4,8 @@ import CardHeader from "../../../components/CardHeader.vue";
 import UserCard from "../../../components/cards/UserCard.vue";
 import CardTable from "../../../components/CardTable.vue";
 import userServices from "../../../services/userServices";
-import { ref, watch } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
+import { userStore } from "../../../stores/userStore.js";
 
 const users = ref([]);
 const page = ref(1);
@@ -12,8 +13,23 @@ const count = ref(0);
 const searchQuery = ref("");
 const showInfo = ref(false);
 const userToShow = ref(null);
+const hasPermission4 = ref(false);
 
 const router = useRouter();
+const store = userStore();
+
+// Get current user's roles
+const currentUser = computed(() => store.user);
+
+const checkDirectorPermission = async () => {
+  hasPermission4.value = await store.checkRole("director");
+};
+
+// Log current user on mount
+onMounted(async () => {
+  await store.setupStore();
+  await checkDirectorPermission();
+});
 
 const fetchUsers = async ({
   pageNumber = page.value,
@@ -30,7 +46,6 @@ const handleSearchChange = (input) => {
 };
 
 const handleCardClick = (user) => {
-  console.log(user);
   userToShow.value = user;
   showInfo.value = true;
 };
@@ -56,6 +71,46 @@ const handleRedeemRewards = () => {
   });
 };
 
+const handlePromoteToAdmin = async () => {
+  if (isViewingSelf.value) {
+    alert("You cannot promote yourself");
+    return;
+  }
+  try {
+    await userServices.promoteToAdmin(userToShow.value.id);
+    await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
+    showInfo.value = false;
+    location.reload();
+  } catch (error) {
+    alert(`Failed to promote user to admin: ${error.message}`);
+  }
+};
+
+const handleDemoteFromAdmin = async () => {
+  if (isViewingSelf.value) {
+    alert("You cannot demote yourself");
+    return;
+  }
+  try {
+    await userServices.demoteFromAdmin(userToShow.value.id);
+    await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
+    showInfo.value = false;
+    location.reload();
+  } catch (error) {
+    alert(`Failed to demote user from admin: ${error.message}`);
+  }
+};
+
+const isAdmin = computed(() => {
+  return userToShow.value?.roles?.some(
+    (role) => role.name.toLowerCase() === "admin",
+  );
+});
+
+const isViewingSelf = computed(() => {
+  return userToShow.value?.id === currentUser.value?.userId;
+});
+
 watch([page, searchQuery], fetchUsers, { immediate: true });
 </script>
 <template>
@@ -63,6 +118,7 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
     <CardHeader
       label="Users"
       :add-button="false"
+      :filter-button="false"
       @changed="handleSearchChange"
     ></CardHeader>
     <v-row v-if="users.length === 0" class="justify-center">
@@ -94,7 +150,13 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               Major:
               {{ userToShow.student?.majors[0]?.name || "Undeclared" }}
             </p>
-            <p>Role: {{ userToShow.roles[0]?.name || "Student" }}</p>
+            <p>
+              Roles:
+              {{
+                userToShow.roles?.map((role) => role.name).join(", ") ||
+                "Student"
+              }}
+            </p>
           </div>
           <v-spacer></v-spacer>
           <div>
@@ -114,6 +176,22 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               class="mb-2"
               @click="handleRedeemRewards"
               >Redeem Rewards</v-btn
+            >
+            <v-btn
+              v-if="hasPermission4 && !isAdmin && !isViewingSelf"
+              block
+              color="warning"
+              class="mb-2"
+              @click="handlePromoteToAdmin"
+              >Promote to Admin</v-btn
+            >
+            <v-btn
+              v-if="hasPermission4 && isAdmin && !isViewingSelf"
+              block
+              color="error"
+              class="mb-2"
+              @click="handleDemoteFromAdmin"
+              >Demote to Student</v-btn
             >
           </div>
         </div>

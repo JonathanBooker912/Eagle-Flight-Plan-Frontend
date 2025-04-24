@@ -2,10 +2,12 @@
 import { computed } from "vue";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { userStore } from "../../stores/userStore";
 
 dayjs.extend(advancedFormat);
 
 const emit = defineEmits(["edit", "delete", "show-info"]);
+const store = userStore();
 
 const props = defineProps({
   event: {
@@ -19,6 +21,10 @@ const props = defineProps({
   status: {
     type: String,
     default: "primary",
+  },
+  statusLabel: {
+    type: String,
+    default: "",
   },
 });
 
@@ -43,6 +49,21 @@ const editEvent = () => {
 const showEventInfo = () => {
   emit("show-info", props.event.id);
 };
+
+const resolvedStatusLabel = computed(() => {
+  if (props.statusLabel && props.statusLabel !== "primary") {
+    return props.statusLabel;
+  }
+
+  switch (props.status) {
+    case "success":
+      return "Checked In";
+    case "warning":
+      return "Registered";
+    default:
+      return "Not Registered";
+  }
+});
 </script>
 
 <template>
@@ -63,6 +84,9 @@ const showEventInfo = () => {
           </p>
           <p class="text-subtitle-1 font-weight-regular">
             {{ eventTime }}
+          </p>
+          <p v-if="!store.isAdmin" class="text-subtitle-2 font-weight-medium">
+            Status: {{ resolvedStatusLabel }}
           </p>
         </v-card-text>
         <v-row class="ma-2 float-right">
@@ -111,6 +135,9 @@ const showEventInfo = () => {
           </p>
           <p class="text-subtitle-2 font-weight-regular">
             {{ eventTime }}
+          </p>
+          <p class="text-subtitle-2 font-weight-medium">
+            {{ statusLabel }}
           </p>
         </v-card-text>
       </v-col>

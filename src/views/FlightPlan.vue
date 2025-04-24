@@ -19,6 +19,10 @@ import { useFlightPlanStore } from "../stores/flightPlanStore";
 import badgeServices from "../services/badgeServices";
 import ViewBadgeAwards from "../components/dialogs/ViewBadgeAwards.vue";
 import { viewBadgeAwardsStore } from "../stores/viewBadgeAwardsStore";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import eventServices from "../services/eventServices";
 
 const props = defineProps({
   isAdmin: {
@@ -26,6 +30,57 @@ const props = defineProps({
     default: false,
   },
 });
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const downloadFlightPlanICS = async () => {
+  const eventRes = await eventServices.getAllEvents(1, 1000);
+  const allEvents = eventRes.data.events;
+  const eventMap = Object.fromEntries(allEvents.map((e) => [e.id, e]));
+
+  // 🔥 Get all items in the current flight plan, not just paginated ones
+  const allFPIRes =
+    await flightPlanItemServices.getAllFlightPlanItemsForFlightPlan(
+      selectedFlightPlan.value.value,
+      { page: 1, pageSize: 1000 }, // or whatever upper bound fits your data
+    );
+  const allItems = allFPIRes.data.flightPlanItems;
+
+  const registeredItems = allItems.filter(
+    (item) => item.eventId && item.status === "Registered",
+  );
+
+  let icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\n`;
+
+  registeredItems.forEach((item) => {
+    const event = eventMap[item.eventId];
+    if (!event || !event.startTime || !event.endTime) return;
+
+    const start = new Date(event.startTime);
+    const end = new Date(event.endTime);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+
+    const dtStart =
+      start.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const dtEnd = end.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    icsContent += `BEGIN:VEVENT\nSUMMARY:${event.name}\nDESCRIPTION:${
+      event.description || ""
+    }\nLOCATION:${event.location || ""}\nDTSTART:${dtStart}\nDTEND:${dtEnd}\nEND:VEVENT\n`;
+  });
+
+  icsContent += `END:VCALENDAR`;
+
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "FlightPlan.ics";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 let student = null;
 
@@ -160,7 +215,7 @@ const fetchFlightPlanItemStatuses = async () => {
 
 const fetchUnviewedBadges = async () => {
   const response = await badgeServices.getUnviewedBadges(student.id);
-  if (response.data.length > 0) {
+  if (response.data.length > 0 && !props.isAdmin) {
     unviewedBadges.value = response.data;
     badgeAwardsStore.toggleVisibility();
   }
@@ -173,6 +228,15 @@ const handleSearchChange = (input) => {
 
 const handleAdd = () => {
   router.push({ name: "addItemToFlightPlan" });
+};
+
+const handleRegister = () => {
+  page.value = 1;
+  fetchFlightPlanAndItems(),
+    fetchFlightPlanProgress(),
+    fetchFlightPlanItemStatuses(),
+    fetchFlightPlanItemTypes(),
+    fetchUnviewedBadges();
 };
 
 const handleChangeFilters = () => {
@@ -225,6 +289,12 @@ watch(selectedFlightPlan, () => {
     fetchFlightPlanProgress();
   }
 });
+
+const hasRegisteredEvents = computed(() =>
+  flightPlanItems.value.some(
+    (item) => item.eventId && item.status === "Registered",
+  ),
+);
 
 watch([page, searchQuery], fetchFlightPlanAndItems);
 </script>
@@ -289,10 +359,12 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       >
     </v-container>
     <CardHeader
-      :add-button="props.isAdmin ? true : false"
+      :add-button="props.isAdmin"
+      :export-calendar-button="hasRegisteredEvents"
       @add="handleAdd"
       @changed="handleSearchChange"
-      @toggle-filters="showFilters = !showfilters"
+      @toggle-filters="showFilters = !showFilters"
+      @export-ics="downloadFlightPlanICS"
     ></CardHeader>
     <CardTable
       :items="flightPlanItems"
@@ -310,9 +382,11 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           :flight-plan-item="item"
           :is-admin="props.isAdmin"
           :is-flight-plan-view="!props.isAdmin"
+          :flight-plan-items="flightPlanItems"
           @incomplete="handleIncompleteButtonClick"
           @view="handlePendingButtonClick"
-        ></FlightPlanItemCard>
+          @register="handleRegister"
+        />
       </template>
       <template #filters>
         <v-select

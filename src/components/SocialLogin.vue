@@ -3,12 +3,10 @@ import { ref, onMounted } from "vue";
 import AuthServices from "../services/authServices";
 import roleServices from "../services/roleServices.js";
 import Utils from "../config/utils.js";
-import { useRouter } from "vue-router";
-import { loginRedirect } from "../router/router.js";
 import { userStore } from "../stores/userStore.js";
 
+const emit = defineEmits(["login-success"]);
 const store = userStore();
-const router = useRouter();
 const fName = ref("");
 const lName = ref("");
 const user = ref({});
@@ -36,21 +34,22 @@ const handleCredentialResponse = async (response) => {
     credential: response.credential,
   };
   let email = "";
-  await AuthServices.loginUser(token)
-    .then((response) => {
-      user.value = response.data;
-      Utils.setStore("user", user.value);
-      fName.value = user.value.fName;
-      lName.value = user.value.lName;
-      email = user.value.email;
-    })
-    .catch((error) => {
-      console.log("error", error);
-    });
-  const roles = await roleServices.getRolesByEmail(email);
-  store.$patch({ user: user.value, roles: roles.data });
-  const redirect = await loginRedirect();
-  router.push(redirect);
+  try {
+    const authResponse = await AuthServices.loginUser(token);
+    user.value = authResponse.data;
+    Utils.setStore("user", user.value);
+    fName.value = user.value.fName;
+    lName.value = user.value.lName;
+    email = user.value.email;
+
+    const roles = await roleServices.getRolesByEmail(email);
+    store.$patch({ user: user.value, roles: roles.data });
+
+    // Emit the login success event with the user data
+    emit("login-success", user.value);
+  } catch (error) {
+    console.error("Login error:", error);
+  }
 };
 
 onMounted(() => {

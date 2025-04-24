@@ -33,7 +33,7 @@ const categoryColor = computed(() => {
   <v-card
     v-show="hoveredStrength === null || hoveredStrength === strength.name"
     color="backgroundDarken"
-    class="pa-3 my-2 rounded-lg strengthCard"
+    class="pa-2 my-1 rounded-lg strengthCard"
     :class="{
       expanded: hoveredStrength === strength.name,
     }"
@@ -57,73 +57,60 @@ const categoryColor = computed(() => {
 
 <style scoped>
 .strengthCard {
-  height: 5vh;
+  height: 4vh;
   align-items: center;
-  transition:
-    height 0.3s ease,
-    opacity 0.3s ease;
+  transition: height 0.2s ease;
   width: 100%;
+  overflow: hidden;
+  padding: 12px 0;
 }
 
 .strength-header {
   display: flex;
   align-items: center;
   width: 100%;
+  height: 4vh;
+  padding: 0;
 }
 
 .strength-name {
-  margin: 0 20px;
-  font-size: 1.2rem;
+  margin: 0 15px;
+  font-size: 1.1rem;
   font-weight: 500;
-}
-
-/* Hide other strengths when hovering */
-.hidden {
-  opacity: 0;
-  display: none !important;
-  height: 0 !important;
-  overflow: hidden;
-  transition:
-    height 0.3s ease,
-    opacity 0.3s ease;
-}
-
-/* Expand hovered strength */
-.expanded {
-  height: 20vh;
+  align-items: center;
+  padding: 8px 0;
 }
 
 .category {
   height: 5vh;
-  width: 40px;
-  border-top-left-radius: 10px;
+  width: 35px;
+  border-top-left-radius: 8px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 8px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  margin-right: 20px;
+  margin-left: 5px;
+  padding: 0;
 }
 
 .domain {
-  margin-right: 20px;
-  font-size: 0.9rem;
+  margin-right: 15px;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.7);
+  padding: 0;
 }
 
 .strength-description {
-  margin: 20px 80px;
-  font-size: 1rem;
-  line-height: 1.5;
+  margin: 40px 15px 0px 15px;
+  font-size: 0.95rem;
+  line-height: 1.4;
   color: rgba(255, 255, 255, 0.9);
 }
 
-.noShow {
-  display: none;
-  height: 0%;
-}
-
 .expanded {
-  height: 100%;
+  height: auto;
+  min-height: 4vh;
 }
 </style>

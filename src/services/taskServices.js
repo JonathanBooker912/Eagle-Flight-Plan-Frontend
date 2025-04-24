@@ -26,11 +26,8 @@ export default {
   getSchedulingTypes() {
     return apiClient.get("/task/types/schedulingTypes");
   },
-  getTaskTypes() {
-    return apiClient.get("/task/types/taskTypes");
-  },
-  getCompletionTypes() {
-    return apiClient.get("/task/types/completionTypes");
+  getSubmissionTypes() {
+    return apiClient.get("/task/types/submissionTypes");
   },
   createTask(taskData) {
     return apiClient.post("/task", taskData);

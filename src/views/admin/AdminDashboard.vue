@@ -3,8 +3,30 @@ import eventServices from "../../services/eventServices";
 import notificationServices from "../../services/notificationServices";
 import EventCard from "../../components/cards/EventCard.vue";
 import { userStore } from "../../stores/userStore";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useNotificationStore } from "../../stores/notificationStore";
+import { useTheme } from "vuetify";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from "chart.js";
+import { Pie, Bar } from "vue-chartjs";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+);
 
 const events = ref([]);
 const notifications = ref([]);
@@ -15,16 +37,196 @@ const currentPage = ref(1);
 const pageSize = ref(14);
 const totalPages = ref(1);
 
+const theme = useTheme();
+const isDark = computed(() => theme.global.current.value.dark);
+
+const getChartColors = () => {
+  if (isDark.value) {
+    return {
+      primary: "rgba(17, 138, 203, 1)", // primary
+      secondary: "rgba(213, 223, 231, 1)", // secondary
+      accent: "rgba(244, 236, 208, 1)", // accent
+      warning: "rgba(249, 198, 51, 1)", // warning
+    };
+  } else {
+    return {
+      primary: "rgba(17, 138, 203, 1)", // primary
+      secondary: "rgba(53, 56, 65, 1)", // secondary
+      accent: "rgba(244, 236, 208, 1)", // accent
+      warning: "rgba(249, 198, 51, 1)", // warning
+    };
+  }
+};
+
+// Chart data
+const engagementData = ref({
+  labels: ["Freshman", "Sophomore", "Junior", "Senior"],
+  datasets: [
+    {
+      label: "Completed Flight Plan Items",
+      data: [45, 65, 80, 90],
+      backgroundColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().secondary,
+        getChartColors().accent,
+        getChartColors().warning,
+      ]),
+      borderColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().secondary,
+        getChartColors().accent,
+        getChartColors().warning,
+      ]),
+      borderWidth: 2,
+      hoverOffset: 15,
+      weight: 1,
+    },
+  ],
+});
+
+const onTrackData = ref({
+  labels: ["Freshman", "Sophomore", "Junior", "Senior"],
+  datasets: [
+    {
+      label: "Students On Track (%)",
+      data: [60, 75, 85, 90],
+      backgroundColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().primary,
+        getChartColors().primary,
+        getChartColors().primary,
+      ]),
+      borderColor: computed(() => [
+        getChartColors().primary,
+        getChartColors().primary,
+        getChartColors().primary,
+        getChartColors().primary,
+      ]),
+      borderWidth: 2,
+    },
+  ],
+});
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: "top",
+      labels: {
+        color: "white",
+        font: {
+          size: 14,
+        },
+      },
+    },
+    title: {
+      display: true,
+      text: "Engagement by Classification",
+      color: "white",
+      font: {
+        size: 16,
+      },
+    },
+    tooltip: {
+      callbacks: {
+        label: function (context) {
+          const label = context.label || "";
+          const value = context.raw;
+          return `${label}: ${value}%`;
+        },
+      },
+    },
+  },
+  cutout: "60%", // Creates a donut chart effect
+  rotation: -45, // Rotates the chart for better visual effect
+  animation: {
+    animateScale: true,
+    animateRotate: true,
+  },
+  elements: {
+    arc: {
+      borderWidth: 2,
+      borderColor: "rgba(255, 255, 255, 0.3)",
+      shadowColor: "rgba(0, 0, 0, 0.5)",
+      shadowBlur: 10,
+      shadowOffsetX: 2,
+      shadowOffsetY: 2,
+    },
+  },
+};
+
+const onTrackOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: "top",
+      labels: {
+        color: "white",
+        font: {
+          size: 14,
+        },
+      },
+    },
+    title: {
+      display: true,
+      text: "Students On Track by Classification",
+      color: "white",
+      font: {
+        size: 16,
+      },
+    },
+    tooltip: {
+      callbacks: {
+        label: function (context) {
+          const label = context.dataset.label || "";
+          const value = context.raw;
+          return `${label}: ${value}%`;
+        },
+      },
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      title: {
+        display: true,
+        text: "Percentage",
+        color: "white",
+      },
+      ticks: {
+        color: "white",
+        callback: function (value) {
+          return value + "%";
+        },
+      },
+      grid: {
+        color: "rgba(255, 255, 255, 0.1)",
+      },
+    },
+    x: {
+      ticks: {
+        color: "white",
+      },
+      grid: {
+        color: "rgba(255, 255, 255, 0.1)",
+      },
+    },
+  },
+};
+
 const getEvents = async () => {
   await eventServices
     .getAllEvents()
     .then((res) => {
       events.value = res.data.events;
       isLoaded.value = true;
-      console.log("Events data:", events.value);
     })
     .catch((err) => console.error(err));
 };
+
 const getNotifications = async (page = 1) => {
   try {
     const res = await notificationServices.getAllNotificationsForUser(
@@ -35,15 +237,15 @@ const getNotifications = async (page = 1) => {
     notifications.value = res.data.notifications;
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page;
-
-    console.log("Updated Notifications:", notifications.value);
   } catch (err) {
     console.error("Error fetching notifications:", err);
   }
 };
+
 const openNotification = (x) => {
   notifStore.setActiveNotification(x);
 };
+
 onMounted(() => {
   getEvents();
   getNotifications();
@@ -78,7 +280,11 @@ onMounted(() => {
           </v-btn>
         </v-card>
         <v-card color="backgroundDarken" class="adminItem adminItemBig">
-          <p>Engagement Breakdown by Classification</p>
+          <Pie
+            :data="engagementData"
+            :options="chartOptions"
+            style="height: 100%; width: 100%"
+          />
         </v-card>
       </div>
       <div class="dashboard-row">
@@ -116,7 +322,11 @@ onMounted(() => {
           </v-btn>
         </v-card>
         <v-card color="backgroundDarken" class="adminItem adminItemBig">
-          <p>Percentage of students on track to complete their flight plan</p>
+          <Bar
+            :data="onTrackData"
+            :options="onTrackOptions"
+            style="height: 100%; width: 100%"
+          />
         </v-card>
       </div>
     </div>

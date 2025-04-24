@@ -10,7 +10,7 @@ const form = ref(null);
 const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
-const experienceTypes = ref([]);
+const submissionTypes = ref([]);
 
 const route = useRoute();
 const router = useRouter();
@@ -24,14 +24,19 @@ const handleSubmit = async () => {
   if (!isValid) return;
 
   try {
-    if (props.isAdd) {
-      await experienceServices.createExperience(formData.value);
-    } else {
-      await experienceServices.updateExperience(
-        route.params.id,
-        formData.value,
-      );
+    const submitData = { ...formData.value };
+
+    // Convert 'text & files' back to 'both' before submitting
+    if (submitData.submissionType === "text & files") {
+      submitData.submissionType = "both";
     }
+
+    if (props.isAdd) {
+      await experienceServices.createExperience(submitData);
+    } else {
+      await experienceServices.updateExperience(route.params.id, submitData);
+    }
+
     router.push({ name: "experience" });
   } catch (error) {
     console.error("Error saving experience:", error);
@@ -40,28 +45,37 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, experienceTypesRes] =
+    const [categoriesRes, schedulingRes, submissionTypesRes] =
       await Promise.all([
         experienceServices.getCategories(),
         experienceServices.getSchedulingTypes(),
-        experienceServices.getExperienceTypes(),
+        experienceServices.getSubmissionTypes(),
       ]);
 
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
-    experienceTypes.value = experienceTypesRes.data;
-    // getFulfillingEvents.value = getFulfillingEventsRes.data;
+    submissionTypes.value = submissionTypesRes.data.map((type) =>
+      type === "both" ? "text & files" : type,
+    );
 
     if (!props.isAdd) {
-      formData.value = (
+      const experience = (
         await experienceServices.getExperience(route.params.id)
       ).data;
+
+      // Convert 'both' to 'text & files' for display
+      if (experience.submissionType === "both") {
+        experience.submissionType = "text & files";
+      }
+
+      formData.value = experience;
     }
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 });
 </script>
+
 <template>
   <h1 class="text-center ma-5">
     {{ props.isAdd ? "Add Experience" : "Edit Experience" }}
@@ -75,8 +89,29 @@ onMounted(async () => {
         label="Name"
         :rules="[required]"
       ></v-text-field>
-      <v-row no-gutters>
-        <v-col size="6" class="mr-4">
+
+      <v-row dense>
+        <v-col :cols="6">
+          <v-select
+            v-model="formData.category"
+            variant="solo"
+            rounded="lg"
+            label="Category"
+            :items="categories"
+            :rules="[required]"
+          ></v-select>
+        </v-col>
+        <v-col :cols="6">
+          <v-select
+            v-model="formData.submissionType"
+            variant="solo"
+            rounded="lg"
+            label="Submission Type"
+            :items="submissionTypes"
+            :rules="[required]"
+          ></v-select>
+        </v-col>
+        <v-col :cols="6">
           <v-select
             v-model="formData.schedulingType"
             variant="solo"
@@ -86,17 +121,17 @@ onMounted(async () => {
             :rules="[required]"
           ></v-select>
         </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.experienceType"
+        <v-col :cols="6">
+          <v-text-field
+            v-model="formData.semestersFromGrad"
             variant="solo"
             rounded="lg"
-            label="Type"
-            :items="experienceTypes"
+            label="Semesters From Graduation"
             :rules="[required]"
-          ></v-select>
+          ></v-text-field>
         </v-col>
       </v-row>
+
       <v-text-field
         v-model="formData.rationale"
         variant="solo"
@@ -104,21 +139,9 @@ onMounted(async () => {
         label="Rationale"
         :rules="[required]"
       ></v-text-field>
-      <v-select
-        v-model="formData.category"
-        variant="solo"
-        rounded="lg"
-        label="Category"
-        :items="categories"
-        :rules="[required]"
-      ></v-select>
-      <v-select
-        v-model="formData.fulfillingEvents"
-        variant="solo"
-        rounded="lg"
-        label="Fulfilling Events"
-        :items="fulfillingEvents"
-      ></v-select>
+
+      <!-- Removed duplicate category select -->
+
       <v-textarea
         v-model="formData.description"
         variant="solo"
@@ -126,19 +149,19 @@ onMounted(async () => {
         label="Description"
         :rules="[required]"
       ></v-textarea>
-      <v-switch
-        v-model="formData.reflectionRequired"
-        label="Reflection Required"
-      ></v-switch>
+
       <v-row class="justify-center mb-1">
         <v-btn
           class="mr-2"
           variant="outlined"
           rounded="xl"
           @click="handleCancel"
-          >Cancel</v-btn
         >
-        <v-btn rounded="xl" color="primary" @click="handleSubmit">Submit</v-btn>
+          Cancel
+        </v-btn>
+        <v-btn rounded="xl" color="primary" @click="handleSubmit">
+          Submit
+        </v-btn>
       </v-row>
     </v-container>
   </v-form>

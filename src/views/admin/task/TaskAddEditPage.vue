@@ -10,8 +10,7 @@ const form = ref(null);
 const formData = ref({});
 const categories = ref([]);
 const schedulingTypes = ref([]);
-const taskTypes = ref([]);
-const completionTypes = ref([]);
+const submissionTypes = ref([]);
 
 const route = useRoute();
 const router = useRouter();
@@ -38,18 +37,16 @@ const handleSubmit = async () => {
 
 onMounted(async () => {
   try {
-    const [categoriesRes, schedulingRes, taskTypesRes, completionRes] =
+    const [categoriesRes, schedulingRes, submissionTypesRes] =
       await Promise.all([
         taskServices.getCategories(),
         taskServices.getSchedulingTypes(),
-        taskServices.getTaskTypes(),
-        taskServices.getCompletionTypes(),
+        taskServices.getSubmissionTypes(),
       ]);
 
     categories.value = categoriesRes.data;
     schedulingTypes.value = schedulingRes.data;
-    taskTypes.value = taskTypesRes.data;
-    completionTypes.value = completionRes.data;
+    submissionTypes.value = submissionTypesRes.data;
 
     if (!props.isAdd) {
       formData.value = (await taskServices.getTask(route.params.id)).data;
@@ -85,50 +82,38 @@ onMounted(async () => {
         </v-col>
         <v-col size="6">
           <v-select
-            v-model="formData.taskType"
+            v-model="formData.submissionType"
             variant="solo"
             rounded="lg"
-            label="Type"
-            :items="taskTypes"
+            label="Submission Type"
+            :items="submissionTypes"
             :rules="[required]"
           ></v-select>
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col size="6" class="mr-4">
-          <v-select
-            v-model="formData.completionType"
-            variant="solo"
-            rounded="lg"
-            label="Completion Type"
-            :items="completionTypes"
-            :rules="[required]"
-          ></v-select>
-        </v-col>
-        <v-col size="6">
-          <v-select
-            v-model="formData.schedulingType"
-            variant="solo"
-            rounded="lg"
-            label="Scheduling Type"
-            :items="schedulingTypes"
-            :rules="[required]"
-          ></v-select>
-        </v-col>
+        <v-select
+          v-model="formData.schedulingType"
+          variant="solo"
+          rounded="lg"
+          label="Scheduling Type"
+          :items="schedulingTypes"
+          :rules="[required]"
+        ></v-select>
       </v-row>
       <v-row no-gutters>
         <v-col size="6" class="mr-4">
           <v-text-field
-            v-model="formData.pointsEarned"
+            v-model="formData.points"
             variant="solo"
             rounded="lg"
-            label="Points Earned"
+            label="Points"
             :rules="[required, positiveNumber]"
           ></v-text-field>
         </v-col>
         <v-col size="6">
           <v-text-field
-            v-model="formData.semestersFromGraduation"
+            v-model="formData.semestersFromGrad"
             variant="solo"
             rounded="lg"
             label="Semesters from Graduation"
@@ -150,10 +135,6 @@ onMounted(async () => {
         label="Rationale"
         :rules="[required]"
       ></v-text-field>
-      <v-switch
-        v-model="formData.reflectionRequired"
-        label="Reflection Required"
-      ></v-switch>
       <v-row class="justify-center mb-1">
         <v-btn
           class="mr-2"

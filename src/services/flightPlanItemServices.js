@@ -41,4 +41,9 @@ export default {
   rejectFlightPlanItem(flightPlanItemId) {
     return apiClient.put(`/flightPlanItem/${flightPlanItemId}/reject`);
   },
+  getFlightPlanItemsWithEventsForStudent(studentId, flightPlanId) {
+    return apiClient.get(
+      `/flightPlanItem/student/${studentId}/flightplan/${flightPlanId}/with-events`,
+    );
+  },
 };

@@ -33,4 +33,44 @@ export default {
   getUserByEmail(email) {
     return apiClient.get(`/user/email/${email}`);
   },
+  promoteToAdmin(userId) {
+    return apiClient
+      .put(`/user/${userId}/promote-to-admin`)
+      .then((response) => {
+        if (
+          typeof response.data === "string" &&
+          response.data.startsWith("<!DOCTYPE")
+        ) {
+          throw new Error(
+            "Server returned HTML instead of JSON. Check if the endpoint exists.",
+          );
+        }
+        return response;
+      })
+      .catch((error) => {
+        throw new Error(
+          `Failed to promote user to admin: ${error.message}. Please check if the endpoint exists and is accessible.`,
+        );
+      });
+  },
+  demoteFromAdmin(userId) {
+    return apiClient
+      .put(`/user/${userId}/demote-from-admin`)
+      .then((response) => {
+        if (
+          typeof response.data === "string" &&
+          response.data.startsWith("<!DOCTYPE")
+        ) {
+          throw new Error(
+            "Server returned HTML instead of JSON. Check if the endpoint exists.",
+          );
+        }
+        return response;
+      })
+      .catch((error) => {
+        throw new Error(
+          `Failed to demote user from admin: ${error.message}. Please check if the endpoint exists and is accessible.`,
+        );
+      });
+  },
 };

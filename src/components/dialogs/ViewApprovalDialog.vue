@@ -6,6 +6,7 @@ import notificationServices from "../../services/notificationServices";
 import flightPlanItemServices from "../../services/flightPlanItemServices";
 import studentServices from "../../services/studentServices";
 import submissionServices from "../../services/submissionServices";
+import { VueFilesPreview } from "vue-files-preview";
 const emit = defineEmits(["reject", "approve"]);
 
 const dialogStore = adminApprovalDialogStore();
@@ -17,6 +18,10 @@ const rejectMessage = ref("");
 const rejectReason = ref("");
 const approveMessage = ref("");
 const submissions = ref([]);
+const selectedSubmissionIndex = ref(0);
+const selectedSubmissionType = ref("text");
+const selectedFile = ref(null);
+
 const getStudentForFlightPlanId = async () => {
   const student = await studentServices.getStudentForFlightPlanId(
     flightPlanItem.value.flightPlanId,
@@ -35,28 +40,9 @@ const getSubmissionsForFlightPlanItem = async () => {
   }
 };
 
-const handleDownload = (index) => {
-  const { fileName, value } = submissions.value[index];
-  const file = new Blob([new Uint8Array(value.data.data)], {
-    type: value.mimeType,
-  });
-  const url = URL.createObjectURL(file);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-};
-
 const handleReject = async () => {
   try {
     const student = await getStudentForFlightPlanId();
-
-    await submissionServices.discardSubmissionForFlightPlanItem(
-      flightPlanItem.value.id,
-    );
 
     await flightPlanItemServices.rejectFlightPlanItem(flightPlanItem.value.id);
 
@@ -86,18 +72,22 @@ const handleApprove = async () => {
 
     await flightPlanItemServices.approveFlightPlanItem(flightPlanItem.value.id);
 
+    var points;
+    if (flightPlanItem.value.flightPlanItemType === "Experience") {
+      points = flightPlanItem.value.experience.points;
+    } else {
+      points = flightPlanItem.value.task.points;
+    }
+
     if (student?.user?.id) {
       await notificationServices.createNotification({
         header: "Flight plan item approved",
-        description: `${flightPlanItem.value.name} has been approved and you have received ${flightPlanItem.value.task.points} points`,
+        description: `${flightPlanItem.value.name} has been approved and you have received ${points} points`,
         read: false,
         userId: student.user.id,
         sentBy: 1, // Sent by the system
       });
-      await studentServices.updatePoints(
-        student.id,
-        flightPlanItem.value.task.points,
-      );
+      await studentServices.updatePoints(student.id, points);
     }
 
     approveMessage.value = "Flight plan item approved";
@@ -111,6 +101,30 @@ const handleApprove = async () => {
   }
 };
 
+const getSubmission = () => {
+  const selectedSubmission = submissions.value[selectedSubmissionIndex.value];
+  if (selectedSubmission.submissionType === "text") {
+    selectedSubmissionType.value = "text";
+  } else if (selectedSubmission.submissionType === "file") {
+    selectedSubmissionType.value = "file";
+    getFile();
+  }
+};
+
+const getFile = () => {
+  try {
+    const { fileName, value } =
+      submissions.value[selectedSubmissionIndex.value];
+    const file = new File([new Uint8Array(value.data.data)], fileName, {
+      type: value.mimeType,
+    });
+
+    selectedFile.value = file;
+  } catch (error) {
+    console.error("Error getting file:", error);
+  }
+};
+
 watch(visible, async (newValue) => {
   if (!newValue) {
     showReject.value = false;
@@ -118,7 +132,12 @@ watch(visible, async (newValue) => {
   } else {
     student.value = await getStudentForFlightPlanId();
     await getSubmissionsForFlightPlanItem();
+    getSubmission();
   }
+});
+
+watch(selectedSubmissionIndex, () => {
+  getSubmission();
 });
 </script>
 <template>
@@ -126,28 +145,71 @@ watch(visible, async (newValue) => {
     <v-card v-if="!showReject" color="backgroundDarken rounded-lg">
       <v-card-title class="d-flex justify-space-between align-center">
         <span class="flex-grow-1 text-center"
-          >Approve: {{ flightPlanItem.name }}</span
+          >Approve: {{ flightPlanItem.name }} for
+          {{
+            student?.user ? student.user.fName + " " + student.user.lName : ""
+          }}</span
         >
         <v-icon class="cursor-pointer" @click="visible = false"
           >mdi-close</v-icon
         >
       </v-card-title>
-      <v-card-text>
+      <v-card-text height="100%">
         <v-fade-transition mode="out-in">
           <div v-if="approveMessage">
-            <v-alert type="success" variant="tonal">{{
+            <v-alert type="success" variant="tonal" closable>{{
               approveMessage
             }}</v-alert>
           </div>
           <div v-else>
-            <v-row class="bg-background rounded-lg mb-1">
-              <p v-if="student?.user" class="text-subtitle-1 pa-2">
-                {{ student.user.fName }}
-                {{ student.user.lName }}
-                ({{ student.user.id }})
-              </p>
-              <p v-else class="text-subtitle-1 pa-2">No name found</p>
+            <v-row
+              v-if="submissions.length > 0"
+              class="bg-background rounded-lg mb-1"
+            >
+              <v-col
+                v-if="selectedSubmissionType === 'file'"
+                :cols="12"
+                class="d-flex justify-center align-center"
+              >
+                <VueFilesPreview
+                  :file="selectedFile"
+                  style="max-height: 60vh"
+                ></VueFilesPreview>
+              </v-col>
+              <v-col
+                v-if="selectedSubmissionType === 'text'"
+                :cols="12"
+                class="pa-4 bg-background rounded-lg"
+                style="white-space: pre-wrap"
+              >
+                {{ submissions[selectedSubmissionIndex].value }}
+              </v-col>
+              <v-col :cols="12" class="d-flex justify-center align-center">
+                <v-btn
+                  class="rounded-xl mr-6"
+                  color="text"
+                  variant="outlined"
+                  :disabled="selectedSubmissionIndex === 0"
+                  @click="selectedSubmissionIndex--"
+                  >Prev</v-btn
+                >
+                <p class="mr-6">
+                  {{ selectedSubmissionIndex + 1 }} /
+                  {{ submissions.length }}
+                </p>
+                <v-btn
+                  class="rounded-xl"
+                  color="text"
+                  variant="outlined"
+                  :disabled="selectedSubmissionIndex === submissions.length - 1"
+                  @click="selectedSubmissionIndex++"
+                  >Next</v-btn
+                >
+              </v-col>
             </v-row>
+            <v-alert v-else type="error" class="text-center"
+              >No submission found!</v-alert
+            >
             <v-row class="bg-background rounded-lg mb-1">
               <v-col cols="12">
                 <p class="text-body-1">Description</p>
@@ -158,66 +220,19 @@ watch(visible, async (newValue) => {
                 </p>
               </v-col>
             </v-row>
-            <v-row class="bg-background rounded-lg mb-1">
-              <v-col cols="12">
-                <p class="text-body-1">Rationale</p>
-              </v-col>
-              <v-col cols="12">
-                <p class="text-body-2 ml-3">
-                  {{ flightPlanItem?.task?.rationale || "No rationale" }}
-                </p>
-              </v-col>
-            </v-row>
-            <v-row class="bg-background rounded-lg mb-1">
-              <v-col cols="12">
-                <p class="text-subtitle-1">Submissions</p>
-              </v-col>
-            </v-row>
-            <v-row
-              v-if="
-                flightPlanItem?.submission?.length === 1 &&
-                flightPlanItem?.submission[0].submissionType === 'text'
-              "
-              class="pa-4 bg-background rounded-lg text-body-1 mb-3"
-              style="white-space: pre-wrap"
-            >
-              {{ flightPlanItem?.submission[0].value }}
-            </v-row>
-            <v-row
-              v-for="(submission, index) in submissions"
-              v-else-if="submissions.length > 0"
-              :key="index"
-              class="bg-background rounded-lg mb-1"
-            >
-              <v-col class="d-flex justify-space-between align-center">
-                <span>File {{ index + 1 }}</span>
-                <v-btn
-                  variant="solo"
-                  density="comfortable"
-                  @click="handleDownload(index)"
-                >
-                  <v-icon icon="mdi-download"></v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-
-            <v-row v-else class="bg-background rounded-lg mb-3">
-              <v-col cols="12">
-                <p class="text-subtitle-1 pa-2 text-center">
-                  No submission found
-                </p>
-              </v-col>
-            </v-row>
             <v-row class="d-flex justify-center">
               <v-btn
-                class="mr-5 rounded-xl"
-                color="danger"
+                class="rounded-xl mr-3"
+                color="primary"
+                @click="handleApprove"
+                >Approve</v-btn
+              >
+              <v-btn
+                class="rounded-xl"
                 variant="outlined"
+                color="danger"
                 @click="showReject = true"
                 >Reject</v-btn
-              >
-              <v-btn class="rounded-xl" color="primary" @click="handleApprove"
-                >Approve</v-btn
               >
             </v-row>
           </div>
@@ -236,19 +251,11 @@ watch(visible, async (newValue) => {
       <v-card-text>
         <v-fade-transition mode="out-in">
           <div v-if="rejectMessage">
-            <v-alert type="success" variant="tonal">{{
+            <v-alert type="success" variant="tonal" closable>{{
               rejectMessage
             }}</v-alert>
           </div>
           <div v-else>
-            <v-row class="bg-background rounded-lg mb-1">
-              <p v-if="student?.user" class="text-subtitle-1 pa-2">
-                {{ student.user.fName }}
-                {{ student.user.lName }}
-                ({{ student.user.id }})
-              </p>
-              <p v-else class="text-subtitle-1 pa-2">No name found</p>
-            </v-row>
             <v-row
               ><v-textarea
                 v-model="rejectReason"

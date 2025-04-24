@@ -94,6 +94,10 @@ export default {
     );
   },
 
+  getEventsForExperience(experienceId) {
+    return apiClient.get(`/event/experience/${experienceId}/fulfilling-events`);
+  },
+
   generateCheckInToken(eventId, expirationTimestamp) {
     return apiClient.post(`/event/${eventId}/check-in-token`, {
       expirationTimestamp,
@@ -106,5 +110,9 @@ export default {
 
   checkInWithToken(eventId, studentId, token) {
     return apiClient.post(`/event/${eventId}/check-in/${studentId}`, { token });
+  },
+
+  importAttendance(attendanceData) {
+    return apiClient.post(`/event/import-attendance`, attendanceData);
   },
 };

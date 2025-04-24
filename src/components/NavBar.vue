@@ -39,7 +39,6 @@ const admin = [
   { "route-name": "admin-calendar", "link-text": "Calendar" },
   { "route-name": "admin-notifications", "link-text": "Notifications" },
   { "route-name": "maintenance", "link-text": "Maintenance" },
-  { "route-name": "admin-search", "link-text": "Search" },
   { "route-name": "admin-approvals", "link-text": "Approvals" },
 ];
 
@@ -49,7 +48,6 @@ const student = [
   { "route-name": "student-flightPlan", "link-text": "Flight Plan" },
   { "route-name": "student-calendar", "link-text": "Calendar" },
   { "route-name": "student-notifications", "link-text": "Notifications" },
-  { "route-name": "student-search", "link-text": "Search" },
   { "route-name": "student-shop", "link-text": "Shop" },
 ];
 
@@ -58,15 +56,16 @@ const route = useRoute();
 const userId = ref(null);
 const router = useRouter();
 const showLogoutDialog = ref(false);
+const isAdmin = ref(false);
 
 onMounted(async () => {
   const store = userStore();
 
-  const isAdmin = await store.isAdmin();
+  isAdmin.value = await store.isAdmin();
   const isFaculty = await store.isFaculty();
 
   // Set the initial role based on authentication and role checks
-  role.value = isAdmin ? "admin" : isFaculty ? "faculty" : "student";
+  role.value = isAdmin.value ? "admin" : isFaculty ? "faculty" : "student";
 
   // Get the user ID from the store
   userId.value = store.user.userId;
@@ -81,6 +80,16 @@ onMounted(async () => {
   }
 });
 
+const toggleView = () => {
+  if (role.value === "admin") {
+    router.push({ name: "student" });
+    role.value = "student";
+  } else {
+    router.push({ name: "admin" });
+    role.value = "admin";
+  }
+};
+
 const getIcon = (linkText) => {
   const icons = {
     Profile: "mdi-account",
@@ -88,7 +97,6 @@ const getIcon = (linkText) => {
     "Flight Plan": "mdi-airplane",
     Calendar: "mdi-calendar",
     Notifications: "mdi-bell",
-    Search: "mdi-magnify",
     Maintenance: "mdi-cog",
     Approvals: "mdi-check",
     Shop: "mdi-cart",
@@ -166,6 +174,22 @@ const handleLogout = async () => {
         </div>
       </div>
       <div class="mt-auto">
+        <v-list-item v-if="isAdmin" class="bg-secondary" @click="toggleView">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
+              <div class="nav-item-content">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                  mdi-account-switch
+                </v-icon>
+                <span class="nav-text text-backgroundDarken">
+                  To {{ role === "admin" ? "Student" : "Admin" }}
+                </span>
+              </div>
+            </v-list-item-title>
+          </div>
+        </v-list-item>
         <v-list-item class="bg-secondary" @click="toggleTheme">
           <div>
             <v-list-item-title
@@ -236,6 +260,22 @@ const handleLogout = async () => {
         </div>
       </div>
       <div class="mt-auto">
+        <v-list-item v-if="isAdmin" class="bg-secondary" @click="toggleView">
+          <div>
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-backgroundDarken"
+            >
+              <div class="nav-item-content">
+                <v-icon :size="32" color="backgroundDarken" class="mr-2">
+                  mdi-account-switch
+                </v-icon>
+                <span class="nav-text text-backgroundDarken">
+                  To {{ role === "admin" ? "Student" : "Admin" }}
+                </span>
+              </div>
+            </v-list-item-title>
+          </div>
+        </v-list-item>
         <v-list-item class="bg-secondary" @click="toggleTheme">
           <div>
             <v-list-item-title

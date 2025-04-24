@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { studentApprovalDialogStore } from "../../stores/studentApprovalDialogStore";
 import userServices from "../../services/userServices";
@@ -11,7 +11,6 @@ const emit = defineEmits(["submit"]);
 const dialogStore = studentApprovalDialogStore();
 const { visible, flightPlanItem } = storeToRefs(dialogStore);
 
-const type = ref("text");
 const optionalReviewers = ref([{ label: "None", value: null }]);
 const selectedOptionalReviewer = ref();
 const reflectionText = ref("");
@@ -19,9 +18,15 @@ const files = ref();
 const successMessage = ref(""); // Track success message
 const errorMessage = ref("");
 
-const handleTypeToggle = () => {
-  type.value = type.value === "text" ? "file" : "text";
-};
+const submissionType = computed(() => {
+  console.log(flightPlanItem.value);
+
+  if (flightPlanItem.value.task) {
+    return flightPlanItem.value.task.submissionType;
+  } else {
+    return flightPlanItem.value.experience.submissionType;
+  }
+});
 
 const fetchOptionalReviewers = async () => {
   try {
@@ -45,30 +50,46 @@ const handleCancel = () => {
 };
 
 const handleSubmit = async () => {
-  const submissionData = {
-    flightPlanItemId: flightPlanItem.value.id,
-    submissionType: type.value,
-  };
+  if (!files.value && !reflectionText.value) {
+    errorMessage.value = "Please upload a file or write a reflection";
+    return;
+  }
+
+  console.log("submissionType");
 
   try {
-    if (type.value === "text") {
-      await submissionServices.createSubmission({
-        ...submissionData,
-        value: reflectionText.value,
-      });
+    console.log(submissionType.value);
+    if (submissionType.value === "text") {
+      console.log("TESTSTESTSETE");
+      await submitReflection();
+    } else if (submissionType.value === "file") {
+      await submitFiles();
     } else {
-      await Promise.all(
+      const fileNames = await Promise.all(
         files.value.map(async (file) => {
           const { data } = await fileServices.uploadFile(
             { file },
             "submissions",
           );
-          return submissionServices.createSubmission({
-            ...submissionData,
-            value: data.fileName,
-          });
+          return data.fileName;
         }),
       );
+
+      let submissions = fileNames.map((fileName) => ({
+        flightPlanItemId: flightPlanItem.value.id,
+        submissionType: "file",
+        value: fileName,
+      }));
+
+      if (reflectionText.value) {
+        submissions.push({
+          flightPlanItemId: flightPlanItem.value.id,
+          submissionType: "text",
+          value: reflectionText.value,
+        });
+      }
+
+      await submissionServices.createSubmissions(submissions);
     }
 
     await flightPlanItemServices.updateFlightPlanItem({
@@ -76,18 +97,63 @@ const handleSubmit = async () => {
       status: "Pending",
     });
     successMessage.value = "Submission successful!";
-
-    setTimeout(() => {
-      successMessage.value = "";
-      files.value = null;
-      reflectionText.value = "";
-      visible.value = false;
-      emit("submit");
-    }, 2000);
+    debounceSubmit();
   } catch (error) {
-    errorMessage.value = error.response.data.message;
+    errorMessage.value = error.response;
   }
 };
+
+const debounceSubmit = () => {
+  setTimeout(() => {
+    successMessage.value = "";
+    files.value = null;
+    reflectionText.value = "";
+    visible.value = false;
+    emit("submit");
+  }, 2000);
+};
+
+const submitFiles = async () => {
+  const submissionData = {
+    flightPlanItemId: flightPlanItem.value.id,
+    submissionType: "file",
+  };
+  await Promise.all(
+    files.value.map(async (file) => {
+      const { data } = await fileServices.uploadFile({ file }, "submissions");
+      return submissionServices.createSubmission({
+        ...submissionData,
+        value: data.fileName,
+      });
+    }),
+  );
+};
+
+const submitReflection = async () => {
+  console.log("submit reflection 1");
+
+  const submissionData = {
+    flightPlanItemId: flightPlanItem.value.id,
+    submissionType: "text",
+  };
+
+  console.log("submit reflection 2");
+
+  await submissionServices.createSubmission({
+    ...submissionData,
+    value: reflectionText.value,
+  });
+};
+
+watch(visible, () => {
+  if (!visible.value) {
+    files.value = null;
+    reflectionText.value = "";
+    selectedOptionalReviewer.value = null;
+    successMessage.value = "";
+    errorMessage.value = "";
+  }
+});
 
 onMounted(fetchOptionalReviewers);
 </script>
@@ -98,47 +164,68 @@ onMounted(fetchOptionalReviewers);
       <v-card-title class="text-h4 d-flex justify-center align-center">
         <span class="flex-grow-1 text-center">
           {{ flightPlanItem.name }}
-          <v-btn
-            v-if="type === 'text'"
-            icon="mdi-upload"
-            variant="text"
-            class="ml-2"
-            @click="handleTypeToggle"
-          ></v-btn>
-          <v-btn
-            v-else
-            icon="mdi-file-document"
-            variant="text"
-            class="ml-2"
-            @click="handleTypeToggle"
-          ></v-btn>
         </span>
+        <v-icon
+          class="cursor-pointer"
+          size="extra-small"
+          @click="visible = false"
+          >mdi-close</v-icon
+        >
       </v-card-title>
       <v-card-text>
         <v-fade-transition mode="out-in">
           <div v-if="successMessage">
-            <v-alert type="success" variant="tonal">{{
+            <v-alert type="success" variant="tonal" closable>{{
               successMessage
             }}</v-alert>
           </div>
           <div v-else>
             <v-textarea
-              v-if="type === 'text'"
+              v-if="submissionType === 'text'"
               v-model="reflectionText"
               label="Reflection"
               variant="solo"
               rounded="xl"
               bg-color="background"
             ></v-textarea>
-
             <v-file-upload
-              v-if="type === 'file'"
+              v-else-if="submissionType === 'files'"
               v-model="files"
               label="Upload Files"
               multiple
               rounded="xl"
               color="background"
             ></v-file-upload>
+            <div v-else>
+              <v-expansion-panels class="mb-4 rounded-lg" color="background">
+                <v-expansion-panel class="mb-2">
+                  <v-expansion-panel-title>Reflection</v-expansion-panel-title>
+                  <v-expansion-panel-text class="bg-backgroundDarken">
+                    <v-textarea
+                      v-model="reflectionText"
+                      label="Reflection"
+                      variant="solo"
+                      rounded="xl"
+                      bg-color="background"
+                    ></v-textarea>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+              <v-expansion-panels class="mb-4 rounded-lg" color="background">
+                <v-expansion-panel class="mb-2">
+                  <v-expansion-panel-title>File Upload</v-expansion-panel-title>
+                  <v-expansion-panel-text class="bg-backgroundDarken">
+                    <v-file-upload
+                      v-model="files"
+                      label="Upload Files"
+                      multiple
+                      rounded="xl"
+                      color="background"
+                    ></v-file-upload>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </div>
 
             <div class="d-flex justify-center mt-4">
               <p class="mr-2 mt-1">(Optional) Request Reviewer</p>
@@ -156,7 +243,7 @@ onMounted(fetchOptionalReviewers);
               </div>
             </div>
             <div v-if="errorMessage">
-              <v-alert type="danger" variant="tonal">{{
+              <v-alert type="danger" variant="tonal" closable>{{
                 errorMessage
               }}</v-alert>
             </div>

@@ -1,18 +1,22 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref, onMounted } from "vue";
+import EventListDialog from "../dialogs/EventListDialog.vue";
+import EventDialog from "../dialogs/EventDialog.vue";
+import eventServices from "../../services/eventServices";
+import studentServices from "../../services/studentServices";
+import flightPlanItemServices from "../../services/flightPlanItemServices";
+import { userStore } from "../../stores/userStore";
 
 const props = defineProps({
   flightPlanItem: {
     type: Object,
-    required: true,
+    default: () => ({}),
   },
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
-  isFlightPlanView: {
-    type: Boolean,
-    default: false,
+  isAdmin: Boolean,
+  isFlightPlanView: Boolean,
+  flightPlanItems: {
+    type: Array,
+    default: () => [],
   },
 });
 
@@ -24,18 +28,143 @@ const emit = defineEmits([
   "click",
 ]);
 
-const color = computed(
+const store = userStore();
+const studentId = ref(null);
+const registeredEventIds = ref(new Set());
+const checkedInEventIds = ref(new Set());
+
+const showEventListDialog = ref(false);
+const showEventDialog = ref(false);
+const eventOptions = ref([]);
+const selectedEvent = ref(null);
+
+const isSubmissionExperience = computed(
   () =>
-    ({
+    props.flightPlanItem.flightPlanItemType === "Experience" &&
+    props.flightPlanItem.experience?.submissionType !== "attendance",
+);
+
+const fetchStudentId = async () => {
+  try {
+    const userId = store.user?.userId;
+    if (!userId) return;
+    const res = await studentServices.getStudentForUserId(userId);
+    studentId.value = res.data.id;
+  } catch (err) {
+    console.error("Failed to fetch student ID:", err);
+  }
+};
+
+const fetchStudentStatus = async () => {
+  if (!studentId.value) return;
+  try {
+    const [registeredRes, checkedInRes] = await Promise.all([
+      eventServices.getRegisteredEventsForStudent(studentId.value),
+      eventServices.getAttendingEventsForStudent(studentId.value),
+    ]);
+    registeredEventIds.value = new Set(registeredRes.data.map((e) => e.id));
+    checkedInEventIds.value = new Set(checkedInRes.data.map((e) => e.id));
+  } catch (err) {
+    console.error("Error fetching student status:", err);
+  }
+};
+
+const loadExperienceEvents = async () => {
+  if (!props.flightPlanItem.experience?.id) return;
+  try {
+    const response = await eventServices.getEventsForExperience(
+      props.flightPlanItem.experience.id,
+    );
+    eventOptions.value = response.data;
+  } catch (err) {
+    console.error("Failed to fetch fulfilling events:", err);
+  }
+};
+
+onMounted(async () => {
+  await fetchStudentId();
+  await fetchStudentStatus();
+  if (props.flightPlanItem.flightPlanItemType === "Experience") {
+    await loadExperienceEvents();
+  }
+
+  if (props.flightPlanItem.eventId) {
+    const response = await eventServices.getEvent(props.flightPlanItem.eventId);
+    selectedEvent.value = response.data;
+  }
+});
+
+const handleRegisterClick = async () => {
+  await loadExperienceEvents();
+  showEventListDialog.value = true;
+};
+
+const handleEventSelected = (event) => {
+  selectedEvent.value = event;
+};
+
+const handleRegister = async (event) => {
+  selectedEvent.value = event;
+  if (!studentId.value) return;
+  try {
+    await eventServices.registerStudents(event.id, [studentId.value]);
+    const updatedItem = {
+      ...props.flightPlanItem,
+      eventId: event.id,
+      status: "Registered",
+    };
+    await flightPlanItemServices.updateFlightPlanItem(updatedItem);
+    await fetchStudentStatus();
+    handleRefresh();
+  } catch (err) {
+    console.error("Registration error:", err);
+  }
+};
+
+const handleUnregister = async (event) => {
+  handleEventSelected(event);
+  if (!studentId.value) return;
+  try {
+    await eventServices.unregisterStudents(event.id, [studentId.value]);
+    const updatedItem = {
+      ...props.flightPlanItem,
+      eventId: null,
+      status: "Incomplete",
+    };
+    await flightPlanItemServices.updateFlightPlanItem(updatedItem);
+    await fetchStudentStatus();
+    handleRefresh();
+  } catch (err) {
+    console.error("Unregistration error:", err);
+  }
+};
+
+const handleRefresh = () => {
+  showEventListDialog.value = false;
+  emit("register");
+};
+
+const isRegisteredForExperience = computed(() => {
+  return props.flightPlanItem.status === "Registered";
+});
+
+const color = computed(() => {
+  const status = props.flightPlanItem.status;
+
+  if (status === "Complete") return "primary";
+  if (isRegisteredForExperience.value) return "warning";
+
+  return (
+    {
       Incomplete: "danger",
       Rejected: "danger",
       Pending: "warning",
       Registered: "warning",
-    })[props.flightPlanItem.status] || "primary",
-);
+    }[status] || "primary"
+  );
+});
 
 const points = computed(() => {
-  console.log(props.flightPlanItem);
   return {
     Task: props.flightPlanItem.task?.points,
     Experience: props.flightPlanItem.experience?.points,
@@ -45,7 +174,27 @@ const points = computed(() => {
 const handleClick = () => {
   emit("click");
 };
+
+const handleViewRegisteredEvent = async () => {
+  const registeredEvent = eventOptions.value.find(
+    (event) => event.id === props.flightPlanItem.eventId,
+  );
+
+  if (registeredEvent) {
+    selectedEvent.value = registeredEvent;
+    showEventDialog.value = true;
+  } else {
+    try {
+      const res = await eventServices.getEvent(props.flightPlanItem.eventId);
+      selectedEvent.value = res.data;
+      showEventDialog.value = true;
+    } catch (err) {
+      console.warn("Could not fetch event by ID:", err);
+    }
+  }
+};
 </script>
+
 <template>
   <v-card
     color="backgroundDarken"
@@ -61,104 +210,171 @@ const handleClick = () => {
         <v-col cols="11">
           <v-card-text class="text-no-wrap">
             <v-tooltip bottom>
-              <!-- eslint-disable-next-line vue/no-template-shadow -->
-              <template #activator="{ props }">
-                <p v-bind="props" class="text-h6 mb-2 truncate-text">
+              <template #activator="{ props: tooltipProps }">
+                <p v-bind="tooltipProps" class="text-h6 mb-2 truncate-text">
                   {{ flightPlanItem.name }}
                 </p>
               </template>
               <span>{{ flightPlanItem.name }}</span>
             </v-tooltip>
             <p>{{ flightPlanItem.flightPlanItemType }}</p>
-            <p>{{ flightPlanItem.status }}</p>
+            <p>
+              {{
+                flightPlanItem.status === "Complete"
+                  ? "Complete"
+                  : isRegisteredForExperience
+                    ? "Registered"
+                    : flightPlanItem.status
+              }}
+            </p>
             <p
-              v-if="
-                flightPlanItem.status == 'Complete' ||
-                flightPlanItem.status == 'Registered' ||
-                isAdmin
-              "
-              class="mb-5"
+              :class="[
+                'mb-3',
+                {
+                  'mb-5':
+                    ['Complete'].includes(flightPlanItem.status) || isAdmin,
+                },
+              ]"
             >
               Points: {{ points }}
             </p>
-            <p v-else>Points: {{ points }}</p></v-card-text
-          >
+          </v-card-text>
 
-          <div v-if="!props.isAdmin">
-            <!-- Incomplete Task -->
+          <div v-if="!isAdmin">
+            <!-- Submission logic for Task and Experience -->
             <v-row
               v-if="
-                flightPlanItem.status == 'Incomplete' &&
-                flightPlanItem.flightPlanItemType == 'Task' &&
+                ['Task', 'Experience'].includes(
+                  flightPlanItem.flightPlanItemType,
+                ) &&
+                flightPlanItem.status === 'Incomplete' &&
+                (flightPlanItem.flightPlanItemType === 'Task' ||
+                  isSubmissionExperience) &&
                 isFlightPlanView
               "
               justify="end"
-              ><v-btn
-                v-if="!props.isAdmin"
+            >
+              <v-btn
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
-                @click="emit('incomplete', props.flightPlanItem)"
+                @click="emit('incomplete', flightPlanItem)"
               >
                 Incomplete
                 <v-icon right class="pl-1">mdi-upload</v-icon>
               </v-btn>
             </v-row>
 
-            <!-- Rejected Task -->
             <v-row
               v-if="
-                flightPlanItem.status == 'Rejected' &&
-                flightPlanItem.flightPlanItemType == 'Task' &&
+                ['Task', 'Experience'].includes(
+                  flightPlanItem.flightPlanItemType,
+                ) &&
+                flightPlanItem.status === 'Rejected' &&
+                (flightPlanItem.flightPlanItemType === 'Task' ||
+                  isSubmissionExperience) &&
                 isFlightPlanView
               "
               justify="end"
-              ><v-btn
+            >
+              <v-btn
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
-                @click="emit('incomplete', props.flightPlanItem)"
+                @click="emit('incomplete', flightPlanItem)"
               >
                 Rejected
                 <v-icon right class="pl-1">mdi-upload</v-icon>
-              </v-btn></v-row
-            >
+              </v-btn>
+            </v-row>
 
-            <!-- Register for Experience -->
+            <!-- Attendance-based Experience Registration -->
             <v-row
               v-if="
-                flightPlanItem.status == 'Incomplete' &&
-                flightPlanItem.flightPlanItemType == 'Experience' &&
+                flightPlanItem.flightPlanItemType === 'Experience' &&
+                flightPlanItem.experience?.submissionType === 'attendance' &&
+                flightPlanItem.status === 'Incomplete' &&
                 isFlightPlanView
               "
               justify="end"
-              ><v-btn
+            >
+              <v-btn
                 class="mr-4 mb-3"
                 variant="outlined"
                 rounded="xl"
-                @click="emit('register', props.flightPlanItem)"
+                @click="handleRegisterClick"
               >
                 Register
                 <v-icon right class="pl-1">mdi-account-plus</v-icon>
-              </v-btn></v-row
-            >
+              </v-btn>
+            </v-row>
 
-            <!-- Pending Task -->
-            <v-row v-else-if="flightPlanItem.status == 'Pending'" justify="end"
-              ><v-btn
-                class="mr-4 mb-3"
-                rounded="xl"
-                variant="outlined"
-                @click="emit('view', props.flightPlanItem)"
-              >
-                View Submission<v-icon right class="pl-1">mdi-eye</v-icon>
-              </v-btn></v-row
+            <!-- View Submission -->
+            <v-row
+              v-if="
+                ['Task', 'Experience'].includes(
+                  flightPlanItem.flightPlanItemType,
+                ) &&
+                flightPlanItem.status === 'Pending' &&
+                (flightPlanItem.flightPlanItemType === 'Task' ||
+                  isSubmissionExperience)
+              "
+              justify="end"
             >
+              <v-btn
+                class="mr-4 mb-3"
+                variant="outlined"
+                rounded="xl"
+                @click="emit('view', flightPlanItem)"
+              >
+                View Submission
+                <v-icon right class="pl-1">mdi-eye</v-icon>
+              </v-btn>
+            </v-row>
+
+            <!-- Registered/Pending Attendance Event View -->
+            <v-row
+              v-if="
+                ['Pending', 'Registered'].includes(flightPlanItem.status) &&
+                flightPlanItem.flightPlanItemType === 'Experience' &&
+                flightPlanItem.experience?.submissionType === 'attendance'
+              "
+              justify="end"
+            >
+              <v-btn
+                class="mr-4 mb-3"
+                variant="outlined"
+                rounded="xl"
+                @click="handleViewRegisteredEvent"
+              >
+                View Registered Event
+                <v-icon right class="pl-1">mdi-calendar</v-icon>
+              </v-btn>
+            </v-row>
           </div>
         </v-col>
       </v-row>
     </v-container>
   </v-card>
+
+  <EventListDialog
+    v-model="showEventListDialog"
+    :experience-id="flightPlanItem.id"
+    :event-options="eventOptions"
+    :flight-plan-item="flightPlanItem"
+    :flight-plan-items="flightPlanItems"
+    @register="handleRegister"
+    @unregister="handleUnregister"
+    @refresh="handleRefresh"
+  />
+
+  <EventDialog
+    v-model="showEventDialog"
+    :event="selectedEvent"
+    :is-admin="isAdmin"
+    @register="handleRegister"
+    @unregister="handleUnregister"
+  />
 </template>
 
 <style scoped>
@@ -169,10 +385,10 @@ const handleClick = () => {
   border-radius: 20px 0px 0px 20px;
 }
 .truncate-text {
-  white-space: nowrap; /* Prevents text from wrapping */
-  overflow: hidden; /* Hides overflowing text */
-  text-overflow: ellipsis; /* Adds '...' when text overflows */
-  max-width: 80%; /* Adjust based on your layout */
-  display: block; /* Ensures it works properly */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+  display: block;
 }
 </style>
