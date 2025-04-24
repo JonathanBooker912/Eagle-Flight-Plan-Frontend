@@ -10,6 +10,7 @@ import EventCard from "../../components/cards/EventCard.vue";
 import { userStore } from "../../stores/userStore";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { useFlightPlanStore } from "../../stores/flightPlanStore";
+import { useRouter } from "vue-router";
 
 const notifications = ref([]);
 const currentPage = ref(1);
@@ -25,7 +26,7 @@ const flightPlans = ref([]);
 const flightPlanItems = ref([]);
 const events = ref([]);
 const isLoaded = ref(false);
-
+const router = useRouter();
 const getNotifications = async (page = 1) => {
   try {
     const res = await notificationServices.getAllNotificationsForUser(
@@ -137,6 +138,7 @@ const openNotification = (x) => {
 const openFlightPlanItem = (item) => {
   flightPlanStore.setActiveFlightPlanItem(item);
   flightPlanStore.setSelectedSemester(selectedFlightPlan.value);
+  router.push({ name: "student-flightPlan" });
 };
 
 onMounted(async () => {
@@ -203,6 +205,7 @@ onMounted(async () => {
               color="background"
               :to="{ name: 'student-flightPlan' }"
               :is-flight-plan-view="false"
+              backgroundColor="background"
               @click="openFlightPlanItem(item)"
             />
           </template>
