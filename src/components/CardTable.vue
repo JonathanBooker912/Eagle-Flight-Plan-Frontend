@@ -106,7 +106,7 @@ const handleCloseInfo = () => {
       <v-col>
         <v-row v-if="props.items.length === 0" class="justify-center">
           <v-col>
-            <v-alert color="success" class="text-center">
+            <v-alert color="danger" class="text-center">
               No results found
             </v-alert>
           </v-col>
