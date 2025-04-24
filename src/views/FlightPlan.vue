@@ -397,7 +397,7 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
           :key="item.id"
           :flight-plan-item="item"
           :is-admin="props.isAdmin"
-          :is-flight-plan-view="!props.isAdmin"
+          :is-flight-plan-view="props.isAdmin"
           :flight-plan-items="flightPlanItems"
           @incomplete="handleIncompleteButtonClick"
           @register="handleRegister"
