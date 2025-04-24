@@ -161,23 +161,16 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
           <v-spacer></v-spacer>
           <div>
             <v-btn
-              v-if="!isViewingSelf"
               block
               color="primary"
               class="mb-2"
               @click="handleViewFlightPlan"
               >View Flight Plan</v-btn
             >
-            <v-btn
-              v-if="!isViewingSelf"
-              block
-              color="primary"
-              class="mb-2"
-              @click="handleViewProfile"
+            <v-btn block color="primary" class="mb-2" @click="handleViewProfile"
               >View Profile</v-btn
             >
             <v-btn
-              v-if="!isViewingSelf"
               block
               color="primary"
               class="mb-2"
