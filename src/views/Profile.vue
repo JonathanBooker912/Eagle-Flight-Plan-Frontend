@@ -186,7 +186,9 @@ onMounted(async () => {
           </p>
         </v-col>
         <v-col cols="4" class="d-flex flex-column justify-center text-left">
-          <p class="text-subtitle-1">{{ selectedMajor.map(major => major.name).join(', ') }}</p>
+          <p class="text-subtitle-1">
+            {{ selectedMajor.map((major) => major.name).join(", ") }}
+          </p>
           <a style="text-align: left !important">
             {{ selectedUser.email }}
           </a>
