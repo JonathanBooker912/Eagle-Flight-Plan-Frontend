@@ -14,7 +14,7 @@ const { visible, flightPlanItem } = storeToRefs(dialogStore);
 const optionalReviewers = ref([{ label: "None", value: null }]);
 const selectedOptionalReviewer = ref();
 const reflectionText = ref("");
-const files = ref();
+const files = ref([]);
 const successMessage = ref(""); // Track success message
 const errorMessage = ref("");
 
@@ -55,31 +55,29 @@ const handleSubmit = async () => {
     return;
   }
 
-  console.log("submissionType");
-
   try {
-    console.log(submissionType.value);
     if (submissionType.value === "text") {
-      console.log("TESTSTESTSETE");
       await submitReflection();
     } else if (submissionType.value === "file") {
       await submitFiles();
     } else {
-      const fileNames = await Promise.all(
-        files.value.map(async (file) => {
-          const { data } = await fileServices.uploadFile(
-            { file },
-            "submissions",
-          );
-          return data.fileName;
-        }),
-      );
-
-      let submissions = fileNames.map((fileName) => ({
-        flightPlanItemId: flightPlanItem.value.id,
-        submissionType: "file",
-        value: fileName,
-      }));
+      let submissions = [];
+      if (files.value.length > 0) {
+        const fileNames = await Promise.all(
+          files.value.map(async (file) => {
+            const { data } = await fileServices.uploadFile(
+              { file },
+              "submissions",
+            );
+            return data.fileName;
+          }),
+        );
+        submissions = fileNames.map((fileName) => ({
+          flightPlanItemId: flightPlanItem.value.id,
+          submissionType: "file",
+          value: fileName,
+        }));
+      }
 
       if (reflectionText.value) {
         submissions.push({
@@ -99,7 +97,7 @@ const handleSubmit = async () => {
     successMessage.value = "Submission successful!";
     debounceSubmit();
   } catch (error) {
-    errorMessage.value = error.response;
+    errorMessage.value = error.response.data.message;
   }
 };
 
@@ -130,14 +128,10 @@ const submitFiles = async () => {
 };
 
 const submitReflection = async () => {
-  console.log("submit reflection 1");
-
   const submissionData = {
     flightPlanItemId: flightPlanItem.value.id,
     submissionType: "text",
   };
-
-  console.log("submit reflection 2");
 
   await submissionServices.createSubmission({
     ...submissionData,

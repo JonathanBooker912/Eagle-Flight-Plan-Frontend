@@ -17,6 +17,7 @@ const showReject = ref(false);
 const rejectMessage = ref("");
 const rejectReason = ref("");
 const approveMessage = ref("");
+const errorMessage = ref("");
 const submissions = ref([]);
 const selectedSubmissionIndex = ref(0);
 const selectedSubmissionType = ref("text");
@@ -72,24 +73,6 @@ const handleApprove = async () => {
 
     await flightPlanItemServices.approveFlightPlanItem(flightPlanItem.value.id);
 
-    var points;
-    if (flightPlanItem.value.flightPlanItemType === "Experience") {
-      points = flightPlanItem.value.experience.points;
-    } else {
-      points = flightPlanItem.value.task.points;
-    }
-
-    if (student?.user?.id) {
-      await notificationServices.createNotification({
-        header: "Flight plan item approved",
-        description: `${flightPlanItem.value.name} has been approved and you have received ${points} points`,
-        read: false,
-        userId: student.user.id,
-        sentBy: 1, // Sent by the system
-      });
-      await studentServices.updatePoints(student.id, points);
-    }
-
     approveMessage.value = "Flight plan item approved";
     setTimeout(() => {
       approveMessage.value = "";
@@ -98,6 +81,10 @@ const handleApprove = async () => {
     }, 2000);
   } catch (error) {
     console.error("Error approving flight plan item:", error);
+    errorMessage.value = "Error approving flight plan item";
+    setTimeout(() => {
+      errorMessage.value = "";
+    }, 2000);
   }
 };
 
@@ -160,6 +147,13 @@ watch(selectedSubmissionIndex, () => {
             <v-alert type="success" variant="tonal" closable>{{
               approveMessage
             }}</v-alert>
+            <v-alert
+              v-if="errorMessage"
+              type="error"
+              variant="tonal"
+              closable
+              >{{ errorMessage }}</v-alert
+            >
           </div>
           <div v-else>
             <v-row

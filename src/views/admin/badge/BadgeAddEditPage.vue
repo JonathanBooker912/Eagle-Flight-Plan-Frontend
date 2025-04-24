@@ -74,6 +74,8 @@ const removeExperience = (experience) => {
 const handleSubmit = async () => {
   const isValid = (await form.value?.validate())?.valid;
 
+  formData.value.ruleType = selectedRule.value;
+
   if (selectedRule.value === "Task and Experience Defined") {
     if (ruleTasks.value.length === 0 && ruleExperiences.value.length === 0) {
       errorMessage.value = "You must add at least one task or experience";
