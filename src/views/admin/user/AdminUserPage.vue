@@ -72,6 +72,10 @@ const handleRedeemRewards = () => {
 };
 
 const handlePromoteToAdmin = async () => {
+  if (isViewingSelf.value) {
+    alert("You cannot promote yourself");
+    return;
+  }
   try {
     await userServices.promoteToAdmin(userToShow.value.id);
     await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
@@ -83,6 +87,10 @@ const handlePromoteToAdmin = async () => {
 };
 
 const handleDemoteFromAdmin = async () => {
+  if (isViewingSelf.value) {
+    alert("You cannot demote yourself");
+    return;
+  }
   try {
     await userServices.demoteFromAdmin(userToShow.value.id);
     await fetchUsers({ pageNumber: page.value, query: searchQuery.value });
@@ -100,7 +108,7 @@ const isAdmin = computed(() => {
 });
 
 const isViewingSelf = computed(() => {
-  return userToShow.value?.id === currentUser.value?.id;
+  return userToShow.value?.id === currentUser.value?.userId;
 });
 
 watch([page, searchQuery], fetchUsers, { immediate: true });
@@ -153,16 +161,23 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
           <v-spacer></v-spacer>
           <div>
             <v-btn
+              v-if="!isViewingSelf"
               block
               color="primary"
               class="mb-2"
               @click="handleViewFlightPlan"
               >View Flight Plan</v-btn
             >
-            <v-btn block color="primary" class="mb-2" @click="handleViewProfile"
+            <v-btn 
+              v-if="!isViewingSelf"
+              block 
+              color="primary" 
+              class="mb-2" 
+              @click="handleViewProfile"
               >View Profile</v-btn
             >
             <v-btn
+              v-if="!isViewingSelf"
               block
               color="primary"
               class="mb-2"
