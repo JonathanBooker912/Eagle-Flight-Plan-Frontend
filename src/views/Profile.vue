@@ -80,7 +80,6 @@ const getBadges = async (id, page = 1) => {
       pageSize.value,
     ); // API call
     badges.value = res.data.badges; // Update badges
-    console.log(badges.value);
 
     totalPages.value = Math.ceil(res.data.total / pageSize.value);
     currentPage.value = page;
@@ -114,10 +113,8 @@ const getStudent = async (userId) => {
     selectedStudent.value = res.data;
     if (selectedStudent.value.id) {
       // Get majors from the student response
-      console.log('Student data:', selectedStudent.value);
       if (selectedStudent.value.majors) {
         selectedMajor.value = selectedStudent.value.majors;
-        console.log('Majors:', selectedMajor.value);
       }
     }
   } catch (err) {
