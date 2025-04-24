@@ -168,11 +168,11 @@ watch([page, searchQuery], fetchUsers, { immediate: true });
               @click="handleViewFlightPlan"
               >View Flight Plan</v-btn
             >
-            <v-btn 
+            <v-btn
               v-if="!isViewingSelf"
-              block 
-              color="primary" 
-              class="mb-2" 
+              block
+              color="primary"
+              class="mb-2"
               @click="handleViewProfile"
               >View Profile</v-btn
             >
