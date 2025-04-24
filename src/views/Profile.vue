@@ -30,6 +30,9 @@ const isAdmin = ref(false);
 const isOwnProfile = ref(false);
 const editDialog = ref(false);
 const editedDescription = ref("");
+const editLinkDialog = ref(false);
+const editedLink = ref({ websiteName: "", link: "" });
+const editingLinkIndex = ref(-1);
 
 // Add pagination variables
 const currentPage = ref(1);
@@ -123,6 +126,55 @@ const saveDescription = async () => {
   }
 };
 
+const saveLink = async () => {
+  try {
+    if (editingLinkIndex.value === -1) {
+      // Check if we've reached the maximum number of links
+      if (links.value.length >= 3) {
+        console.error("Maximum number of links reached");
+        editLinkDialog.value = false;
+        return;
+      }
+      // Add new link
+      const newLink = await linkServices.createLink({
+        userId: route.params.userId,
+        websiteName: editedLink.value.websiteName,
+        link: editedLink.value.link
+      });
+      links.value.push(newLink.data);
+    } else {
+      // Update existing link
+      const updatedLink = await linkServices.updateLink(links.value[editingLinkIndex.value].id, {
+        websiteName: editedLink.value.websiteName,
+        link: editedLink.value.link
+      });
+      links.value[editingLinkIndex.value] = updatedLink.data;
+    }
+    editLinkDialog.value = false;
+  } catch (err) {
+    console.error("Error saving link:", err);
+  }
+};
+
+const deleteLink = async (index) => {
+  try {
+    await linkServices.deleteLink(links.value[index].id);
+    links.value.splice(index, 1);
+  } catch (err) {
+    console.error("Error deleting link:", err);
+  }
+};
+
+const openEditLinkDialog = (index = -1) => {
+  editingLinkIndex.value = index;
+  if (index === -1) {
+    editedLink.value = { websiteName: "", link: "" };
+  } else {
+    editedLink.value = { ...links.value[index] };
+  }
+  editLinkDialog.value = true;
+};
+
 // Add watcher for pagination
 watch(currentPage, (newPage) => {
   getBadges(route.params.userId, newPage);
@@ -141,7 +193,7 @@ onMounted(async () => {
   await getBadges(passedId);
   await getUser(passedId);
 
-  isOwnProfile.value = passedId == selectedUser.value.id;
+  isOwnProfile.value = passedId == store.user.userId;
 
   console.log(passedId);
   console.log(selectedUser.value);
@@ -184,30 +236,40 @@ onMounted(async () => {
             {{ selectedUser.profileDescription }}
           </p>
         </v-col>
-        <v-col class="v-col-2 d-flex flex-column justify-center text-right">
-          <p style="font-size: 16px; text-align: right !important">Email</p>
-          <p
-            v-for="(link, index) in links.slice(0, 3)"
-            :key="index"
-            style="text-align: right !important; font-size: 16px"
-          >
-            {{ link.websiteName }}
-          </p>
-        </v-col>
-        <v-col cols="3" class="d-flex flex-column justify-center text-left">
-          <a style="text-align: left !important">
-            {{ selectedUser.email }}
-          </a>
-          <a
-            v-for="(link, index) in links.slice(0, 3)"
-            :key="index"
-            style="text-align: left !important; font-size: 16px"
-            :href="link.link"
-            target="_blank"
-          >
-            {{ link.link }}
-            <br />
-          </a>
+        <v-col cols="4" class="d-flex flex-column justify-center">
+          <div class="contact-info">
+            <div class="d-flex align-center mb-2">
+              <v-icon class="mr-2">mdi-email</v-icon>
+              <a :href="'mailto:' + selectedUser.email" class="text-decoration-none">
+                {{ selectedUser.email }}
+              </a>
+            </div>
+            <div v-for="(link, index) in links.slice(0, 3)" :key="index" class="d-flex align-center mb-2">
+              <v-icon class="mr-2">mdi-link</v-icon>
+              <div class="d-flex align-center link-container">
+                <a :href="link.link" target="_blank" class="text-decoration-none">
+                  {{ link.websiteName }}
+                </a>
+                <div v-if="isOwnProfile" class="ml-2">
+                  <v-icon size="small" @click="openEditLinkDialog(index)" class="mr-1">mdi-pencil</v-icon>
+                  <v-icon size="small" @click="deleteLink(index)">mdi-delete</v-icon>
+                </div>
+              </div>
+            </div>
+            <v-btn 
+              v-if="isOwnProfile && links.length < 3" 
+              color="primary" 
+              variant="text" 
+              @click="openEditLinkDialog()" 
+              class="mt-2"
+              prepend-icon="mdi-plus"
+            >
+              Add Link
+            </v-btn>
+            <p v-else-if="isOwnProfile && links.length >= 3" class="text-caption mt-2">
+              Maximum of 3 links reached
+            </p>
+          </div>
         </v-col>
         <v-col cols="1" class="d-flex align-right">
           <v-icon
@@ -328,6 +390,33 @@ onMounted(async () => {
     </v-card>
   </v-dialog>
 
+  <v-dialog v-model="editLinkDialog" max-width="500px">
+    <v-card>
+      <v-card-title>{{ editingLinkIndex === -1 ? 'Add Link' : 'Edit Link' }}</v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model="editedLink.websiteName"
+          label="Website Name"
+          variant="outlined"
+        ></v-text-field>
+        <v-text-field
+          v-model="editedLink.link"
+          label="Link URL"
+          variant="outlined"
+        ></v-text-field>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" variant="text" @click="editLinkDialog = false">
+          Cancel
+        </v-btn>
+        <v-btn color="primary" variant="text" @click="saveLink">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <ViewBadgeAwards :badges="unviewedBadges" />
 </template>
 
@@ -356,5 +445,31 @@ onMounted(async () => {
 .pagination {
   margin-top: 20px;
   padding: 10px 0;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.link-container a {
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.link-container a:hover {
+  color: var(--v-primary-base);
+}
+
+.v-icon {
+  color: var(--v-primary-base);
 }
 </style>
