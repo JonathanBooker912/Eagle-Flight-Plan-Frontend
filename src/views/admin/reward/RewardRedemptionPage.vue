@@ -127,12 +127,6 @@ const handleRedeemConfirm = async () => {
       user.value.id,
     );
 
-    await notificationServices.createNotification(
-      student.value.id,
-      "Reward Redeemed",
-      `You have redeemed ${selectedReward.value.name} for ${selectedReward.value.points} points`,
-    );
-
     showDialogMessage(true);
     await Promise.all([fetchStudentById(), fetchRewards()]);
   } catch (error) {
