@@ -19,6 +19,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  backgroundColor: {
+    type: String,
+    default: "backgroundDarken",
+  },
 });
 
 const emit = defineEmits([
@@ -222,7 +226,7 @@ const handleViewRegisteredEvent = async () => {
 
 <template>
   <v-card
-    color="backgroundDarken"
+    :color="props.backgroundColor"
     class="cardContainer pa-0 ma-1"
     @click="handleClick"
   >
@@ -283,7 +287,7 @@ const handleViewRegisteredEvent = async () => {
                 rounded="xl"
                 @click="emit('incomplete', flightPlanItem)"
               >
-                Incomplete
+                Start
                 <v-icon right class="pl-1">mdi-upload</v-icon>
               </v-btn>
               <v-btn

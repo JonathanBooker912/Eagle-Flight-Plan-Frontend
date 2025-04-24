@@ -115,10 +115,6 @@ const handleSelectAll = () => {
 };
 
 const handleBatchDelete = async () => {
-  if (!isAdmin.value) {
-    console.error("Only admins can delete notifications");
-    return;
-  }
   try {
     await Promise.all(
       selectedNotificationsStore.selectedNotificationIds.map((id) =>
