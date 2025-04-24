@@ -274,12 +274,13 @@ onMounted(async () => {
           <v-row
             v-if="strengths && strengths.length > 0"
             class="strengths-list"
+            style="margin: 0; padding: 0"
           >
             <v-col
               v-for="(item, index) in strengths.slice(0, 5)"
               :key="index"
               cols="12"
-              style="padding: 0px 10px"
+              style="padding: 0; margin: 0"
             >
               <StrengthCard :strength="item" />
             </v-col>
@@ -328,5 +329,15 @@ onMounted(async () => {
 .pagination {
   margin-top: 20px;
   padding: 10px 0;
+}
+
+.strengths-list {
+  margin: 0;
+  padding: 0;
+}
+
+.strengths-list .v-col {
+  margin: 0;
+  padding: 0;
 }
 </style>
