@@ -5,7 +5,6 @@ import { ref, onMounted, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import rewardServices from "../../../services/rewardServices";
 import studentServices from "../../../services/studentServices";
-import notificationServices from "../../../services/notificationServices";
 import CardHeader from "../../../components/CardHeader.vue";
 import CardTable from "../../../components/CardTable.vue";
 import RewardCard from "../../../components/cards/RewardCard.vue";
