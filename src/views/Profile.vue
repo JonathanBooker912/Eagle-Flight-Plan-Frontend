@@ -6,7 +6,6 @@ import strengthServices from "../services/strengthServices";
 import badgeServices from "../services/badgeServices";
 import userServices from "../services/userServices";
 import studentServices from "../services/studentServices";
-import majorServices from "../services/majorServices";
 import StrengthCard from "../components/cards/StrengthCard.vue";
 import BadgeCard from "../components/cards/BadgeCard.vue";
 import { userStore } from "../stores/userStore";
@@ -108,22 +107,15 @@ const toFlightPlan = () => {
   router.push({ name: "student-flightPlan" });
 };
 
-const getMajor = async (majorId) => {
-  try {
-    const res = await majorServices.getMajor(majorId);
-    selectedMajor.value = res.data;
-    console.log(selectedMajor.value);
-  } catch (err) {
-    console.error("Error fetching major:", err);
-  }
-};
-
 const getStudent = async (userId) => {
   try {
     const res = await studentServices.getStudentForUserId(userId);
     selectedStudent.value = res.data;
     if (selectedStudent.value.id) {
-      await getMajor(selectedStudent.value.id);
+      // Get majors from the student response
+      if (selectedStudent.value.majors) {
+        selectedMajor.value = selectedStudent.value.majors;
+      }
     }
   } catch (err) {
     console.error("Error fetching student:", err);
@@ -193,8 +185,8 @@ onMounted(async () => {
             {{ link.websiteName }}
           </p>
         </v-col>
-        <v-col cols="3" class="d-flex flex-column justify-center text-left">
-          <p class="text-subtitle-1">{{ selectedMajor.name }}</p>
+        <v-col cols="4" class="d-flex flex-column justify-center text-left">
+          <p class="text-subtitle-1">{{ selectedMajor.map(major => major.name).join(', ') }}</p>
           <a style="text-align: left !important">
             {{ selectedUser.email }}
           </a>
