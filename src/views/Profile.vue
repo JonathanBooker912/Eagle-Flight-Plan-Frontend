@@ -130,6 +130,12 @@ const saveDescription = async () => {
 
 const saveLink = async () => {
   try {
+    // Validate URL
+    let url = editedLink.value.link;
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      url = "https://" + url;
+    }
+
     if (editingLinkIndex.value === -1) {
       // Check if we've reached the maximum number of links
       if (links.value.length >= 3) {
@@ -141,15 +147,18 @@ const saveLink = async () => {
       const newLink = await linkServices.createLink({
         userId: route.params.userId,
         websiteName: editedLink.value.websiteName,
-        link: editedLink.value.link
+        link: url,
       });
       links.value.push(newLink.data);
     } else {
       // Update existing link
-      const updatedLink = await linkServices.updateLink(links.value[editingLinkIndex.value].id, {
-        websiteName: editedLink.value.websiteName,
-        link: editedLink.value.link
-      });
+      const updatedLink = await linkServices.updateLink(
+        links.value[editingLinkIndex.value].id,
+        {
+          websiteName: editedLink.value.websiteName,
+          link: url,
+        },
+      );
       links.value[editingLinkIndex.value] = updatedLink.data;
     }
     editLinkDialog.value = false;
@@ -183,10 +192,10 @@ const getStudent = async (userId) => {
     selectedStudent.value = res.data;
     if (selectedStudent.value.id) {
       // Get majors from the student response
-      console.log('Student data:', selectedStudent.value);
+      console.log("Student data:", selectedStudent.value);
       if (selectedStudent.value.majors) {
         selectedMajor.value = selectedStudent.value.majors;
-        console.log('Majors:', selectedMajor.value);
+        console.log("Majors:", selectedMajor.value);
       }
     }
   } catch (err) {
@@ -229,12 +238,12 @@ onMounted(async () => {
             class="profile-pic"
             style="
               position: absolute;
-              top: -20px;
+              top: 20px;
               z-index: 10000;
               border-radius: 50%;
             "
           />
-          <div style="margin-top: 160px">
+          <div style="margin-top: 180px">
             <p class="text-h6 font-weight-bold">
               {{ selectedUser.fullName }}
             </p>
@@ -244,45 +253,74 @@ onMounted(async () => {
         <v-col cols="4" class="d-flex flex-column justify-center">
           <div class="d-flex align-center">
             <h3 style="text-align: left">About Me:</h3>
-            <v-icon v-if="isOwnProfile" class="ml-2" @click="editDialog = true">mdi-pencil</v-icon>
+            <v-icon v-if="isOwnProfile" class="ml-2" @click="editDialog = true"
+              >mdi-pencil</v-icon
+            >
           </div>
-          <p style="text-align: left; display: flex; font-size: 18px">
+          <p
+            style="
+              text-align: left;
+              display: flex;
+              font-size: 18px;
+              margin-top: 8px;
+            "
+          >
             {{ selectedUser.profileDescription }}
           </p>
         </v-col>
         <v-col cols="4" class="d-flex flex-column justify-center">
           <div class="contact-info">
-            <div class="d-flex align-center mb-2">
+            <div class="d-flex align-center mb-1">
               <v-icon class="mr-2">mdi-email</v-icon>
-              <a :href="'mailto:' + selectedUser.email" class="text-decoration-none">
+              <a
+                :href="'mailto:' + selectedUser.email"
+                class="text-decoration-none link-text"
+                target="_blank"
+              >
                 {{ selectedUser.email }}
               </a>
             </div>
-            <div v-for="(link, index) in links.slice(0, 3)" :key="index" class="d-flex align-center mb-2">
+            <div
+              v-for="(link, index) in links.slice(0, 3)"
+              :key="index"
+              class="d-flex align-center mb-1"
+            >
               <v-icon class="mr-2">mdi-link</v-icon>
               <div class="d-flex align-center link-container">
-                <a :href="link.link" target="_blank" class="text-decoration-none">
-                  {{ link.websiteName }}
-                </a>
-                <div v-if="isOwnProfile" class="ml-2">
-                  <v-icon size="small" @click="openEditLinkDialog(index)" class="mr-1">mdi-pencil</v-icon>
-                  <v-icon size="small" @click="deleteLink(index)">mdi-delete</v-icon>
+                <span class="website-name">{{ link.websiteName }}</span>
+                <div class="d-flex align-center">
+                  <a
+                    :href="link.link"
+                    target="_blank"
+                    class="text-decoration-none visit-link"
+                  >
+                    Visit
+                  </a>
+                  <div v-if="isOwnProfile" class="ml-2">
+                    <v-icon
+                      size="small"
+                      @click="openEditLinkDialog(index)"
+                      class="mr-1"
+                      >mdi-pencil</v-icon
+                    >
+                    <v-icon size="small" @click="deleteLink(index)"
+                      >mdi-delete</v-icon
+                    >
+                  </div>
                 </div>
               </div>
             </div>
-            <v-btn 
-              v-if="isOwnProfile && links.length < 3" 
-              color="primary" 
-              variant="text" 
-              @click="openEditLinkDialog()" 
-              class="mt-2"
+            <v-btn
+              v-if="isOwnProfile && links.length < 3"
+              color="primary"
+              variant="text"
+              @click="openEditLinkDialog()"
+              class="mt-1"
               prepend-icon="mdi-plus"
+              size="small"
             >
               Add Link
             </v-btn>
-            <p v-else-if="isOwnProfile && links.length >= 3" class="text-caption mt-2">
-              Maximum of 3 links reached
-            </p>
           </div>
         </v-col>
         <v-col cols="1" class="d-flex align-right">
@@ -407,7 +445,9 @@ onMounted(async () => {
 
   <v-dialog v-model="editLinkDialog" max-width="500px">
     <v-card>
-      <v-card-title>{{ editingLinkIndex === -1 ? 'Add Link' : 'Edit Link' }}</v-card-title>
+      <v-card-title>{{
+        editingLinkIndex === -1 ? "Add Link" : "Edit Link"
+      }}</v-card-title>
       <v-card-text>
         <v-text-field
           v-model="editedLink.websiteName"
@@ -425,9 +465,7 @@ onMounted(async () => {
         <v-btn color="primary" variant="text" @click="editLinkDialog = false">
           Cancel
         </v-btn>
-        <v-btn color="primary" variant="text" @click="saveLink">
-          Save
-        </v-btn>
+        <v-btn color="primary" variant="text" @click="saveLink"> Save </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -445,8 +483,9 @@ onMounted(async () => {
 .topBar {
   width: 100%;
   margin-right: 2vw;
-  height: 25vh; /* Allows it to grow dynamically */
+  height: 30vh;
   max-width: 100%;
+  padding: 20px;
 }
 
 .adminItem {
@@ -465,7 +504,7 @@ onMounted(async () => {
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .link-container {
@@ -478,6 +517,7 @@ onMounted(async () => {
 .link-container a {
   color: inherit;
   transition: color 0.2s;
+  font-size: 14px;
 }
 
 .link-container a:hover {
@@ -486,8 +526,10 @@ onMounted(async () => {
 
 .v-icon {
   color: var(--v-primary-base);
+  font-size: 18px;
+}
 
-  .strengths-list {
+.strengths-list {
   margin: 0;
   padding: 0;
 }
@@ -495,5 +537,35 @@ onMounted(async () => {
 .strengths-list .v-col {
   margin: 0;
   padding: 0;
+}
+
+.link-text {
+  color: #1976d2; /* Material Design Blue */
+  font-size: 14px;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.link-text:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.website-name {
+  font-size: 14px;
+  color: inherit;
+}
+
+.visit-link {
+  color: #1976d2;
+  font-size: 14px;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+  margin-left: 8px;
+}
+
+.visit-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 </style>
