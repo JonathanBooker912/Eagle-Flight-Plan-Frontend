@@ -7,7 +7,7 @@ import {
   fileTypeRule,
 } from "../../../utils/formValidators";
 import rewardServices from "../../../services/rewardServices";
-
+import fileServices from "../../../services/fileServices";
 // Define statements for vue
 const props = defineProps({
   isAdd: Boolean,
@@ -48,8 +48,9 @@ const handleSubmit = async () => {
 
 const uploadImage = async () => {
   if (!image.value) return;
-  const response = await rewardServices.uploadRewardImage({
-    image: image.value,
+  const response = await fileServices.uploadFile({
+    file: image.value,
+    folder: "photos",
   });
   formData.value.imageName = response.data.fileName;
 };
@@ -60,12 +61,12 @@ const handleImageUpdate = async () => {
   }
   // Case where image is changed
   else if (image.value && formData.value.imageName !== image.value.name) {
-    await rewardServices.deleteRewardImage(formData.value.imageName);
+    await fileServices.deleteFileForName(formData.value.imageName);
     await uploadImage();
   }
   // Case where image is deleted
   else if (!image.value && formData.value.imageName) {
-    await rewardServices.deleteRewardImage(formData.value.imageName);
+    await fileServices.deleteFileForName(formData.value.imageName);
     formData.value.imageName = null;
   }
   formData.value.image = undefined;
