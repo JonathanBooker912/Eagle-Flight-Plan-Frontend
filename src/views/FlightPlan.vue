@@ -375,8 +375,8 @@ watch([page, searchQuery], fetchFlightPlanAndItems);
       >
     </v-container>
     <CardHeader
+      :key="selectedFlightPlan"
       :export-calendar-button="hasRegisteredEvents"
-      :add-button="selectedFlightPlan == flightPlans[0] ? true : false"
       @add="handleAdd"
       @changed="handleSearchChange"
       @toggle-filters="showFilters = !showFilters"
