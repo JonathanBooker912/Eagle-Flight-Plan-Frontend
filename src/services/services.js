@@ -30,24 +30,24 @@ const apiClient = axios.create({
     return JSON.stringify(data);
   },
   transformResponse: function (data) {
-    data = JSON.parse(data);
-    // if (!data.success && data.code == "expired-session") {
-    //   localStorage.deleteItem("user");
-    // }
-    if (data.message !== undefined && data.message.includes("Unauthorized")) {
-      AuthServices.logoutUser(Utils.getStore("user"))
-        .then((response) => {
-          console.log(response);
-          Utils.removeItem("user");
-          Router.push({ name: "login" });
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
-      // Utils.removeItem("user")
+    try {
+      data = JSON.parse(data);
+      if (data.message !== undefined && data.message.includes("Unauthorized")) {
+        AuthServices.logoutUser(Utils.getStore("user"))
+          .then((response) => {
+            console.log(response);
+            Utils.removeItem("user");
+            Router.push({ name: "login" });
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+      }
+      return data;
+    } catch (error) {
+      console.error("Error parsing response:", error);
+      return { error: "Invalid response from server" };
     }
-    // console.log(Utils.getStore("user"))
-    return data;
   },
 });
 

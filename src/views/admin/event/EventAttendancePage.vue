@@ -9,6 +9,8 @@ import ListTable from "../../../components/ListTable.vue";
 import ListTableHeader from "../../../components/ListTableHeader.vue";
 import { useSelectedStudentsStore } from "../../../stores/selectedStudents";
 import AttendanceStudentRow from "../../../components/AttendanceStudentRow.vue";
+import userServices from "../../../services/userServices";
+import studentServices from "../../../services/studentServices";
 
 const selectedStudentsStore = useSelectedStudentsStore();
 
@@ -24,6 +26,11 @@ const itemsPerPage = 5;
 const showImportDialog = ref(false);
 const csvFile = ref(null);
 const csvData = ref([]);
+const snackbar = ref({
+  show: false,
+  message: "",
+  color: "success",
+});
 
 const count = computed(() => Math.ceil(students.value.length / itemsPerPage));
 
@@ -66,18 +73,37 @@ const getRegisteredStudents = async () => {
 };
 
 const getData = async () => {
-  event.value = (await eventServices.getEvent(route.params.id)).data;
-  eventId.value = event.value.id;
+  try {
+    event.value = (await eventServices.getEvent(route.params.id)).data;
+    eventId.value = event.value.id;
 
-  const registeredStudents = await getRegisteredStudents();
-  students.value = registeredStudents.map((student) => ({
-    fName: student.user?.fName ?? "Unknown",
-    lName: student.user?.lName ?? "Unknown",
-    studentId: student.studentId ?? "N/A",
-    recordedTime: student.recordedTime ?? null,
-    attendedStatus: student.attendedStatus,
-    eventId: eventId.value,
-  }));
+    const registeredStudents = await getRegisteredStudents();
+    students.value = registeredStudents.map((student) => ({
+      fName: student.user?.fName ?? "Unknown",
+      lName: student.user?.lName ?? "Unknown",
+      studentId: student.studentId ?? "N/A",
+      recordedTime: student.recordedTime ?? null,
+      attendedStatus: student.attendedStatus,
+      eventId: eventId.value,
+      id: student.id, // Add the student ID to the mapped data
+    }));
+
+    // Show success message if we have students
+    if (students.value.length > 0) {
+      snackbar.value = {
+        show: true,
+        message: `Successfully loaded ${students.value.length} students`,
+        color: "success",
+      };
+    }
+  } catch (error) {
+    console.error("Error loading students:", error);
+    snackbar.value = {
+      show: true,
+      message: "Error loading students. Please try again.",
+      color: "error",
+    };
+  }
 };
 
 onMounted(async () => {
@@ -140,6 +166,9 @@ const submitImport = async () => {
           email: row["Email Address"],
           checkedIn: row["Checked In"],
           eventId: eventId.value,
+          fullName: `${row["First Name"]} ${row["Last Name"]}`,
+          fName: row["First Name"],
+          lName: row["Last Name"],
         };
       });
 
@@ -158,6 +187,69 @@ const submitImport = async () => {
       return acc;
     }, []);
 
+    // For each unique record, check if user exists and create if needed
+    for (const record of uniqueData) {
+      try {
+        let userId;
+        try {
+          // Check if user exists
+          const userResponse = await userServices.getUserByEmail(record.email);
+          userId = userResponse.data?.id;
+        } catch (error) {
+          if (error.response?.status === 404) {
+            // User not found, create new user
+            const newUserResponse = await userServices.createUser({
+              email: record.email,
+              fName: record.fName,
+              lName: record.lName,
+              fullName: record.fullName,
+            });
+            userId = newUserResponse.data.id;
+
+            // Create new student for the user
+            try {
+              console.log("Creating student for user:", userId);
+              const studentResponse = await studentServices.createStudent({
+                userId: userId,
+                graduationDate: new Date(new Date().getFullYear() + 4, 0, 1), // Default to 4 years from now
+                pointsAwarded: 0,
+                pointsUsed: 0,
+              });
+
+              console.log("Student creation response:", studentResponse);
+
+              if (!studentResponse.data?.id) {
+                throw new Error(
+                  "Failed to create student record - no student ID returned",
+                );
+              }
+
+              // Add student ID to the record
+              record.studentId = studentResponse.data.id;
+            } catch (studentError) {
+              console.error("Error creating student:", studentError);
+              throw new Error(
+                `Failed to create student: ${studentError.message}`,
+              );
+            }
+          } else {
+            throw error;
+          }
+        }
+
+        // Add userId to the record for attendance
+        record.userId = userId;
+      } catch (error) {
+        console.error(`Error processing user ${record.email}:`, error);
+        snackbar.value = {
+          show: true,
+          message: `Error processing user ${record.email}: ${error.message}`,
+          color: "error",
+        };
+        continue; // Skip this record but continue with others
+      }
+    }
+
     // Send to backend
     await eventServices.importAttendance(uniqueData);
 
@@ -166,8 +258,20 @@ const submitImport = async () => {
     showImportDialog.value = false;
     csvFile.value = null;
     csvData.value = [];
+
+    // Show success message
+    snackbar.value = {
+      show: true,
+      message: "Attendance imported successfully!",
+      color: "success",
+    };
   } catch (error) {
     console.error("Import error:", error);
+    snackbar.value = {
+      show: true,
+      message: `Import failed: ${error.message}`,
+      color: "error",
+    };
   }
 };
 </script>
@@ -250,4 +354,13 @@ const submitImport = async () => {
       </template>
     </ListTable>
   </v-container>
+
+  <v-snackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    :timeout="3000"
+    location="top"
+  >
+    {{ snackbar.message }}
+  </v-snackbar>
 </template>
